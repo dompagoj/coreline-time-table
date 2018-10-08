@@ -1,0 +1,26 @@
+{
+  "extends": ["tslint:latest", "tslint-eslint-rules", "tslint-react"],
+  "defaultSeverity": "warning",
+  "rules": {
+    "quotemark": [true, "single", "jsx-double"],
+    "eofline": true,
+    "semicolon": [true, "never"],
+    "jsx-boolean-value": false,
+    "no-implicit-dependencies": false,
+    "indent": [true, "spaces", 2],
+    "object-literal-sort-keys": false,
+    "jsx-no-lambda": false,
+    "interface-name": false,
+    "jsx-no-multiline-js": false
+  },
+  "linterOptions": {
+    "exclude": [
+      "config/**/*.js",
+      "node_modules/**/*.ts",
+      "coverage/lcov-report/*.js",
+      "src/registerServiceWorker.ts",
+      "./config-overrides.js",
+      "public/main.js"
+    ]
+  }
+}
