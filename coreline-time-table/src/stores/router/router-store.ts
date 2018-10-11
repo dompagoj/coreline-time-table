@@ -12,7 +12,7 @@ export class MobxRouterStore extends RouterStore {
 
   @action.bound
   public gotoHome() {
-    this.history.push('/home')
+    this.history.push('/')
   }
 }
 

@@ -11,13 +11,12 @@
     "object-literal-sort-keys": false,
     "jsx-no-lambda": false,
     "interface-name": false,
-    "jsx-no-multiline-js": false
+    "jsx-no-multiline-js": false,
+    "arrow-parens": false
   },
   "linterOptions": {
     "exclude": [
-      "config/**/*.js",
-      "node_modules/**/*.ts",
-      "coverage/lcov-report/*.js",
+      "node_modules/",
       "src/registerServiceWorker.ts",
       "./config-overrides.js",
       "public/main.js"

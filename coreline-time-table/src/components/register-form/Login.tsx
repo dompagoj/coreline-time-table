@@ -24,6 +24,7 @@ export class Login extends React.Component {
           values: Values,
           { setSubmitting }: FormikActions<Values>,
         ) => {
+          routerStore.gotoHome()
           setSubmitting(false)
         }}
         render={this.renderForm}
@@ -31,7 +32,7 @@ export class Login extends React.Component {
     )
   }
   public goToHome = () => {
-    // routerStore.gotoHome()
+    routerStore.gotoHome()
   }
   public renderForm = (formik: FormikProps<Values>) => {
     const { handleChange, handleSubmit } = formik
@@ -45,6 +46,7 @@ export class Login extends React.Component {
                 <Input
                   onChange={handleChange}
                   name="email"
+                  placeholder="example@coreline.agency"
                   prefix={<Icon type="user" />}
                 />
               </FormItem>

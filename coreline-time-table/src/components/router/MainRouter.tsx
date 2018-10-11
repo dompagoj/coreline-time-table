@@ -7,10 +7,9 @@ import {
   withRouter,
 } from 'react-router-dom'
 
+import { Navbar } from '../navbar/Navbar'
 import { Login } from '../register-form/Login'
 import { isLoggedIn } from '../utils/auth'
-
-const hello = () => <div>Hello world!</div>
 
 export class MainRouterComponent extends React.Component<RouteComponentProps> {
   public render() {
@@ -19,9 +18,8 @@ export class MainRouterComponent extends React.Component<RouteComponentProps> {
     return (
       <>
         <Switch>
-          <Redirect exact path="/" to="/login" />
           <Route path="/login" component={Login} />
-          <Route path="/home" component={hello} />
+          <Route path="/" component={Navbar} />
         </Switch>
       </>
     )
