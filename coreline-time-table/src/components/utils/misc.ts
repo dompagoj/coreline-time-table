@@ -1,3 +1,3 @@
 export function inRange(value: number): number[] {
-  return Array.from(new Array(value).keys())
+  return new Array(value).fill(undefined).map((_, i) => i)
 }
