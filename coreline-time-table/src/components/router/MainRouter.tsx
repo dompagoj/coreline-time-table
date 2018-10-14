@@ -7,21 +7,17 @@ import {
   withRouter,
 } from 'react-router-dom'
 
-import { Navbar } from '../navbar/Navbar'
+import { MainLayout } from '../MainLayout'
 import { Login } from '../register-form/Login'
 import { isLoggedIn } from '../utils/auth'
 
 export class MainRouterComponent extends React.Component<RouteComponentProps> {
   public render() {
-    const { location } = this.props
-
     return (
-      <>
-        <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/" component={Navbar} />
-        </Switch>
-      </>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/" component={MainLayout} />
+      </Switch>
     )
   }
 }

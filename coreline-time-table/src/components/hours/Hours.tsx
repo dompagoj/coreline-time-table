@@ -1,11 +1,18 @@
-import { css } from 'emotion'
+import { Button } from 'antd'
+import { css, cx } from 'emotion'
 import * as moment from 'moment'
 import * as React from 'react'
 
 import { inRange } from '../utils/misc'
-
 const container = css`
   min-width: 400px;
+  height: 90%;
+`
+
+const rowContainer = css`
+  display: grid;
+  height: 100%;
+  grid: auto-flow / repeat(7, 1fr);
 `
 
 const dayContainer = css`
@@ -13,9 +20,16 @@ const dayContainer = css`
   border: 1px solid black;
   margin: -1px -1px 0 0;
   &:hover {
-    background-color: lightgray;
+    background-color: #4082ed;
   }
 `
+const disabledDayContainer = css`
+  padding: 10px;
+  border: 1px solid black;
+  margin: -1px -1px 0 0;
+  background-color: lightgray;
+`
+
 const dayContent = css`
   padding: 0 5px 0 0;
   text-align: end;
@@ -53,7 +67,6 @@ export class Hours extends React.Component<any, IState> {
       })
       .reverse()
 
-    // -1
     const daysAfter: number[] =
       this.state.month.endOf('month').isoWeekday() > 0
         ? inRange(
@@ -71,7 +84,7 @@ export class Hours extends React.Component<any, IState> {
     return (
       <div className={container}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <button
+          <Button
             onClick={() =>
               this.setState({
                 month: moment(this.state.month).add(-1, 'months'),
@@ -79,9 +92,9 @@ export class Hours extends React.Component<any, IState> {
             }
           >
             &lt;
-          </button>
+          </Button>
           <div>{this.state.month.format('MMM, YYYY')}</div>
-          <button
+          <Button
             onClick={() =>
               this.setState({
                 month: moment(this.state.month).add(1, 'months'),
@@ -89,7 +102,7 @@ export class Hours extends React.Component<any, IState> {
             }
           >
             &gt;
-          </button>
+          </Button>
         </div>
         <div className={header}>
           <div>Mon</div>
@@ -102,7 +115,7 @@ export class Hours extends React.Component<any, IState> {
         </div>
         <div className={rowContainer}>
           {daysBefore.map(day => (
-            <div key={day} className={dayContainer}>
+            <div key={day} className={disabledDayContainer}>
               <div className={dayContent}>{day + 1}</div>
             </div>
           ))}
@@ -112,7 +125,7 @@ export class Hours extends React.Component<any, IState> {
             </div>
           ))}
           {daysAfter.map(day => (
-            <div key={day} className={dayContainer}>
+            <div key={day} className={disabledDayContainer}>
               <div className={dayContent}>{day + 1}</div>
             </div>
           ))}
@@ -121,7 +134,3 @@ export class Hours extends React.Component<any, IState> {
     )
   }
 }
-const rowContainer = css`
-  display: grid;
-  grid: auto-flow 100px / repeat(7, 1fr);
-`
