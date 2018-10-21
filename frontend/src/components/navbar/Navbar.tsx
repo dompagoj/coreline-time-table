@@ -1,4 +1,5 @@
 import { Icon, Menu } from 'antd'
+import axios from 'axios'
 import { css } from 'emotion'
 import * as React from 'react'
 import Media from 'react-media'
@@ -36,10 +37,6 @@ export class Navbar extends React.Component {
         <Icon type="clock-circle" />
         Hours
       </Menu.Item>
-      <Menu.Item key="calendar">
-        <Icon type="calendar" />
-        Calendar
-      </Menu.Item>
     </Menu>
   )
   public renderMenuIcons = () => (
@@ -50,9 +47,6 @@ export class Navbar extends React.Component {
       <Menu.Divider />
       <Menu.Item key="hours">
         <Icon type="clock-circle" />
-      </Menu.Item>
-      <Menu.Item key="calendar">
-        <Icon type="calendar" />
       </Menu.Item>
     </Menu>
   )

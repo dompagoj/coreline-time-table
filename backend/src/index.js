@@ -1,3 +1,5 @@
-require('ts-node').register()
-require('./server/server.ts')
+require("ts-node").register();
+require("dotenv").config();
+require("reflect-metadata");
 
+require("./server/app");
