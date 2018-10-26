@@ -69,7 +69,7 @@ export class Hours extends React.Component<any, IState> {
           {daysBefore.map(day => (
             <div
               onClick={this.goToPrevMonth}
-              key={day}
+              key={`${day}-before`}
               className={styles.disabledDayContainer}
             >
               <div className={styles.dayContent}>{day + 1}</div>
@@ -77,6 +77,7 @@ export class Hours extends React.Component<any, IState> {
           ))}
           {days.map(day => (
             <Popconfirm
+              key={`${day}-current`}
               title="Title"
               placement="right"
               onConfirm={this.onConfirm}
@@ -84,7 +85,6 @@ export class Hours extends React.Component<any, IState> {
             >
               <div
                 onClick={this.handleDateSelect(day + 1)}
-                key={day}
                 className={styles.dayContainer}
               >
                 <div className={styles.dayContent}>
@@ -97,7 +97,7 @@ export class Hours extends React.Component<any, IState> {
           {daysAfter.map(day => (
             <div
               onClick={this.goToNextMonth}
-              key={day}
+              key={`${day}-after`}
               className={styles.disabledDayContainer}
             >
               <div className={styles.dayContent}>{day + 1}</div>
