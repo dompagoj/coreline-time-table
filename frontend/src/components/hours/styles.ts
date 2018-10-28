@@ -17,7 +17,8 @@ export const styles = {
     border: 1px solid black;
     margin: -1px -1px 0 0;
     &:hover {
-      background-color: #4082ed;
+      background-color: rgba(127, 176, 255, 0.65);
+      transition: 0.8s ease-out;
     }
   `,
   disabledDayContainer: css`
@@ -37,8 +38,11 @@ export const styles = {
     grid-template-columns: repeat(7, 1fr);
     justify-items: center;
   `,
-  day: css``,
+  day: css`
+    font-weight: 1000;
+    font-size: 20px;
+  `,
   content: css`
-    background-color: lightgreen;
+    border-bottom: 3px solid lightgreen;
   `,
 }

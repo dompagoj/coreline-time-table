@@ -1,14 +1,6 @@
-import * as express from 'express'
-import { User } from '../../entities/User'
+import { Router } from 'express'
+import { userRouter } from './UserRouter'
 
-export const mainRouter = express.Router()
+export const mainRouter = Router()
 
-mainRouter.post('create-user', async (req, res) => {
-  // TODO
-})
-mainRouter.get('', async (req, res) => {
-  const users = await User.find()
-  res.json({
-    users,
-  })
-})
+mainRouter.use('users', userRouter)
