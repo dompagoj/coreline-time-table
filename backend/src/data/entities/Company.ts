@@ -16,5 +16,5 @@ export class Company extends BaseEntity {
   public name: string
 
   @OneToMany(type => User, user => user.company)
-  public users: User[]
+  public users: Promise<User[]>
 }

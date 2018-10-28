@@ -1,5 +1,4 @@
 import { Request, Response, Router } from 'express'
-import { Route } from '../../data/types/routing'
 
 export abstract class BaseController {
   protected req: Request
@@ -19,7 +18,10 @@ export abstract class BaseController {
       .json(object)
       .end()
   }
-  protected badRequest() {
-    this.res.status(400).end()
+  protected badRequest(error?: string | object) {
+    if (error) {
+      return this.res.status(400).json(error)
+    }
+    return this.res.status(400).end()
   }
 }

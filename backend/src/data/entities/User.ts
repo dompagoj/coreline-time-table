@@ -24,8 +24,8 @@ export class User extends BaseEntity {
   @Column({ enum: UserType })
   public type: UserType
 
-  @ManyToOne(type => Company, company => company.users)
-  public company: Company
+  @ManyToOne(type => Company, company => company.users, { lazy: true })
+  public company: Promise<Company>
 
   @OneToMany(type => Hour, hour => hour.user)
   public hours: Hour[]
