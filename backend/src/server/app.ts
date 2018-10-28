@@ -40,7 +40,7 @@ async function bootstrap() {
     },
   })
 
-  app.use('/', mainRouter)
+  app.use('', mainRouter)
 
   app.listen(8000, () => {
     console.log('server started on port 8000!')
