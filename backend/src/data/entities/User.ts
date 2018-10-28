@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -24,9 +25,13 @@ export class User extends BaseEntity {
   @Column({ enum: UserType })
   public type: UserType
 
-  @ManyToOne(type => Company, company => company.users, { lazy: true })
+  @Column()
+  public companyId: number
+
+  @ManyToOne(type => Company, company => company.users, { nullable: false })
+  @JoinColumn({ name: 'company_id' })
   public company: Promise<Company>
 
   @OneToMany(type => Hour, hour => hour.user)
-  public hours: Hour[]
+  public hours: Promise<Hour[]>
 }

@@ -1,9 +1,15 @@
 import { Router } from 'express'
+import { GenericRequest, UserRequest } from '../../data/types/express'
+import { registerRoutes } from '../../utils/helper-functions'
 import { UserController } from '../controllers/UserController'
 
 export const userRouter = Router()
 
-UserController.registerRoutes(userRouter)
-// userRouter.get('/', (req, res) => {
-//   res.send('Hello world')
-// })
+userRouter.use((req: GenericRequest<UserRequest>, res, next) => {
+  console.log('req headers: ', req.headers)
+  // @ts-ignore
+  req.companyId = req.headers.companyid
+  next()
+})
+
+registerRoutes(userRouter, UserController)

@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,9 +17,13 @@ export class Hour extends BaseEntity {
   @Column()
   public amount: number
 
+  @Column()
+  public userId: number
+
   @Column({ type: 'date', default: new Date() })
   public date: Date
 
   @ManyToOne(type => User, user => user.hours)
-  public user: User
+  @JoinColumn({ name: 'user_id' })
+  public user: Promise<User>
 }
