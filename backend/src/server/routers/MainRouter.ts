@@ -7,6 +7,6 @@ export const mainRouter = Router()
 
 mainRouter.use('/companies', companyRouter)
 
-mainRouter.use('/users', userRouter)
+mainRouter.use('/companies/:companyId/users', userRouter)
 
 mainRouter.use('/companies/:companyId/users/:userId/hours', hourRouter)

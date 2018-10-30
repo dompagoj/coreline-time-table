@@ -10,27 +10,26 @@ import { BaseController } from './BaseController'
 
 export class UserController extends BaseController<UserRequest> {
   public static routes: Route[] = []
-  private companyId: number
 
   constructor(req: GenericRequest<UserRequest>, res: Response) {
     super(req, res)
-    this.companyId = req.companyId
   }
   @GET('/')
   public async all() {
-    console.log('company id', this.req.companyId)
+    const { companyId } = this.req.params
     const users = await User.find({
-      where: { companyId: this.companyId },
+      where: { companyId },
     })
 
     return this.accepted(users)
   }
   @GET('/:id')
   public async one() {
+    const { companyId } = this.req.params
     const user = await User.findOne({
       where: {
         id: this.req.params.id,
-        companyId: this.companyId,
+        companyId,
       },
     })
 
