@@ -1,7 +1,5 @@
-import { Response } from 'express'
-
 import { User } from '../../data/entities/User'
-import { GenericRequest, UserRequest } from '../../data/types/express'
+import { UserRequest } from '../../data/types/express'
 import { Route } from '../../data/types/routing'
 import { UserCreateInput } from '../../data/types/UserTypes'
 import { validateInput } from '../../utils/helper-functions'
@@ -11,7 +9,7 @@ import { BaseController } from './BaseController'
 export class UserController extends BaseController<UserRequest> {
   public static routes: Route[] = []
 
-  constructor(req: GenericRequest<UserRequest>, res: Response) {
+  constructor(req, res) {
     super(req, res)
   }
   @GET('/')

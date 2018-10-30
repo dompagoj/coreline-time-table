@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { GenericRequest, UserRequest } from '../../data/types/express'
 import { registerRoutes } from '../../utils/helper-functions'
 import { UserController } from '../controllers/UserController'
 
