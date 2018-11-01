@@ -14,6 +14,11 @@ export function strToBool(str: string): boolean {
 
 export function registerRoutes(router: Router, Controller: any) {
   Controller.routes.forEach(route => {
+    if (route.middlewares.before) {
+    route.middlewares.before.forEach(middleware => {
+      router[route.method](route.route, middleware)
+    })
+  }
     router[route.method](route.route, (req, res) => {
       const controller = new Controller(req, res)
       const result = controller[route.action]()
@@ -21,6 +26,11 @@ export function registerRoutes(router: Router, Controller: any) {
         result.then().catch(e => console.error(e))
       }
     })
+    if (route.middlewares.after) {
+    route.middlewares.after.forEach(middleware => {
+      router[route.method](route.route, middleware)
+    })
+  }
   })
 }
 

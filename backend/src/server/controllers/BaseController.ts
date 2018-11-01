@@ -4,7 +4,7 @@ import { GenericRequest } from '../../data/types/express'
 export abstract class BaseController<T> {
   protected req: GenericRequest<T>
   protected res: Response
-  protected routeData: any
+  protected routeData
   protected url: string
 
   constructor(req: GenericRequest<T>, res: Response) {
