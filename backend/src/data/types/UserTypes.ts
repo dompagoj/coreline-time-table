@@ -1,38 +1,21 @@
-import { IsEnum, Length, Min, validate } from 'class-validator'
+import { IsEnum, IsString, Length, Min, ValidateIf } from 'class-validator'
 
-import { Company } from '../entities/Company'
 import { UserType } from '../enums/UserType'
 
-export class UserCreateInput {
+export class UserInput {
   @Length(5, 20)
-  private username: string
+  public username: string
 
   @IsEnum(UserType)
-  private type: UserType
+  public type: UserType
 
-  @Min(0)
-  private companyId: number
+  @ValidateIf(o => !!o)
+  @IsString()
+  public googleToken?: string | null
 
-  private googleToken?: string | null
-
-  public constructor(
-    username: string,
-    type: UserType,
-    companyId: number,
-    googleToken?: string | null,
-  ) {
+  public constructor({ username, type, googleToken }: UserInput) {
     this.username = username
     this.type = type
-    this.companyId = companyId
     this.googleToken = googleToken
-  }
-
-  public getFields(company) {
-    return {
-      username: this.username,
-      type: this.type,
-      company: Promise.resolve(company),
-      googleToken: this.googleToken,
-    }
   }
 }

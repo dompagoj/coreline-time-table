@@ -1,9 +1,12 @@
 import { Router } from 'express'
+import { registerUser } from '../middlewares/auth'
 import { companyRouter } from './companyRouter'
 import { hourRouter } from './hourRouter'
 import { userRouter } from './UserRouter'
 
 export const mainRouter = Router()
+
+mainRouter.use('/', registerUser())
 
 mainRouter.use('/companies', companyRouter)
 

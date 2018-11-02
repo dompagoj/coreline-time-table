@@ -1,46 +1,39 @@
 import { User } from '../../data/entities/User'
-import { UserRequest } from '../../data/types/express'
-import { Route } from '../../data/types/routing'
-import { UserCreateInput } from '../../data/types/UserTypes'
-import { validateInput } from '../../utils/helper-functions'
+import { Context } from '../../data/types/Context'
+import { UserInput } from '../../data/types/UserTypes'
 import { DELETE, GET, POST } from '../controller-decorators'
+import { validateBody } from '../middlewares/validate-body'
 import { BaseController } from './BaseController'
 
-export class UserController extends BaseController<UserRequest> {
-  public static routes: Route[] = []
-
-  constructor(req, res) {
-    super(req, res)
+export class UserController extends BaseController<Context, { companyId: string }> {
+  constructor(req, res, next) {
+    super(req, res, next)
   }
+
   @GET('/')
   public async all() {
-    const { companyId } = this.req.params
+    const { companyId } = this.routeData
     const users = await User.find({
       where: { companyId },
     })
-
-    return this.accepted(users)
+    this.accepted(users)
   }
   @GET('/:id')
   public async one() {
-    const { companyId } = this.req.params
+    const { companyId } = this.routeData
+    const { id } = this.req.params
     const user = await User.findOne({
       where: {
-        id: this.req.params.id,
+        id,
         companyId,
       },
     })
 
     return this.accepted(user)
   }
-  @POST('/')
-  public async create() {
-    const { type, username, companyId } = this.req.body
-    const userInput = new UserCreateInput(username, type, companyId)
-    const { errors } = await validateInput(userInput)
-    if (errors) {
-      return this.badRequest(errors)
-    }
+  @POST('/', { before: validateBody(UserInput) })
+  public async create({ type, username }: UserInput) {
+    const companyId = parseInt(this.routeData.companyId, 10)
     const user = await User.create({
       username,
       type,
@@ -51,8 +44,12 @@ export class UserController extends BaseController<UserRequest> {
   }
   @DELETE('/:id')
   public async delete() {
-    const deletedUser = await User.delete(this.req.params.id)
-
-    return this.accepted(deletedUser)
+    User.delete(this.req.params.id)
+      .then(() => {
+        return this.accepted()
+      })
+      .catch(() => {
+        return this.badRequest()
+      })
   }
 }

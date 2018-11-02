@@ -1,7 +1,3 @@
-import { Request } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
-export interface UserRequest {
-  companyId: string
-}
-
-export type GenericRequest<T> = T & Request
+export type ExpressFunction = (req: Request, res: Response, next: NextFunction) => any

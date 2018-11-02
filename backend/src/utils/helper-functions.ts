@@ -14,24 +14,31 @@ export function strToBool(str: string): boolean {
 
 export function registerRoutes(router: Router, Controller: any) {
   Controller.routes.forEach(route => {
-    if (route.middlewares.before) {
-    route.middlewares.before.forEach(middleware => {
-      router[route.method](route.route, middleware)
-    })
-  }
-    router[route.method](route.route, (req, res) => {
-      const controller = new Controller(req, res)
-      const result = controller[route.action]()
+    const { before, after } = route.middlewares
+    if (before) {
+      before instanceof Array
+        ? before.forEach(middleware => {
+            router[route.method](route.route, middleware)
+          })
+        : router[route.method](route.route, before)
+    }
+    router[route.method](route.route, (req, res, next) => {
+      const controller = new Controller(req, res, next)
+      const result = controller[route.action](req.body, req.ctx)
       if (result instanceof Promise) {
+        // tslint:disable-next-line
         result.then().catch(e => console.error(e))
       }
     })
-    if (route.middlewares.after) {
-    route.middlewares.after.forEach(middleware => {
-      router[route.method](route.route, middleware)
-    })
-  }
+    if (after) {
+      after instanceof Array
+        ? route.middlewares.after.forEach(middleware => {
+            router[route.method](route.route, middleware)
+          })
+        : router[route.method](route.route, after)
+    }
   })
+  Controller.routes = null
 }
 
 export async function validateInput(instance: any) {

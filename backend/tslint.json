@@ -1,6 +1,6 @@
 {
   "extends": ["tslint:latest", "tslint-eslint-rules"],
-  "defaultSeverity": "warning",
+  "defaultSeverity": "error",
   "rules": {
     "quotemark": [true, "single"],
     "eofline": true,
@@ -12,8 +12,6 @@
     "arrow-parens": false
   },
   "linterOptions": {
-    "exclude": [
-      "node_modules/"
-    ]
+    "exclude": ["node_modules/"]
   }
 }

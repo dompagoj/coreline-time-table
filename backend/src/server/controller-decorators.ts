@@ -7,8 +7,8 @@ export function GET(route: string, options?: DecoratorOptions) {
       method: 'get',
       action: methodName,
       middlewares: {
-        before: options && options.before || null,
-        after: options && options.after || null,
+        before: (options && options.before) || null,
+        after: (options && options.after) || null,
       },
     })
   }
@@ -21,10 +21,9 @@ export function POST(route: string, options?: DecoratorOptions) {
       method: 'post',
       action: methodName,
       middlewares: {
-        before: options && options.before || null,
-        after: options && options.after || null,
+        before: (options && options.before) || null,
+        after: (options && options.after) || null,
       },
-
     })
   }
 }
@@ -36,10 +35,9 @@ export function PUT(route: string, options?: DecoratorOptions) {
       method: 'put',
       action: methodName,
       middlewares: {
-        before: options && options.before || null,
-        after: options && options.after || null,
+        before: (options && options.before) || null,
+        after: (options && options.after) || null,
       },
-
     })
   }
 }
@@ -51,10 +49,9 @@ export function DELETE(route: string, options?: DecoratorOptions) {
       method: 'delete',
       action: methodName,
       middlewares: {
-        before: options && options.before || null,
-        after: options && options.after || null,
+        before: (options && options.before) || null,
+        after: (options && options.after) || null,
       },
-
     })
   }
 }
