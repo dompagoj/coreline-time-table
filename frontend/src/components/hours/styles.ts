@@ -40,9 +40,20 @@ export const styles = {
   `,
   day: css`
     font-weight: 1000;
-    font-size: 20px;
+    font-size: 18px;
   `,
   content: css`
     border-bottom: 3px solid lightgreen;
+  `,
+  today: css`
+    display: flex;
+    justify-content: center;
+    color: white;
+    width: 25%;
+    margin-left: auto;
+    font-weight: 1000;
+    font-size: 19px;
+    background-color: red;
+    border-radius: 25px;
   `,
 }

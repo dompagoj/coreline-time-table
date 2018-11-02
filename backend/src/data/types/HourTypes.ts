@@ -6,10 +6,17 @@ export class HourInput {
   @Min(0)
   public id?: ID
 
+  @ValidateIf(o => !!o)
   @Min(0)
   @Max(12)
-  public amount: number
+  public amount?: number
 
   @IsDate()
   public date: Date
+
+  public constructor({ id, amount, date }: HourInput) {
+    this.id = id
+    this.amount = amount
+    this.date = date
+  }
 }

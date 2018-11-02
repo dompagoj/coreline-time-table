@@ -11,16 +11,12 @@
     "object-literal-sort-keys": false,
     "jsx-no-lambda": false,
     "no-console": false,
+    "newline-before-return": true,
     "interface-name": false,
     "jsx-no-multiline-js": false,
     "arrow-parens": false
   },
   "linterOptions": {
-    "exclude": [
-      "node_modules/",
-      "src/registerServiceWorker.ts",
-      "./config-overrides.js",
-      "public/main.js"
-    ]
+    "exclude": ["node_modules/", "src/registerServiceWorker.ts", "./config-overrides.js", "public/main.js"]
   }
 }

@@ -1,5 +1,4 @@
 import { Button, message, Popconfirm } from 'antd'
-import { css, cx } from 'emotion'
 import * as moment from 'moment'
 import * as React from 'react'
 
@@ -67,12 +66,10 @@ export class Hours extends React.Component<any, IState> {
         </div>
         <div className={styles.rowContainer}>
           {daysBefore.map(day => (
-            <div
-              onClick={this.goToPrevMonth}
-              key={`${day}-before`}
-              className={styles.disabledDayContainer}
-            >
-              <div className={styles.dayContent}>{day + 1}</div>
+            <div onClick={this.goToPrevMonth} key={`${day}-before`} className={styles.disabledDayContainer}>
+              <div className={styles.dayContent}>
+                <div className={styles.day}>{day + 1}</div>
+              </div>
             </div>
           ))}
           {days.map(day => (
@@ -83,35 +80,31 @@ export class Hours extends React.Component<any, IState> {
               onConfirm={this.onConfirm}
               onCancel={this.onCancel}
             >
-              <div
-                onClick={this.handleDateSelect(day + 1)}
-                className={styles.dayContainer}
-              >
+              <div onClick={this.handleDateSelect(day + 1)} className={styles.dayContainer}>
                 <div className={styles.dayContent}>
-                  <div className={styles.day}>{day + 1}</div>
+                  <div className={this.isToday(day + 1) ? styles.today : styles.day}>{day + 1}</div>
                   <div className={styles.content}> 8 hours </div>
                 </div>
               </div>
             </Popconfirm>
           ))}
           {daysAfter.map(day => (
-            <div
-              onClick={this.goToNextMonth}
-              key={`${day}-after`}
-              className={styles.disabledDayContainer}
-            >
-              <div className={styles.dayContent}>{day + 1}</div>
+            <div onClick={this.goToNextMonth} key={`${day}-after`} className={styles.disabledDayContainer}>
+              <div className={styles.dayContent}>
+                <div className={styles.day}>{day + 1}</div>
+              </div>
             </div>
           ))}
         </div>
       </div>
     )
   }
+  public isToday = day => {
+    return moment().date() === day
+  }
   public handleDateSelect = day => () => {
     const { currDate } = this.state
-    const selectedDay = moment(
-      new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`),
-    )
+    const selectedDay = moment(new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`))
   }
   public onConfirm = () => {
     message.success('Confirmed')
