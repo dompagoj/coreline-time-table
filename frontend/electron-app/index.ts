@@ -1,13 +1,29 @@
-import * as electron from 'electron'
-const app = electron.app
-const BrowserWindow = electron.BrowserWindow
-
+import { app, BrowserWindow, ipcMain } from 'electron'
 import * as isDev from 'electron-is-dev'
-import * as path from 'path'
-import * as url from 'url'
+import { readFile, writeFile } from 'fs'
+import { join } from 'path'
+import { googleSignIn } from './google-login'
 
 let mainWindow
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
+
+// const data = {
+//   user: {
+//     username: 'dompanovic',
+//     password: 'test123',
+//   },
+// }
+// writeFile(`${app.getPath('userData')}/auth`, JSON.stringify(data), err => {
+//   console.log('ERR: ', err)
+// })
+
+// readFile(`${app.getPath('userData')}/auth`, (err, data) => {
+//   if (err) {
+//     return
+//   }
+//   const config = JSON.parse(data.toString('utf8'))
+//   console.log({ config })
+// })
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -15,20 +31,13 @@ function createWindow() {
     height: 680,
     minWidth: 500,
     minHeight: 500,
-    icon: path.join(__dirname, 'icons/coreline-logo.icns'),
+    icon: join(__dirname, 'icons/coreline-logo.icns'),
   })
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`,
-  )
+  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${join(__dirname, '../build/index.html')}`)
   mainWindow.on('closed', () => (mainWindow = null))
 
   if (isDev) {
-    const {
-      default: installExtension,
-      REACT_DEVELOPER_TOOLS,
-    } = require('electron-devtools-installer')
+    const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
 
     installExtension(REACT_DEVELOPER_TOOLS)
       .then(name => {
@@ -52,4 +61,9 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.on('login', async (event, arg) => {
+  const user = await googleSignIn()
+  event.sender.send('reply', user)
 })

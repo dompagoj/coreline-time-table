@@ -39,20 +39,21 @@ export const styles = {
     justify-items: center;
   `,
   day: css`
-    font-weight: 1000;
-    font-size: 18px;
+    font-weight: bold;
+    font-size: 16px;
   `,
   content: css`
     border-bottom: 3px solid lightgreen;
   `,
   today: css`
     display: flex;
+    padding: 0 10px;
     justify-content: center;
     color: white;
     width: 25%;
     margin-left: auto;
-    font-weight: 1000;
-    font-size: 19px;
+    font-weight: bold;
+    font-size: 17px;
     background-color: red;
     border-radius: 25px;
   `,

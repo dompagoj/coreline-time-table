@@ -1,6 +1,6 @@
 import { Icon, Menu } from 'antd'
-import axios from 'axios'
 import { css } from 'emotion'
+import { observer } from 'mobx-react'
 import * as React from 'react'
 import Media from 'react-media'
 
@@ -15,12 +15,11 @@ const menuStyleIcons = css`
   height: 100;
 `
 
+@observer
 export class Navbar extends React.Component {
   public render() {
     return (
-      <Media query="(max-width: 949px)">
-        {matches => (matches ? this.renderMenuIcons() : this.renderFullMenu())}
-      </Media>
+      <Media query="(max-width: 949px)">{matches => (matches ? this.renderMenuIcons() : this.renderFullMenu())}</Media>
     )
   }
   public handleRoute = e => {

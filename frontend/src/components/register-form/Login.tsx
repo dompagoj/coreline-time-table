@@ -20,10 +20,7 @@ export class Login extends React.Component {
           email: '',
           password: '',
         }}
-        onSubmit={(
-          values: Values,
-          { setSubmitting }: FormikActions<Values>,
-        ) => {
+        onSubmit={(values: Values, { setSubmitting }: FormikActions<Values>) => {
           routerStore.gotoHome()
           setSubmitting(false)
         }}
@@ -36,6 +33,7 @@ export class Login extends React.Component {
   }
   public renderForm = (formik: FormikProps<Values>) => {
     const { handleChange, handleSubmit } = formik
+
     return (
       <>
         <Row type="flex" justify="center">
@@ -53,19 +51,10 @@ export class Login extends React.Component {
             </Col>
             <Col>
               <FormItem>
-                <Input
-                  onChange={handleChange}
-                  name="password"
-                  type="password"
-                  prefix={<Icon type="lock" />}
-                />
+                <Input onChange={handleChange} name="password" type="password" prefix={<Icon type="lock" />} />
               </FormItem>
             </Col>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className={styles.loginButton}
-            >
+            <Button type="primary" htmlType="submit" className={styles.loginButton}>
               Log in
             </Button>
             <span style={{ marginLeft: '10px' }}>

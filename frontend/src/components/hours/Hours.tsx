@@ -1,7 +1,9 @@
 import { Button, message, Popconfirm } from 'antd'
+import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
 
+import { userStore } from '../../stores/UserStore'
 import { inRange } from '../utils/misc'
 import { styles } from './styles'
 
@@ -9,14 +11,16 @@ interface IState {
   currDate: moment.Moment
 }
 
+@observer
 export class Hours extends React.Component<any, IState> {
   public state: IState = {
     currDate: moment(),
   }
-
   public render() {
+    if (userStore.loading) {
+      return <div>Loading...</div>
+    }
     const { currDate } = this.state
-
     const endOfPreviousMonth = moment(currDate)
       .add(-1, 'months')
       .endOf('month')
@@ -51,9 +55,17 @@ export class Hours extends React.Component<any, IState> {
     return (
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button onClick={this.goToPrevMonth}>&lt;</Button>
-          <div>{this.state.currDate.format('MMM, YYYY')}</div>
-          <Button onClick={this.goToNextMonth}>&gt;</Button>
+          <div style={{}}>
+            <span style={{ marginRight: '5px', fontWeight: 'bold', fontSize: '20px' }}>
+              {this.state.currDate.format('MMMM')}
+            </span>
+            <span>{this.state.currDate.format('YYYY')}</span>
+          </div>
+          <div>
+            <Button onClick={this.goToPrevMonth}>&lt;</Button>
+            <Button onClick={this.goToToday}>Today</Button>
+            <Button onClick={this.goToNextMonth}>&gt;</Button>
+          </div>
         </div>
         <div className={styles.header}>
           <div>Mon</div>
@@ -99,7 +111,15 @@ export class Hours extends React.Component<any, IState> {
       </div>
     )
   }
+  public componentWillMount() {
+    userStore.getUsers({ companyId: 1 })
+  }
+
   public isToday = day => {
+    if (this.state.currDate.month() !== moment().month()) {
+      return false
+    }
+
     return moment().date() === day
   }
   public handleDateSelect = day => () => {
@@ -111,6 +131,11 @@ export class Hours extends React.Component<any, IState> {
   }
   public onCancel = () => {
     message.warning('Canceled')
+  }
+  public goToToday = () => {
+    this.setState({
+      currDate: moment(),
+    })
   }
   public goToPrevMonth = () => {
     this.setState({
