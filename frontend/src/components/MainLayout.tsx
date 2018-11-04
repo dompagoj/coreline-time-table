@@ -1,6 +1,6 @@
 import { css } from 'emotion'
 import * as React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Redirect, Route, Switch } from 'react-router-dom'
 import { Navbar } from './navbar/Navbar'
 
 import { Hours } from './hours/Hours'
@@ -17,6 +17,7 @@ export class MainLayout extends React.Component {
         <Navbar />
         <div className={routerContainer}>
           <Switch>
+            <Route path="/profile" component={test} />
             <Route path="/hours" component={Hours} />
           </Switch>
         </div>
@@ -24,3 +25,9 @@ export class MainLayout extends React.Component {
     )
   }
 }
+
+const test = () => (
+  <div>
+    <h1>Helo world</h1>
+  </div>
+)

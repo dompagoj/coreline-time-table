@@ -3,9 +3,9 @@ import { IpcRenderer } from 'electron'
 import { css } from 'emotion'
 import * as React from 'react'
 
-import Axios from 'axios'
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
+import { LoginResponse } from '../../types/login-response'
 
 // @ts-ignore
 const electron = window.require('electron')
@@ -59,10 +59,9 @@ export class GoogleLoginComponent extends React.Component<any, { error: string |
     )
   }
   public login = async () => {
-    ipcRenderer.on('reply', async (event, arg: { googleToken: string }) => {
-      console.log(arg)
-      // authStore.isLoggedIn = true
-      // routerStore.gotoHome()
+    ipcRenderer.on('reply', async (event, arg) => {
+      authStore.user = arg.user
+      routerStore.gotoHome()
     })
     ipcRenderer.send('login')
   }

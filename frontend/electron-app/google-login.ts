@@ -2,6 +2,7 @@ import Axios from 'axios'
 import { BrowserWindow } from 'electron'
 import { stringify } from 'querystring'
 import { parse } from 'url'
+import { LoginResponse } from '../src/types/login-response'
 
 const GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
@@ -80,11 +81,8 @@ async function fetchAccessTokens(code) {
   return response.data
 }
 
-async function signIn(googleToken) {
-  try {
-    const { data, status } = await Axios.post('http://localhost:8000/auth/login', { googleToken })
-    console.log({ data }, { status })
-  } catch (e) {
-    console.log('Fun fun fun')
-  }
+async function signIn(googleToken): Promise<LoginResponse> {
+  const { data, status } = await Axios.post('http://localhost:8000/auth/login', { googleToken })
+
+  return data
 }

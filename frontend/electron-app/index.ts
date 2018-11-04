@@ -47,9 +47,10 @@ app.on('activate', () => {
 })
 
 ipcMain.on('login', async (event, arg) => {
-  await googleSignIn()
+  const { token, user } = await googleSignIn()
+  await saveToken(app.getPath('userData'), token)
 
-  return event.sender.send('reply', 'hello')
+  return event.sender.send('reply', { user })
 })
 
 ipcMain.on('jwt', async (event, arg) => {

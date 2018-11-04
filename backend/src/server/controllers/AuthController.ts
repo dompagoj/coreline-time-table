@@ -16,7 +16,7 @@ export class AuthController extends BaseController {
     try {
       payload = await this.verify(googleToken)
     } catch (e) {
-      return this.badRequest('Not valid google token')
+      return this.accepted('Not valid google token')
     }
     const { email, given_name: firstName, family_name: lastName, hd, picture } = payload
     if (hd !== 'coreline.agency') {

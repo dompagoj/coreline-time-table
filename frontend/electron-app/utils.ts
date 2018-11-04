@@ -1,10 +1,8 @@
-import Axios from 'axios'
 import { readFile, writeFile } from 'fs'
 import { decode } from 'jsonwebtoken'
 
-export async function saveToken(path: string, user) {
-  const { data, status } = await Axios.post('http://localhost:8000/auth/login', user)
-  writeFile(`${path}/auth`, data, err => {
+export async function saveToken(path: string, token) {
+  writeFile(`${path}/auth`, token, err => {
     if (err) {
       throw new Error('Failed to write token')
     }
