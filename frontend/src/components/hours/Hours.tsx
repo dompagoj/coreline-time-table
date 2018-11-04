@@ -114,7 +114,6 @@ export class Hours extends React.Component<any, IState> {
   public componentWillMount() {
     userStore.getUsers({ companyId: 1 })
   }
-
   public isToday = day => {
     if (this.state.currDate.month() !== moment().month()) {
       return false

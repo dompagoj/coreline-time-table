@@ -32,16 +32,21 @@ export class UserController extends BaseController<Context, { companyId: string 
     return this.accepted(user)
   }
   @POST('/', { before: validateBody(UserInput) })
-  public async create({ type, username }: UserInput) {
+  public async create({ type, username, firstName, lastName, googleToken, email }: UserInput) {
     const companyId = parseInt(this.routeData.companyId, 10)
     const user = await User.create({
       username,
       type,
       companyId,
+      firstName,
+      lastName,
+      googleToken,
+      email,
     }).save()
 
     return this.accepted(user)
   }
+
   @DELETE('/:id')
   public async delete() {
     User.delete(this.req.params.id)

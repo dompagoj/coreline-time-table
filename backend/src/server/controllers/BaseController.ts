@@ -27,7 +27,7 @@ export abstract class BaseController<Context = any, Params = any, Locals = any> 
     if (typeof object === 'string') {
       return this.res
         .status(400)
-        .json({ object })
+        .json({ data: object })
         .end()
     }
     return this.res

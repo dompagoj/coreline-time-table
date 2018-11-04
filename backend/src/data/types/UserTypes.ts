@@ -1,21 +1,37 @@
-import { IsEnum, IsString, Length, Min, ValidateIf } from 'class-validator'
+import { IsEmail, IsEnum, IsString, Length, Min, ValidateIf } from 'class-validator'
 
 import { UserType } from '../enums/UserType'
+import { ID } from './random'
 
 export class UserInput {
   @Length(5, 20)
-  public username: string
+  public username: string | null
 
   @IsEnum(UserType)
-  public type: UserType
+  public type: UserType = UserType.EMPLOYEE
 
-  @ValidateIf(o => !!o)
   @IsString()
   public googleToken?: string | null
 
-  public constructor({ username, type, googleToken }: UserInput) {
+  @IsEmail()
+  public email: string
+
+  @IsString()
+  public firstName: string | null
+
+  @IsString()
+  public lastName: string | null
+
+  @Min(0)
+  public companyId?: number | null
+
+  public constructor({ username, type, email, googleToken, firstName, lastName, companyId }: UserInput) {
     this.username = username
     this.type = type
+    this.email = email
     this.googleToken = googleToken
+    this.firstName = firstName
+    this.lastName = lastName
+    this.companyId = companyId
   }
 }

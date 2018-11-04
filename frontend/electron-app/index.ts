@@ -1,29 +1,12 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import * as isDev from 'electron-is-dev'
-import { readFile, writeFile } from 'fs'
+import { sign } from 'jsonwebtoken'
 import { join } from 'path'
 import { googleSignIn } from './google-login'
+import { readToken, saveToken } from './utils'
 
 let mainWindow
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
-
-// const data = {
-//   user: {
-//     username: 'dompanovic',
-//     password: 'test123',
-//   },
-// }
-// writeFile(`${app.getPath('userData')}/auth`, JSON.stringify(data), err => {
-//   console.log('ERR: ', err)
-// })
-
-// readFile(`${app.getPath('userData')}/auth`, (err, data) => {
-//   if (err) {
-//     return
-//   }
-//   const config = JSON.parse(data.toString('utf8'))
-//   console.log({ config })
-// })
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -64,6 +47,13 @@ app.on('activate', () => {
 })
 
 ipcMain.on('login', async (event, arg) => {
-  const user = await googleSignIn()
-  event.sender.send('reply', user)
+  await googleSignIn()
+
+  return event.sender.send('reply', 'hello')
+})
+
+ipcMain.on('jwt', async (event, arg) => {
+  const token = await readToken(app.getPath('userData'))
+  console.log('token: ', token)
+  event.sender.send('jwt-reply', token)
 })

@@ -1,8 +1,9 @@
-import { Button } from 'antd'
+import { Alert, Button } from 'antd'
 import { IpcRenderer } from 'electron'
 import { css } from 'emotion'
 import * as React from 'react'
 
+import Axios from 'axios'
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
 
@@ -21,30 +22,53 @@ const buttonContainerStyle = css`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 `
 
 const buttonStyle: React.CSSProperties = {
   background: 'red',
   color: 'white',
   height: '100px',
+  width: '100%',
 }
 
-export class GoogleLoginComponent extends React.Component {
+export class GoogleLoginComponent extends React.Component<any, { error: string | null }> {
+  public state = {
+    error: null,
+  }
   public render() {
+    const { error } = this.state
+
     return (
       <div className={buttonContainerStyle}>
         <Button style={buttonStyle} onClick={this.login}>
           Login in with google
         </Button>
+        {error && (
+          <Alert
+            style={{ width: '100%', marginTop: '20px' }}
+            message="Error"
+            description={this.state.error}
+            type="error"
+            showIcon
+            closable
+            onClose={this.closePopup}
+          />
+        )}
       </div>
     )
   }
-  public login = () => {
-    ipcRenderer.on('reply', (event, arg) => {
-      console.log('arg in react', arg) // prints "pong"
-      authStore.isLoggedIn = true
-      routerStore.gotoHome()
+  public login = async () => {
+    ipcRenderer.on('reply', async (event, arg: { googleToken: string }) => {
+      console.log(arg)
+      // authStore.isLoggedIn = true
+      // routerStore.gotoHome()
     })
-    ipcRenderer.send('login', 'start login')
+    ipcRenderer.send('login')
+  }
+  public closePopup = () => {
+    this.setState({
+      error: null,
+    })
   }
 }

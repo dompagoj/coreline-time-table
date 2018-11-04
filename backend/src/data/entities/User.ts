@@ -1,12 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm'
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { UserType } from '../enums/UserType'
 import { Company } from './Company'
 import { Hour } from './Hour'
@@ -16,13 +8,22 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   public id: number
 
-  @Column()
+  @Column({ nullable: true })
   public username: string
+
+  @Column({ nullable: true })
+  public firstName: string
+
+  @Column({ nullable: true })
+  public lastName: string
 
   @Column({ nullable: true })
   public googleToken: string
 
-  @Column({ enum: UserType })
+  @Column({ unique: true })
+  public email: string
+
+  @Column({ enum: UserType, default: UserType.EMPLOYEE })
   public type: UserType
 
   @Column()

@@ -5,22 +5,14 @@ import { parse } from 'url'
 
 const GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
-const GOOGLE_PROFILE_URL = 'https://www.googleapis.com/userinfo/v2/me'
 const GOOGLE_REDIRECT_URI = 'coreline.time.table:localhost:3000'
 const GOOGLE_CLIENT_ID = '252217239009-2ud4h9klfmf8j8kl6lrtfrt677u9tl59.apps.googleusercontent.com'
 
 export async function googleSignIn() {
   const code = await signInWithPopup()
-  const tokens = await fetchAccessTokens(code)
-  const { id, email, name } = await fetchGoogleProfile(tokens.access_token)
-  const providerUser = {
-    uid: id,
-    email,
-    displayName: name,
-    idToken: tokens.id_token,
-  }
+  const { id_token: googleToken } = await fetchAccessTokens(code)
 
-  return mySignInFunction(providerUser)
+  return signIn(googleToken)
 }
 
 function signInWithPopup() {
@@ -88,17 +80,11 @@ async function fetchAccessTokens(code) {
   return response.data
 }
 
-async function fetchGoogleProfile(accessToken) {
-  const response = await Axios.get(GOOGLE_PROFILE_URL, {
-    headers: {
-      'Content-Type': 'application/json',
-      "Authorization": `Bearer ${accessToken}`,
-    },
-  })
-
-  return response.data
-}
-
-function mySignInFunction(user) {
-  return user
+async function signIn(googleToken) {
+  try {
+    const { data, status } = await Axios.post('http://localhost:8000/auth/login', { googleToken })
+    console.log({ data }, { status })
+  } catch (e) {
+    console.log('Fun fun fun')
+  }
 }
