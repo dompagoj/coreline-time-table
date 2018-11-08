@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import * as isDev from 'electron-is-dev'
-import { sign } from 'jsonwebtoken'
 import { join } from 'path'
 import { googleSignIn } from './google-login'
 import { readToken, saveToken } from './utils'
@@ -48,13 +47,13 @@ app.on('activate', () => {
 
 ipcMain.on('login', async (event, arg) => {
   const { token, user } = await googleSignIn()
-  await saveToken(app.getPath('userData'), token)
+  await saveToken(token)
+  console.log({ token })
 
-  return event.sender.send('reply', { user })
+  return event.sender.send('reply', { user, token })
 })
 
 ipcMain.on('jwt', async (event, arg) => {
-  const token = await readToken(app.getPath('userData'))
-  console.log('token: ', token)
+  const token = await readToken()
   event.sender.send('jwt-reply', token)
 })

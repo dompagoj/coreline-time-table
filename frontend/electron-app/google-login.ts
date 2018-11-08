@@ -2,6 +2,7 @@ import Axios from 'axios'
 import { BrowserWindow } from 'electron'
 import { stringify } from 'querystring'
 import { parse } from 'url'
+
 import { LoginResponse } from '../src/types/login-response'
 
 const GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
@@ -17,6 +18,7 @@ export async function googleSignIn() {
 }
 
 function signInWithPopup() {
+
   return new Promise((resolve, reject) => {
     const authWindow = new BrowserWindow({
       width: 500,

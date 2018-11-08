@@ -60,6 +60,7 @@ export class GoogleLoginComponent extends React.Component<any, { error: string |
   }
   public login = async () => {
     ipcRenderer.on('reply', async (event, arg) => {
+      authStore.token = arg.token
       authStore.user = arg.user
       routerStore.gotoHome()
     })

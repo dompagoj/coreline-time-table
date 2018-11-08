@@ -28,10 +28,11 @@ export class UserController extends BaseController<Context, { companyId: string 
         companyId,
       },
     })
+    const { googleToken, ...userData } = user
 
-    return this.accepted(user)
+    return this.accepted(userData)
   }
-  @POST('/', { before: validateBody(UserInput) })
+  @POST('/', { before: validateBody(UserInput)})
   public async create({ type, username, firstName, lastName, googleToken, email }: UserInput) {
     const companyId = parseInt(this.routeData.companyId, 10)
     const user = await User.create({
@@ -42,7 +43,7 @@ export class UserController extends BaseController<Context, { companyId: string 
       lastName,
       googleToken,
       email,
-    }).save()
+     }).save()
 
     return this.accepted(user)
   }
@@ -50,11 +51,7 @@ export class UserController extends BaseController<Context, { companyId: string 
   @DELETE('/:id')
   public async delete() {
     User.delete(this.req.params.id)
-      .then(() => {
-        return this.accepted()
-      })
-      .catch(() => {
-        return this.badRequest()
-      })
+      .then(this.accepted)
+      .catch(() => this.badRequest())
   }
 }

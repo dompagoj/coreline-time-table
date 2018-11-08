@@ -1,4 +1,4 @@
-import { Button, message, Popconfirm } from 'antd'
+import { Button, Input, InputNumber, message, Popover } from 'antd'
 import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
@@ -85,12 +85,12 @@ export class Hours extends React.Component<any, IState> {
             </div>
           ))}
           {days.map(day => (
-            <Popconfirm
+            <Popover
               key={`${day}-current`}
-              title="Title"
+              content={popoverContent}
               placement="right"
-              onConfirm={this.onConfirm}
-              onCancel={this.onCancel}
+              trigger="click"
+              title="Title"
             >
               <div onClick={this.handleDateSelect(day + 1)} className={styles.dayContainer}>
                 <div className={styles.dayContent}>
@@ -98,7 +98,7 @@ export class Hours extends React.Component<any, IState> {
                   <div className={styles.content}> 8 hours </div>
                 </div>
               </div>
-            </Popconfirm>
+            </Popover>
           ))}
           {daysAfter.map(day => (
             <div onClick={this.goToNextMonth} key={`${day}-after`} className={styles.disabledDayContainer}>
@@ -147,3 +147,13 @@ export class Hours extends React.Component<any, IState> {
     })
   }
 }
+
+const popoverContent = (
+  <div>
+    <p>Hours: </p>
+    <InputNumber min={0} max={12} defaultValue={0}/>
+    <p>Project: </p>
+    <Input />
+    <Button style={{ marginTop: '5px' }}>Click me!</Button>
+  </div>
+)
