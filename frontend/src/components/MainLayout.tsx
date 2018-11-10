@@ -17,11 +17,7 @@ const routerContainer = css`
 export class MainLayout extends React.Component {
   public render() {
     if (authStore.loading) {
-      console.log(authStore.user)
-
-      return (
-        <Spinner />
-      )
+      return null
     }
 
     return (

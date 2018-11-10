@@ -4,6 +4,7 @@ import * as moment from 'moment'
 import * as React from 'react'
 
 import { userStore } from '../../stores/UserStore'
+import { Spinner } from '../spinner/Spinner'
 import { inRange } from '../utils/misc'
 import { styles } from './styles'
 
@@ -17,9 +18,6 @@ export class Hours extends React.Component<any, IState> {
     currDate: moment(),
   }
   public render() {
-    if (userStore.loading) {
-      return <div>Loading...</div>
-    }
     const { currDate } = this.state
     const endOfPreviousMonth = moment(currDate)
       .add(-1, 'months')
@@ -110,9 +108,6 @@ export class Hours extends React.Component<any, IState> {
         </div>
       </div>
     )
-  }
-  public componentWillMount() {
-    userStore.getUsers({ companyId: 1 })
   }
   public isToday = day => {
     if (this.state.currDate.month() !== moment().month()) {
