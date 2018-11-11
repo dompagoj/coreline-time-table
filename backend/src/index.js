@@ -1,5 +1,5 @@
-require("ts-node").register();
-require("dotenv").config();
-require("reflect-metadata");
+require('ts-node').register({ typeCheck: true })
+require('dotenv').config()
+require('reflect-metadata')
 
-require("./server/app");
+require('./server/app')

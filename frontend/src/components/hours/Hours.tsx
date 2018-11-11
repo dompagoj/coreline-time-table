@@ -1,63 +1,47 @@
-import { Button, Input, InputNumber, message, Popover } from 'antd'
+import { Button, message, Modal, Popover } from 'antd'
 import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
 
-import { userStore } from '../../stores/UserStore'
+import { findDOMNode } from 'react-dom'
+import { hoursStore } from '../../stores/HoursStore'
 import { Spinner } from '../spinner/Spinner'
+import { getDaysAfter, getDaysBefore, today } from '../utils/hours'
 import { inRange } from '../utils/misc'
+import { PopoverContent } from './PopoverContent'
 import { styles } from './styles'
 
 interface IState {
   currDate: moment.Moment
+  openModal: boolean
+  modalStyle: React.CSSProperties
 }
 
 @observer
 export class Hours extends React.Component<any, IState> {
   public state: IState = {
     currDate: moment(),
+    openModal: false,
+    modalStyle: {},
   }
   public render() {
-    const { currDate } = this.state
-    const endOfPreviousMonth = moment(currDate)
-      .add(-1, 'months')
-      .endOf('month')
+    if (hoursStore.loading) {
+      return <Spinner />
+    }
+    const { currDate, openModal } = this.state
 
-    const daysBefore: number[] = inRange(
-      Math.max(
-        0,
-        moment(currDate)
-          .startOf('month')
-          .isoWeekday() - 1,
-      ),
-    )
-      .map(i => {
-        return endOfPreviousMonth.date() - i - 1
-      })
-      .reverse()
+    const daysBefore: number[] = getDaysBefore(currDate)
 
-    const daysAfter: number[] =
-      currDate.endOf('month').isoWeekday() > 0
-        ? inRange(
-            Math.max(
-              0,
-              7 -
-                moment(currDate)
-                  .endOf('month')
-                  .isoWeekday(),
-            ),
-          )
-        : []
+    const daysAfter: number[] = getDaysAfter(currDate)
+
     const days = inRange(currDate.daysInMonth())
 
     return (
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div style={{}}>
-            <span style={{ marginRight: '5px', fontWeight: 'bold', fontSize: '20px' }}>
-              {this.state.currDate.format('MMMM')}
-            </span>
-            <span>{this.state.currDate.format('YYYY')}</span>
+            <span style={{ marginRight: '5px', fontWeight: 'bold', fontSize: '20px' }}>{currDate.format('MMMM')}</span>
+            <span>{currDate.format('YYYY')}</span>
           </div>
           <div>
             <Button onClick={this.goToPrevMonth}>&lt;</Button>
@@ -82,22 +66,24 @@ export class Hours extends React.Component<any, IState> {
               </div>
             </div>
           ))}
-          {days.map(day => (
-            <Popover
-              key={`${day}-current`}
-              content={popoverContent}
-              placement="right"
-              trigger="click"
-              title="Title"
-            >
-              <div onClick={this.handleDateSelect(day + 1)} className={styles.dayContainer}>
+          {days.map(day => {
+            const hours = hoursStore.getHour(currDate, day + 1)
+
+            return (
+              <div
+                // tslint:disable-next-line:jsx-no-string-ref
+                ref={`${day}-current`}
+                onClick={this.openPopover(day)}
+                key={`${day}-current`}
+                className={styles.dayContainer}
+              >
                 <div className={styles.dayContent}>
                   <div className={this.isToday(day + 1) ? styles.today : styles.day}>{day + 1}</div>
-                  <div className={styles.content}> 8 hours </div>
+                  {hours && <div className={styles.content}>{hours.amount} Hours</div>}
                 </div>
               </div>
-            </Popover>
-          ))}
+            )
+          })}
           {daysAfter.map(day => (
             <div onClick={this.goToNextMonth} key={`${day}-after`} className={styles.disabledDayContainer}>
               <div className={styles.dayContent}>
@@ -106,49 +92,88 @@ export class Hours extends React.Component<any, IState> {
             </div>
           ))}
         </div>
+        <Modal
+          // tslint:disable-next-line:jsx-no-string-ref
+          ref="modal-ref"
+          style={this.state.modalStyle}
+          visible={openModal}
+          title="Input hours"
+          closable
+          onCancel={this.closePopover}
+        />
       </div>
     )
   }
+  public async componentDidMount() {
+    await hoursStore.getHours()
+  }
+
   public isToday = day => {
-    if (this.state.currDate.month() !== moment().month()) {
+    const { currDate } = this.state
+    if (currDate.month() !== today.month() || currDate.year() !== today.year()) {
       return false
     }
 
     return moment().date() === day
   }
-  public handleDateSelect = day => () => {
-    const { currDate } = this.state
-    const selectedDay = moment(new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`))
-  }
+
   public onConfirm = () => {
     message.success('Confirmed')
   }
+
   public onCancel = () => {
     message.warning('Canceled')
   }
+
   public goToToday = () => {
     this.setState({
       currDate: moment(),
     })
   }
+
   public goToPrevMonth = () => {
     this.setState({
       currDate: moment(this.state.currDate).add(-1, 'months'),
     })
   }
+
   public goToNextMonth = () => {
     this.setState({
       currDate: moment(this.state.currDate).add(1, 'months'),
     })
   }
-}
+  public openPopover = day => () => {
+    const windowHeight = window.innerHeight
+    const windowWidth = window.innerWidth
+    const element = this.refs[`${day}-current`]
+    // @ts-ignore
+    const rect = findDOMNode(element)!.getBoundingClientRect()
+    const { top, left, right, height, width, bottom, x, y } = rect
+    console.log({ left }, { right }, { height }, { width }, { x }, { y }, { bottom })
 
-const popoverContent = (
-  <div>
-    <p>Hours: </p>
-    <InputNumber min={0} max={12} defaultValue={0}/>
-    <p>Project: </p>
-    <Input />
-    <Button style={{ marginTop: '5px' }}>Click me!</Button>
-  </div>
-)
+    this.setState({
+      openModal: true,
+      modalStyle: {
+        top,
+        left: '200px',
+      },
+    })
+  }
+  public closePopover = () => {
+    this.setState({
+      openModal: false,
+    })
+  }
+
+  public createHour = day => async () => {
+    const { currDate } = this.state
+    const selectedDay = moment(new Date(`${currDate.month() + 1}.${day + 1}.${currDate.year()}`))
+    await hoursStore.createHour({
+      date: new Date(selectedDay.toDate()),
+      hours: {
+        amount: 8,
+      },
+    })
+    this.onConfirm()
+  }
+}

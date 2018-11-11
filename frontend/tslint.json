@@ -11,6 +11,7 @@
     "object-literal-sort-keys": false,
     "jsx-no-lambda": false,
     "no-console": false,
+    "comment-format": false,
     "newline-before-return": true,
     "interface-name": false,
     "jsx-no-multiline-js": false,

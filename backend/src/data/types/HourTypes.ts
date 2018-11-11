@@ -1,22 +1,28 @@
-import { IsDate, Max, Min, ValidateIf } from 'class-validator'
+import { IsDate, Min, ValidateIf } from 'class-validator'
 import { ID } from './random'
 
-export class HourInput {
-  @ValidateIf(o => !!o)
-  @Min(0)
-  public id?: ID
+interface ProjectHours {
+  projectId: number
+  hours: number
+}
 
-  @ValidateIf(o => !!o)
+interface Hours {
+  amount: number
+  projects?: ProjectHours[] | null
+}
+
+export class HourInput {
   @Min(0)
-  @Max(12)
-  public amount?: number
+  public id: ID
+
+  public hours: Hours
 
   @IsDate()
   public date: Date
 
-  public constructor({ id, amount, date }: HourInput) {
+  public constructor({ id, hours, date }: HourInput) {
     this.id = id
-    this.amount = amount
+    this.hours = hours
     this.date = date
   }
 }

@@ -41,6 +41,7 @@ export class CompanyController extends BaseController<Context> {
       .then(() => this.accepted('Delete successful'))
       .catch(e => this.badRequest())
   }
+
   @PUT('/:id')
   public async update({ name }: CompanyInput) {
     const { id } = this.routeData

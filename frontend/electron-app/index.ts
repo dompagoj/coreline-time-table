@@ -48,7 +48,6 @@ app.on('activate', () => {
 ipcMain.on('login', async (event, arg) => {
   const { token, user } = await googleSignIn()
   await saveToken(token)
-  console.log({ token })
 
   return event.sender.send('reply', { user, token })
 })
