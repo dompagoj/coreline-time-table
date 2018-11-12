@@ -3,10 +3,11 @@ import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
 
+import { css } from 'emotion'
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { Spinner } from '../spinner/Spinner'
-import { getDaysAfter, getDaysBefore, today } from '../utils/hours'
+import { checkIfOutOfBounds, checkifOutOfBoundsX, getDaysAfter, getDaysBefore, today } from '../utils/hours'
 import { inRange } from '../utils/misc'
 import { PopoverContent } from './PopoverContent'
 import { styles } from './styles'
@@ -16,6 +17,14 @@ interface IState {
   openModal: boolean
   modalStyle: React.CSSProperties
 }
+
+const MODAL_WIDTH_STYLE = '400px'
+const MODAL_HEIGHT_STYLE = '100px'
+const MODAL_WIDTH = 400
+const MODAL_HEIGHT = 100
+
+const windowHeight = window.innerHeight
+const windowWidth = window.innerWidth
 
 @observer
 export class Hours extends React.Component<any, IState> {
@@ -95,6 +104,7 @@ export class Hours extends React.Component<any, IState> {
         <Modal
           // tslint:disable-next-line:jsx-no-string-ref
           ref="modal-ref"
+          bodyStyle={{ height: MODAL_HEIGHT_STYLE, width: MODAL_WIDTH_STYLE }}
           style={this.state.modalStyle}
           visible={openModal}
           title="Input hours"
@@ -143,20 +153,26 @@ export class Hours extends React.Component<any, IState> {
     })
   }
   public openPopover = day => () => {
-    const windowHeight = window.innerHeight
-    const windowWidth = window.innerWidth
+
     const element = this.refs[`${day}-current`]
+    const modal = this.refs['modal-ref']
     // @ts-ignore
     const rect = findDOMNode(element)!.getBoundingClientRect()
+
     const { top, left, right, height, width, bottom, x, y } = rect
-    console.log({ left }, { right }, { height }, { width }, { x }, { y }, { bottom })
+    console.log({ left }, { right }, { height }, { width }, { x }, { y }, { bottom }, { top })
+
+    const modalXOffset = ((windowWidth - MODAL_WIDTH) / 2) - 70 - right
+    const modalYOffset = checkIfOutOfBounds(top, windowHeight, MODAL_HEIGHT)
+    const modalLeftOffset = checkifOutOfBoundsX(x, width, modalXOffset, windowHeight, MODAL_WIDTH)
+    console.log('MODAL LEFT OFFSET: ', modalLeftOffset)
 
     this.setState({
-      openModal: true,
       modalStyle: {
-        top,
-        left: '200px',
+        top: top - modalYOffset,
+        right: modalXOffset + modalLeftOffset,
       },
+      openModal: true,
     })
   }
   public closePopover = () => {
@@ -176,4 +192,5 @@ export class Hours extends React.Component<any, IState> {
     })
     this.onConfirm()
   }
+
 }

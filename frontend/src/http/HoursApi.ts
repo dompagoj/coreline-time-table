@@ -1,3 +1,4 @@
+import { authStore } from '../stores/AuthStore'
 import { ID } from '../types/general'
 import { axios } from './axios'
 
@@ -23,13 +24,16 @@ export interface CreateHoursInput {
 
 export class HoursApi {
   public async getHours() {
-    return axios.get('/companies/1/users/60/hours')
+    const { user } = authStore
+
+    return axios.get(`/companies/${user.companyId}/users/${user.id}/hours`)
   }
 
   public async createHour(input: CreateHoursInput) {
     const { date, hours } = input
+    const { user } = authStore
 
-    return axios.post('/companies/1/users/60/hours', {
+    return axios.post(`/companies/${user.companyId}/users/${user.id}/hours`, {
       date,
       hours,
     })
