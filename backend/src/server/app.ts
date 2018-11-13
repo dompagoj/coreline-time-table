@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
 import * as bodyParser from 'body-parser'
+import * as cors from 'cors'
 import * as express from 'express'
 import { createConnection } from 'typeorm'
 import { config } from './config'
@@ -9,16 +10,9 @@ import { mainRouter } from './routers/MainRouter'
 async function bootstrap() {
   const app = express()
 
+  app.use(cors())
   app.use(bodyParser.json())
 
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept',
-    )
-    next()
-  })
   await createConnection({
     // @ts-ignore
     type: config.dbType,

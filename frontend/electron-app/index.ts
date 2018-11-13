@@ -11,8 +11,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 680,
-    minWidth: 500,
-    minHeight: 500,
+    minWidth: 800,
+    minHeight: 800,
     icon: join(__dirname, 'icons/coreline-logo.icns'),
   })
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${join(__dirname, '../build/index.html')}`)

@@ -30,7 +30,13 @@ class HoursStore {
   @action.bound
   public async createHour(input: CreateHoursInput) {
     const { data } = await this.api.createHour(input)
-    this.hours.push(data)
+    console.log({ data })
+    if (data.updated) {
+      const hourIndex = this.hours.findIndex(hour => hour.date === data.hour.date)
+      this.hours[hourIndex] = data.hour
+    } else {
+      this.hours.push(data)
+    }
   }
   @computed
   get loading() {

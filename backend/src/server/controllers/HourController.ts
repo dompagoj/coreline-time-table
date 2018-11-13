@@ -48,8 +48,8 @@ export class HourController extends BaseController<
       .catch(e => this.badRequest(`No hour with id ${dateId} found`))
   }
 
-  @POST('/')
-  public async create({ date, hours }: HourInput) {
+  @PUT('/')
+  public async updateOrCreate({ date, hours }: HourInput) {
     const { user } = this.locals
     const { amount, projects } = hours
     if (projects) {
@@ -61,6 +61,17 @@ export class HourController extends BaseController<
         }),
       )
     }
+    const hour = await Hour.findOne({
+      where: {
+        date,
+      },
+    })
+    if (hour) {
+      hour.amount = amount
+      await hour.save()
+
+      return this.accepted({ hour, updated: true })
+    }
 
     Hour.create({
       amount,
@@ -68,8 +79,7 @@ export class HourController extends BaseController<
       userId: user.id,
     })
       .save()
-      .then(hour => this.accepted(hour))
-      .catch(e => this.badRequest(`Hours have already been saved`))
+      .then(created => this.accepted(created))
   }
 
   @PUT('/:id')

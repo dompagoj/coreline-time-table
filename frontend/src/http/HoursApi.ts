@@ -33,7 +33,7 @@ export class HoursApi {
     const { date, hours } = input
     const { user } = authStore
 
-    return axios.post(`/companies/${user.companyId}/users/${user.id}/hours`, {
+    return axios.put(`/companies/${user.companyId}/users/${user.id}/hours`, {
       date,
       hours,
     })

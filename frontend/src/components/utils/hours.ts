@@ -43,21 +43,4 @@ export function getDaysAfter(currDate: moment.Moment) {
 
 export const today = moment()
 
-export function checkIfOutOfBounds(top, windowHeight, MODAL_HEIGHT) {
-  const condition = (top + MODAL_HEIGHT) - windowHeight
-  if (condition > 0)  {
-    return condition
-  }
 
-  return 0
-}
-export function  checkifOutOfBoundsX(x, width, modalXOffset, windowHeight, MODAL_WIDTH) {
-  console.log('X INSIDE FUN', x)
-  const condition =  windowHeight - (x + width + modalXOffset + MODAL_WIDTH)
-  console.log('CONDITION: ', condition)
-  if (condition < 0) {
-    return condition + width + MODAL_WIDTH
-   }
-
-  return 0
-}

@@ -1,35 +1,33 @@
-import { Button, message, Modal, Popover } from 'antd'
+import { Button, message, Modal } from 'antd'
 import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
 
-import { css } from 'emotion'
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { Spinner } from '../spinner/Spinner'
-import { checkIfOutOfBounds, checkifOutOfBoundsX, getDaysAfter, getDaysBefore, today } from '../utils/hours'
+import { getDaysAfter, getDaysBefore, today } from '../utils/hours'
 import { inRange } from '../utils/misc'
-import { PopoverContent } from './PopoverContent'
+import { ModalContent } from './PopoverContent'
 import { styles } from './styles'
 
 interface IState {
   currDate: moment.Moment
   openModal: boolean
   modalStyle: React.CSSProperties
+  selectedDay: number
+  hoursAmount: number
 }
 
-const MODAL_WIDTH_STYLE = '400px'
-const MODAL_HEIGHT_STYLE = '100px'
 const MODAL_WIDTH = 400
-const MODAL_HEIGHT = 100
-
-const windowHeight = window.innerHeight
-const windowWidth = window.innerWidth
+const MODAL_HEIGHT = 150
 
 @observer
 export class Hours extends React.Component<any, IState> {
   public state: IState = {
     currDate: moment(),
+    selectedDay: 0,
+    hoursAmount: 0,
     openModal: false,
     modalStyle: {},
   }
@@ -81,8 +79,8 @@ export class Hours extends React.Component<any, IState> {
             return (
               <div
                 // tslint:disable-next-line:jsx-no-string-ref
-                ref={`${day}-current`}
-                onClick={this.openPopover(day)}
+                ref={`${day + 1}-current`}
+                onClick={this.openModal(day + 1)}
                 key={`${day}-current`}
                 className={styles.dayContainer}
               >
@@ -104,13 +102,20 @@ export class Hours extends React.Component<any, IState> {
         <Modal
           // tslint:disable-next-line:jsx-no-string-ref
           ref="modal-ref"
-          bodyStyle={{ height: MODAL_HEIGHT_STYLE, width: MODAL_WIDTH_STYLE }}
           style={this.state.modalStyle}
+          width={MODAL_WIDTH}
           visible={openModal}
-          title="Input hours"
           closable
           onCancel={this.closePopover}
-        />
+          onOk={this.createHour}
+          destroyOnClose
+          okText="Save"
+        >
+          <ModalContent
+            onChange={this.hoursAmountChange}
+            currentAmount={hoursStore.getHour(this.state.currDate, this.state.selectedDay)}
+          />
+        </Modal>
       </div>
     )
   }
@@ -125,14 +130,6 @@ export class Hours extends React.Component<any, IState> {
     }
 
     return moment().date() === day
-  }
-
-  public onConfirm = () => {
-    message.success('Confirmed')
-  }
-
-  public onCancel = () => {
-    message.warning('Canceled')
   }
 
   public goToToday = () => {
@@ -152,26 +149,21 @@ export class Hours extends React.Component<any, IState> {
       currDate: moment(this.state.currDate).add(1, 'months'),
     })
   }
-  public openPopover = day => () => {
-
+  public openModal = day => () => {
     const element = this.refs[`${day}-current`]
-    const modal = this.refs['modal-ref']
     // @ts-ignore
     const rect = findDOMNode(element)!.getBoundingClientRect()
 
-    const { top, left, right, height, width, bottom, x, y } = rect
-    console.log({ left }, { right }, { height }, { width }, { x }, { y }, { bottom }, { top })
+    const { top, right } = rect
 
-    const modalXOffset = ((windowWidth - MODAL_WIDTH) / 2) - 70 - right
-    const modalYOffset = checkIfOutOfBounds(top, windowHeight, MODAL_HEIGHT)
-    const modalLeftOffset = checkifOutOfBoundsX(x, width, modalXOffset, windowHeight, MODAL_WIDTH)
-    console.log('MODAL LEFT OFFSET: ', modalLeftOffset)
-
+    const modalXOffset = this.checkifOutOfBoundsX(right)
+    const modalYOffset = this.checkIfOutOfBoundsY(top)
     this.setState({
       modalStyle: {
         top: top - modalYOffset,
-        right: modalXOffset + modalLeftOffset,
+        right: modalXOffset,
       },
+      selectedDay: day,
       openModal: true,
     })
   }
@@ -181,16 +173,40 @@ export class Hours extends React.Component<any, IState> {
     })
   }
 
-  public createHour = day => async () => {
-    const { currDate } = this.state
-    const selectedDay = moment(new Date(`${currDate.month() + 1}.${day + 1}.${currDate.year()}`))
+  public createHour = async () => {
+    const { currDate, selectedDay, hoursAmount } = this.state
+    const day = moment(new Date(`${currDate.month() + 1}.${selectedDay + 1}.${currDate.year()}`))
     await hoursStore.createHour({
-      date: new Date(selectedDay.toDate()),
+      date: new Date(day.toDate()),
       hours: {
-        amount: 8,
+        amount: hoursAmount,
       },
     })
-    this.onConfirm()
+    this.setState({ openModal: false, hoursAmount: 0 })
+    message.success('Confirmed')
+  }
+  public checkIfOutOfBoundsY = top => {
+    const condition = top + MODAL_HEIGHT * 2 - window.innerHeight
+    if (condition > 0) {
+      return condition
+    }
+
+    return 0
+  }
+  public checkifOutOfBoundsX = right => {
+    const defaultXOffset = (window.innerWidth - MODAL_WIDTH) / 2 - 30 - right
+
+    const modalRight = right + MODAL_WIDTH + 30
+    if (modalRight > window.innerWidth) {
+      return defaultXOffset + modalRight - window.innerWidth + MODAL_WIDTH / 2
+    }
+
+    return defaultXOffset
   }
 
+  public hoursAmountChange = amount => {
+    this.setState({
+      hoursAmount: amount,
+    })
+  }
 }

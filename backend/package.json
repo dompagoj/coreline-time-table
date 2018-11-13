@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon",
+    "db:start": "docker container start 79b48208b00d",
     "db:init": "docker-compose -f docker-compose.yml up -d"
   },
   "author": "",
@@ -12,6 +13,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "class-validator": "^0.9.1",
+    "cors": "^2.8.5",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "google-auth-library": "^2.0.0",

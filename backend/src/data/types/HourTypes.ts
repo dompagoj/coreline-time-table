@@ -1,4 +1,4 @@
-import { IsDate, Min, ValidateIf } from 'class-validator'
+import { Min } from 'class-validator'
 import { ID } from './random'
 
 interface ProjectHours {
@@ -17,7 +17,6 @@ export class HourInput {
 
   public hours: Hours
 
-  @IsDate()
   public date: Date
 
   public constructor({ id, hours, date }: HourInput) {
