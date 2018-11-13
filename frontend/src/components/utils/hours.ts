@@ -22,7 +22,7 @@ export function getDaysBefore(currDate: moment.Moment) {
     ),
   )
     .map(i => {
-      return endOfPreviousMonth.date() - i - 1
+      return endOfPreviousMonth.date() - i + 1
     })
     .reverse()
 }
@@ -40,7 +40,3 @@ export function getDaysAfter(currDate: moment.Moment) {
       )
     : []
 }
-
-export const today = moment()
-
-

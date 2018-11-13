@@ -4,6 +4,7 @@ export const styles = {
   container: css`
     min-width: 400px;
     height: 90%;
+    margin: 20px;
   `,
 
   rowContainer: css`
@@ -41,6 +42,7 @@ export const styles = {
   day: css`
     font-weight: bold;
     font-size: 16px;
+    margin-bottom: 5px;
   `,
   content: css`
     border-bottom: 3px solid lightgreen;
@@ -56,5 +58,6 @@ export const styles = {
     font-size: 17px;
     background-color: red;
     border-radius: 25px;
+    margin-bottom: 5px;
   `,
 }

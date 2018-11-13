@@ -9,3 +9,9 @@ body {
 #root {
   height: 100%;
 }
+
+.ant-layout-sider-children {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}

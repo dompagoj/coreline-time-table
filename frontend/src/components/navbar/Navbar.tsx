@@ -1,64 +1,78 @@
-import { Icon, Menu } from 'antd'
+import { Icon, Layout, Menu } from 'antd'
+// tslint:disable-next-line:no-submodule-imports
+import { SelectParam } from 'antd/lib/menu'
+import { IpcRenderer } from 'electron'
 import { css } from 'emotion'
 import { observer } from 'mobx-react'
 import * as React from 'react'
-import Media from 'react-media'
 
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
 
-const menuStyleFull = css`
-  width: 200px;
-  height: 100%;
-`
-const menuStyleIcons = css`
-  width: 60px;
-  height: 100;
+// @ts-ignore
+const electron = window.require('electron')
+const ipcRenderer: IpcRenderer = electron.ipcRenderer
+
+const siderContainer = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `
 
 @observer
-export class Navbar extends React.Component<any, { activeMenu }> {
+export class Navbar extends React.Component<any, { activeMenu: string[] }> {
   public state = {
-    activeMenu: '',
+    activeMenu: [],
   }
   public render() {
+    const { activeMenu } = this.state
+    if (activeMenu.length === 0) {
+      return null
+    }
+
     return (
-      <Media query="(max-width: 949px)">{matches => (matches ? this.renderMenuIcons() : this.renderFullMenu())}</Media>
+      <Layout>
+        <Layout.Sider theme="dark" defaultCollapsed collapsible>
+          <Menu defaultSelectedKeys={this.state.activeMenu} onSelect={this.handleRoute} mode="inline" theme="dark">
+            <Menu.Item key="/profile">
+              <Icon type="user" />
+              {authStore.user && <span>{authStore.user.firstName}</span>}
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item key="/hours">
+              <Icon type="clock-circle" />
+              <span>Hours</span>
+            </Menu.Item>
+          </Menu>
+          <Menu onClick={this.logout} selectable={false} mode="inline" theme="dark">
+            <Menu.Item>
+              <Icon type="logout" />
+              <span>Logout</span>
+            </Menu.Item>
+          </Menu>
+        </Layout.Sider>
+      </Layout>
     )
   }
-  public handleRoute = e => {
-    this.setState({
-      activeMenu: e.key,
-    })
-    routerStore.goto(e.key)
-  }
-  public renderFullMenu = () => (
-    <Menu defaultOpenKeys={[this.state.activeMenu]} className={menuStyleFull} theme="dark" onClick={this.handleRoute}>
-      <Menu.Item key="profile">
-        <Icon type="user" />
-        {authStore.user && authStore.user.firstName}
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="hours">
-        <Icon type="clock-circle" />
-        Hours
-      </Menu.Item>
-    </Menu>
-  )
-  public renderMenuIcons = () => (
-    <Menu defaultOpenKeys={[this.state.activeMenu]} className={menuStyleIcons} theme="dark" onClick={this.handleRoute}>
-      <Menu.Item key="profile">
-        <Icon type="user" />
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="hours">
-        <Icon type="clock-circle" />
-      </Menu.Item>
-    </Menu>
-  )
   public componentDidMount = () => {
     this.setState({
-      activeMenu: routerStore.location.pathname,
+      activeMenu: [routerStore.location.pathname],
     })
+  }
+
+  public logout = () => {
+    ipcRenderer.on('logout-reply', (event, result) => {
+      if (result) {
+        routerStore.goto('/login')
+      }
+    })
+    ipcRenderer.send('logout')
+  }
+
+  public handleRoute = (e: SelectParam) => {
+    this.setState({
+      activeMenu: [e.key],
+    })
+    routerStore.goto(e.key)
   }
 }

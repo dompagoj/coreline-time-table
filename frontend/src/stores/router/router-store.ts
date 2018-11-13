@@ -5,14 +5,18 @@ import { RouterStore, syncHistoryWithStore } from 'mobx-react-router'
 const browserHistory = createBrowserHistory()
 
 export class MobxRouterStore extends RouterStore {
-  @action.bound
+  @action
   public goto(path: string) {
-    this.history.push(`/${path}`)
+    this.history.push(`${path}`)
   }
 
-  @action.bound
+  @action
   public gotoHome() {
     this.history.push('/profile')
+  }
+  @action
+  public gotoCalendar() {
+    this.history.push('/hours')
   }
 }
 

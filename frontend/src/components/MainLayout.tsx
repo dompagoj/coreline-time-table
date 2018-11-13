@@ -6,10 +6,9 @@ import { Navbar } from './navbar/Navbar'
 import { observer } from 'mobx-react'
 import { authStore } from '../stores/AuthStore'
 import { Hours } from './hours/Hours'
-import { Spinner } from './spinner/Spinner'
+import { Profile } from './profile/Profile'
 
 const routerContainer = css`
-  margin: 20px;
   width: 100%;
 `
 
@@ -26,7 +25,7 @@ export class MainLayout extends React.Component {
         <div className={routerContainer}>
           <Switch>
             <Redirect exact from="/" to="/profile" />
-            <Route path="/profile" component={test} />
+            <Route path="/profile" component={Profile} />
             <Route path="/hours" component={Hours} />
           </Switch>
         </div>
@@ -39,9 +38,3 @@ export class MainLayout extends React.Component {
     }
   }
 }
-
-const test = () => (
-  <div>
-    <h1>Helo world</h1>
-  </div>
-)

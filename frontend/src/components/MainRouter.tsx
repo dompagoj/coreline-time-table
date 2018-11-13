@@ -21,9 +21,7 @@ export class MainRouterComponent extends React.Component<RouteComponentProps, { 
   }
   public render() {
     if (this.state.loading) {
-      return (
-        <Spinner />
-      )
+      return <Spinner />
     }
 
     return (
@@ -39,7 +37,7 @@ export class MainRouterComponent extends React.Component<RouteComponentProps, { 
       if (token) {
         const { email, id, type }: any = decode(token.toString('utf-8'), { json: true })
         authStore.token = token
-        routerStore.gotoHome()
+        routerStore.gotoCalendar()
       }
       this.setState({ loading: false })
     })

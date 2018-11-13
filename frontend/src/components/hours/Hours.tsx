@@ -6,27 +6,33 @@ import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { Spinner } from '../spinner/Spinner'
-import { getDaysAfter, getDaysBefore, today } from '../utils/hours'
+import { getDaysAfter, getDaysBefore } from '../utils/hours'
 import { inRange } from '../utils/misc'
-import { ModalContent } from './PopoverContent'
+import { HoursModalContent } from './HoursModalContent'
 import { styles } from './styles'
 
 interface IState {
   currDate: moment.Moment
+  today: moment.Moment
   openModal: boolean
   modalStyle: React.CSSProperties
   selectedDay: number
+  selectedDayAmount: number
   hoursAmount: number
 }
 
 const MODAL_WIDTH = 400
 const MODAL_HEIGHT = 150
+const LIGHT_RED = '#ff8e8e'
+const LIGHT_GREEN = '#b7ffd7'
 
 @observer
 export class Hours extends React.Component<any, IState> {
   public state: IState = {
     currDate: moment(),
+    today: moment(),
     selectedDay: 0,
+    selectedDayAmount: 0,
     hoursAmount: 0,
     openModal: false,
     modalStyle: {},
@@ -35,7 +41,7 @@ export class Hours extends React.Component<any, IState> {
     if (hoursStore.loading) {
       return <Spinner />
     }
-    const { currDate, openModal } = this.state
+    const { currDate, openModal, selectedDayAmount, modalStyle, today } = this.state
 
     const daysBefore: number[] = getDaysBefore(currDate)
 
@@ -69,23 +75,30 @@ export class Hours extends React.Component<any, IState> {
           {daysBefore.map(day => (
             <div onClick={this.goToPrevMonth} key={`${day}-before`} className={styles.disabledDayContainer}>
               <div className={styles.dayContent}>
-                <div className={styles.day}>{day + 1}</div>
+                <div className={styles.day}>{day}</div>
               </div>
             </div>
           ))}
           {days.map(day => {
-            const hours = hoursStore.getHour(currDate, day + 1)
+            const hours = hoursStore.getHour(currDate, day)
 
             return (
               <div
                 // tslint:disable-next-line:jsx-no-string-ref
-                ref={`${day + 1}-current`}
-                onClick={this.openModal(day + 1)}
+                ref={`${day}-current`}
+                onClick={this.openModal(day, hours ? hours.amount : 0)}
                 key={`${day}-current`}
                 className={styles.dayContainer}
+                style={{
+                  backgroundColor: hours
+                    ? LIGHT_GREEN
+                    : today.date() > day && today.month() === currDate.month()
+                    ? LIGHT_RED
+                    : 'white',
+                }}
               >
                 <div className={styles.dayContent}>
-                  <div className={this.isToday(day + 1) ? styles.today : styles.day}>{day + 1}</div>
+                  <div className={this.isToday(day) ? styles.today : styles.day}>{day}</div>
                   {hours && <div className={styles.content}>{hours.amount} Hours</div>}
                 </div>
               </div>
@@ -94,15 +107,13 @@ export class Hours extends React.Component<any, IState> {
           {daysAfter.map(day => (
             <div onClick={this.goToNextMonth} key={`${day}-after`} className={styles.disabledDayContainer}>
               <div className={styles.dayContent}>
-                <div className={styles.day}>{day + 1}</div>
+                <div className={styles.day}>{day}</div>
               </div>
             </div>
           ))}
         </div>
         <Modal
-          // tslint:disable-next-line:jsx-no-string-ref
-          ref="modal-ref"
-          style={this.state.modalStyle}
+          style={modalStyle}
           width={MODAL_WIDTH}
           visible={openModal}
           closable
@@ -111,10 +122,7 @@ export class Hours extends React.Component<any, IState> {
           destroyOnClose
           okText="Save"
         >
-          <ModalContent
-            onChange={this.hoursAmountChange}
-            currentAmount={hoursStore.getHour(this.state.currDate, this.state.selectedDay)}
-          />
+          <HoursModalContent onChange={this.hoursAmountChange} currentAmount={selectedDayAmount} />
         </Modal>
       </div>
     )
@@ -124,12 +132,12 @@ export class Hours extends React.Component<any, IState> {
   }
 
   public isToday = day => {
-    const { currDate } = this.state
-    if (currDate.month() !== today.month() || currDate.year() !== today.year()) {
+    const { currDate, today } = this.state
+    if (today.date() !== day) {
       return false
     }
 
-    return moment().date() === day
+    return !(currDate.month() !== today.month() || currDate.year() !== today.year())
   }
 
   public goToToday = () => {
@@ -149,7 +157,7 @@ export class Hours extends React.Component<any, IState> {
       currDate: moment(this.state.currDate).add(1, 'months'),
     })
   }
-  public openModal = day => () => {
+  public openModal = (day, selectedDayAmount) => () => {
     const element = this.refs[`${day}-current`]
     // @ts-ignore
     const rect = findDOMNode(element)!.getBoundingClientRect()
@@ -164,6 +172,7 @@ export class Hours extends React.Component<any, IState> {
         right: modalXOffset,
       },
       selectedDay: day,
+      selectedDayAmount,
       openModal: true,
     })
   }

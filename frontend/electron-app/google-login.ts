@@ -4,6 +4,7 @@ import { stringify } from 'querystring'
 import { parse } from 'url'
 
 import { LoginResponse } from '../src/types/login-response'
+import { axios } from './axios'
 
 const GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
@@ -18,7 +19,6 @@ export async function googleSignIn() {
 }
 
 function signInWithPopup() {
-
   return new Promise((resolve, reject) => {
     const authWindow = new BrowserWindow({
       width: 500,
@@ -84,7 +84,5 @@ async function fetchAccessTokens(code) {
 }
 
 async function signIn(googleToken): Promise<LoginResponse> {
-  const { data, status } = await Axios.post('http://localhost:8000/auth/login', { googleToken })
-
-  return data
+  return axios.post('auth/login', { googleToken })
 }
