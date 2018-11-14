@@ -2,10 +2,9 @@ import { IpcRenderer } from 'electron'
 import * as React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom'
 
-import { decode } from 'jsonwebtoken'
 import { observer } from 'mobx-react'
+import { axios } from '../http/axios'
 import { authStore } from '../stores/AuthStore'
-import { routerStore } from '../stores/router/router-store'
 import { GoogleLoginComponent } from './login-forms/GoogleLogin'
 import { MainLayout } from './MainLayout'
 import { Spinner } from './spinner/Spinner'
@@ -35,9 +34,8 @@ export class MainRouterComponent extends React.Component<RouteComponentProps, { 
   public componentDidMount = () => {
     ipcRenderer.on('jwt-reply', (event, token) => {
       if (token) {
-        const { email, id, type }: any = decode(token.toString('utf-8'), { json: true })
         authStore.token = token
-        routerStore.gotoCalendar()
+        axios.defaults.headers.token = token
       }
       this.setState({ loading: false })
     })

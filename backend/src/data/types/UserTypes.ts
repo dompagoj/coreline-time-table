@@ -35,3 +35,10 @@ export class UserInput {
     this.companyId = companyId
   }
 }
+
+export interface UserUpdateInput {
+  username: string
+  type: UserType
+  authKey: string
+  avatar: string
+}

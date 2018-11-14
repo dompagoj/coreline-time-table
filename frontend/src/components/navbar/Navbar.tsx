@@ -43,6 +43,10 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
               <Icon type="clock-circle" />
               <span>Hours</span>
             </Menu.Item>
+            <Menu.Item key="/voting">
+              <Icon type="usergroup-add" />
+              <span>Voting</span>
+            </Menu.Item>
           </Menu>
           <Menu onClick={this.logout} selectable={false} mode="inline" theme="dark">
             <Menu.Item>

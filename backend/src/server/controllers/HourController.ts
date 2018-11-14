@@ -52,15 +52,15 @@ export class HourController extends BaseController<
   public async updateOrCreate({ date, hours }: HourInput) {
     const { user } = this.locals
     const { amount, projects } = hours
-    if (projects) {
-      await Promise.all(
-        projects.map(async project => {
-          const dbProject = await Project.findOneOrFail(project.projectId)
-          dbProject.hours += project.hours
-          await dbProject.save()
-        }),
-      )
-    }
+    // if (projects) {
+    //   await Promise.all(
+    //     projects.map(async project => {
+    //       const dbProject = await Project.findOneOrFail(project.projectId)
+    //       dbProject.hours += project.hours
+    //       await dbProject.save()
+    //     }),
+    //   )
+    // }
     const hour = await Hour.findOne({
       where: {
         date,

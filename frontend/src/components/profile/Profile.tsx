@@ -1,11 +1,29 @@
-import { Button, Form, Input, Radio } from 'antd'
+import { Button, Form, Input, Modal, Radio } from 'antd'
 import * as React from 'react'
 const FormItem = Form.Item
 
+import { authStore } from '../../stores/AuthStore'
+import { UserType } from '../../types/enums'
 import { styles } from './styles'
 
-export class Profile extends React.Component {
+interface IState {
+  modalOpen: boolean
+  username: string
+  authKey: string
+  type?: UserType
+}
+
+export class Profile extends React.Component<any, IState> {
+  public state: IState = {
+    modalOpen: false,
+    username: '',
+    authKey: '',
+    type: undefined,
+  }
   public render() {
+    const { user } = authStore
+    const { modalOpen } = this.state
+
     return (
       <div className={styles.container}>
         <div>
@@ -15,16 +33,16 @@ export class Profile extends React.Component {
           <div>
             <Form>
               <FormItem>
-                <Input addonBefore="Username" size="large" />
+                <Input required defaultValue={user.username} addonBefore="Username" size="large" />
               </FormItem>
               <FormItem>
-                <Input addonBefore="Firstname" size="large" />
+                <Input disabled defaultValue={user.firstName} addonBefore="Firstname" size="large" />
               </FormItem>
-              <FormItem>
-                <Input addonBefore="Lastname" size="large" />
+              <FormItem style={{ marginBottom: 5 }}>
+                <Input disabled defaultValue={user.lastName} addonBefore="Lastname" size="large" />
               </FormItem>
               <FormItem style={{ textAlign: 'center' }}>
-                <Radio.Group buttonStyle="solid" defaultValue="employee">
+                <Radio.Group name="type" onChange={this.onRadioChange} buttonStyle="solid" defaultValue={user.type}>
                   <Radio.Button style={{ marginRight: 10 }} value="employee">
                     Employee
                   </Radio.Button>
@@ -33,13 +51,40 @@ export class Profile extends React.Component {
                   </Radio.Button>
                 </Radio.Group>
               </FormItem>
+              <FormItem className={styles.buttons}>
+                <Button onClick={this.updateProfile} size="large" type="primary" icon="save">
+                  Save
+                </Button>
+              </FormItem>
             </Form>
           </div>
           <div>
-            <h1>World</h1>
+            <h1>Todo: profile pic</h1>
           </div>
         </div>
+        <Modal title="Company password" visible={modalOpen} onCancel={this.closeModal}>
+          <Input name="authKey" addonBefore="Password" />
+        </Modal>
       </div>
     )
   }
+  public openModal = () => {
+    this.setState({ modalOpen: true })
+  }
+  public closeModal = () => {
+    this.setState({ modalOpen: false })
+  }
+
+  public onRadioChange = e => {
+    if (e.target.value === 'employer') {
+      this.openModal()
+    }
+  }
+  public onChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    } as any)
+  }
+
+  public updateProfile = () => {}
 }

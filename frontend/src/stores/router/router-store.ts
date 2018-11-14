@@ -12,8 +12,19 @@ export class MobxRouterStore extends RouterStore {
 
   @action
   public gotoHome() {
+    this.history.push('/')
+  }
+
+  @action
+  public gotoProfile() {
     this.history.push('/profile')
   }
+
+  @action
+  public gotoVoting() {
+    this.history.push('/voting')
+  }
+
   @action
   public gotoCalendar() {
     this.history.push('/hours')

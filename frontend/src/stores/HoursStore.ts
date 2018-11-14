@@ -1,6 +1,7 @@
 import { action, computed, observable } from 'mobx'
 import * as moment from 'moment'
 
+import { successCode } from '../components/utils/misc'
 import { CreateHoursInput, HoursApi } from '../http/HoursApi'
 
 class HoursStore {
@@ -16,6 +17,9 @@ class HoursStore {
   }
 
   public getHour(currDate, day) {
+    if (!this.hours) {
+      return undefined
+    }
     const selectedDay = moment(new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`))
 
     const foundHour = this.hours.find(hour => {
@@ -29,8 +33,10 @@ class HoursStore {
 
   @action.bound
   public async createHour(input: CreateHoursInput) {
-    const { data } = await this.api.createHour(input)
-    console.log({ data })
+    const { data, status } = await this.api.createHour(input)
+    if (!successCode(status)) {
+      return
+    }
     if (data.updated) {
       const hourIndex = this.hours.findIndex(hour => hour.date === data.hour.date)
       this.hours[hourIndex] = data.hour

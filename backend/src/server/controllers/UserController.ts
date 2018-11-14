@@ -1,11 +1,13 @@
+import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
+import { UserType } from '../../data/enums/UserType'
 import { Context } from '../../data/types/Context'
-import { UserInput } from '../../data/types/UserTypes'
-import { DELETE, GET, POST } from '../controller-decorators'
+import { UserInput, UserUpdateInput } from '../../data/types/UserTypes'
+import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { validateBody } from '../middlewares/validate-body'
 import { BaseController } from './BaseController'
 
-export class UserController extends BaseController<Context, { companyId: string }> {
+export class UserController extends BaseController<Context, { companyId: string; id: string }, { company: Company }> {
   constructor(req, res, next) {
     super(req, res, next)
   }
@@ -32,21 +34,24 @@ export class UserController extends BaseController<Context, { companyId: string 
 
     return this.accepted(userData)
   }
-  // @POST('/', { before: validateBody(UserInput)})
-  // public async create({ type, username, firstName, lastName, googleToken, email }: UserInput) {
-  //   const companyId = parseInt(this.routeData.companyId, 10)
-  //   const user = await User.create({
-  //     username,
-  //     type,
-  //     companyId,
-  //     firstName,
-  //     lastName,
-  //     googleToken,
-  //     email,
-  //    }).save()
+  @PUT('/:id')
+  public async update({ username, type, authKey, avatar }: UserUpdateInput) {
+    const { id } = this.routeData
+    const { company } = this.locals
+    const user = await User.findOne(id)
 
-  //   return this.accepted(user)
-  // }
+    if (type === UserType.EMPLOYER) {
+      if (company.authKey !== authKey) {
+        return this.badRequest({ error: 'Wrong password' })
+      }
+    }
+    user.username = username
+    user.type = type
+    user.avatar = avatar
+    await user.save()
+
+    this.accepted(user)
+  }
 
   @DELETE('/:id')
   public async delete() {

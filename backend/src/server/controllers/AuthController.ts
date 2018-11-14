@@ -3,6 +3,7 @@ import { sign } from 'jsonwebtoken'
 
 // tslint:disable-next-line:no-submodule-imports
 import { TokenPayload } from 'google-auth-library/build/src/auth/loginticket'
+import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
 import { UserType } from '../../data/enums/UserType'
 import { config } from '../config'
@@ -16,7 +17,7 @@ export class AuthController extends BaseController {
     try {
       payload = await this.verify(googleToken)
     } catch (e) {
-      return this.accepted('Not valid google token')
+      return this.badRequest({ error: 'Not valid google token' })
     }
     const { email, given_name: firstName, family_name: lastName, hd, picture } = payload
     if (hd !== 'coreline.agency') {
@@ -27,6 +28,12 @@ export class AuthController extends BaseController {
         email,
       },
     })
+    const company = await Company.findOne({
+      where: { domain: hd },
+    })
+    if (!company) {
+      return this.badRequest({ error: `No company with domain: ${hd}` })
+    }
     if (!user) {
       user = await User.create({
         email,
@@ -35,7 +42,8 @@ export class AuthController extends BaseController {
         type: UserType.EMPLOYEE,
         googleToken,
         username: firstName,
-        companyId: 1,
+        companyId: company.id,
+        avatar: picture,
       }).save()
     }
     const { googleToken: token, ...data } = user

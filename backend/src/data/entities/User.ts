@@ -26,10 +26,13 @@ export class User extends BaseEntity {
   @Column({ enum: UserType, default: UserType.EMPLOYEE })
   public type: UserType
 
+  @Column({ nullable: true })
+  public avatar?: string
+
   @Column()
   public companyId: number
 
-  @ManyToOne(type => Company, company => company.users, { nullable: false })
+  @ManyToOne(type => Company, company => company.users, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'company_id' })
   public company: Promise<Company>
 

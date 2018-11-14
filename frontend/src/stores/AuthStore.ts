@@ -1,6 +1,7 @@
 import Axios from 'axios'
 import { decode } from 'jsonwebtoken'
 import { action, computed, observable } from 'mobx'
+import { axios } from '../http/axios'
 import { User } from '../types/user'
 
 class AuthStore {
@@ -14,14 +15,15 @@ class AuthStore {
   get isLoggedIn() {
     return this.token !== null && this.token !== undefined
   }
-  @computed get loading() {
+  @computed
+  get loading() {
     return this.user === null || this.user === undefined
   }
 
   @action
   public async getUser() {
     const { id }: any = decode(this.token)
-    const { data } = await Axios.get(`http://localhost:8000/companies/1/users/${id}`)
+    const { data } = await axios.get(`companies/1/users/${id}`)
     this.user = data
   }
 }

@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx'
-import { GetUsersInput, UsersApi } from '../http/UsersApi'
+import { GetUsersInput, UpdateUserInput, UsersApi } from '../http/UsersApi'
 
 class UserStore {
   @observable
@@ -18,6 +18,11 @@ class UserStore {
   }
   public getUser(id: number) {
     return this.users.find(user => user.id === id)
+  }
+  public async updateUser(input: UpdateUserInput) {
+    const { data, status } = await this.usersApi.updateUser(input)
+
+    return data
   }
 }
 

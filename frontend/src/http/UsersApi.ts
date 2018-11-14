@@ -1,6 +1,7 @@
 import Axios from 'axios'
 import { UserType } from '../types/enums'
 import { ID } from '../types/general'
+import { axios } from './axios'
 
 export interface GetUsersInput {
   companyId: ID
@@ -9,24 +10,25 @@ export interface GetUserInput extends GetUsersInput {
   userId: ID
 }
 
-export interface CreateUserInput {
+export interface UpdateUserInput {
+  companyId: ID
   username: string
   type: UserType
-  googleToken?: string | null
-  firstName: string
-  lastName: string
-  companyId: ID
+  authKey: string
 }
 
 export class UsersApi {
   public async getUsers({ companyId }: GetUsersInput) {
-    return Axios.get(`http://localhost:8000/companies/${companyId}/users`)
+    return axios.get(`companies/${companyId}/users`)
   }
 
   public async getUser({ userId, companyId }: GetUserInput) {
-    return Axios.get(`http://localhost:8000/companies/${companyId}/users/${userId}`)
+    return axios.get(`companies/${companyId}/users/${userId}`)
   }
-  public createUser({ companyId, ...data }: CreateUserInput) {
-    return Axios.post(`http://localhost:8000/companies/${companyId}/users`, data)
+
+  public async updateUser(input: UpdateUserInput) {
+    const { companyId, ...data } = input
+
+    return axios.put(`companies/${input.companyId}/users`, { ...data })
   }
 }

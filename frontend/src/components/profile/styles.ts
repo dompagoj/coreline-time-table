@@ -18,6 +18,9 @@ export const styles = {
     grid-template-columns: 60% 40%;
     grid-gap: 15px;
   `,
+  buttons: css`
+    text-align: end;
+  `,
 }
 
 //style={{ fontWeight: 'bold', letterSpacing: '-0.5px', textAlign: 'center' }}

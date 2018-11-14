@@ -12,6 +12,12 @@ export class Company extends BaseEntity {
   })
   public name: string
 
+  @Column()
+  public authKey: string
+
+  @Column()
+  public domain: string
+
   @OneToMany(type => User, user => user.company)
   public users: Promise<User[]>
 
