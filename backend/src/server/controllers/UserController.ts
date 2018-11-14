@@ -30,6 +30,9 @@ export class UserController extends BaseController<Context, { companyId: string;
         companyId,
       },
     })
+    if (!user) {
+      this.badRequest({ error: 'No user found' })
+    }
     const { googleToken, ...userData } = user
 
     return this.accepted(userData)

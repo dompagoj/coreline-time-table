@@ -3,14 +3,14 @@ import { css } from 'emotion'
 export const styles = {
   container: css`
     min-width: 400px;
-    height: 90%;
-    margin: 20px;
+    height: 100%;
+    padding: 20px;
   `,
 
   rowContainer: css`
     display: grid;
-    height: 100%;
-    grid: auto-flow / repeat(7, 1fr);
+    height: calc(100% - 53px);
+    grid-template: repeat(6, 1fr) / repeat(7, 1fr);
   `,
 
   dayContainer: css`
