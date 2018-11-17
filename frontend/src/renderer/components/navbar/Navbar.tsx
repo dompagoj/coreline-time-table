@@ -59,8 +59,9 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
     )
   }
   public componentDidMount = () => {
+    const { pathname } = routerStore.location
     this.setState({
-      activeMenu: [routerStore.location.pathname],
+      activeMenu: pathname === '/' ? ['/profile'] : [pathname],
     })
   }
 

@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import * as isDev from 'electron-is-dev'
 import { join } from 'path'
+import { format as formatUrl } from 'url'
 import { googleSignIn } from './google-login'
 import { deleteToken, readToken, saveToken } from './utils'
 
@@ -15,7 +16,11 @@ function createWindow() {
     minHeight: 680,
     icon: join(__dirname, 'icons/coreline-logo.icns'),
   })
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${join(__dirname, '../build/index.html')}`)
+  mainWindow.loadURL(isDev ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}` : formatUrl({
+    pathname: join(__dirname, 'index.html'),
+    protocol: 'file',
+    slashes: true
+  }))
   mainWindow.on('closed', () => (mainWindow = null))
 
   if (isDev) {

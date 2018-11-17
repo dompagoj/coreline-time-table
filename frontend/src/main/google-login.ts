@@ -3,7 +3,7 @@ import { BrowserWindow } from 'electron'
 import { stringify } from 'querystring'
 import { parse } from 'url'
 
-import { LoginResponse } from '../src/types/login-response'
+import { LoginResponse } from '../renderer/types/login-response'
 import { axios } from './axios'
 
 const GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
@@ -84,5 +84,5 @@ async function fetchAccessTokens(code) {
 }
 
 async function signIn(googleToken): Promise<LoginResponse> {
-  return axios.post('auth/login', { googleToken })
+ return axios.post('auth/login', { googleToken })
 }

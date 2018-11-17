@@ -1,8 +1,8 @@
-import { createBrowserHistory } from 'history'
+import { createHashHistory } from 'history'
 import { action } from 'mobx'
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router'
 
-const browserHistory = createBrowserHistory()
+const hashHistory = createHashHistory()
 
 export class MobxRouterStore extends RouterStore {
   @action
@@ -32,4 +32,4 @@ export class MobxRouterStore extends RouterStore {
 }
 
 export const routerStore = new MobxRouterStore()
-export const history = syncHistoryWithStore(browserHistory, routerStore)
+export const history = syncHistoryWithStore(hashHistory, routerStore)

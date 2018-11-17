@@ -10,7 +10,8 @@ export const styles = {
   rowContainer: css`
     display: grid;
     height: calc(100% - 53px);
-    grid-template: repeat(6, 1fr) / repeat(7, 1fr);
+    grid: auto-flow / repeat(7, 1fr);
+    /* grid-template: repeat(6, 1fr) / repeat(7, 1fr); */
   `,
 
   dayContainer: css`
