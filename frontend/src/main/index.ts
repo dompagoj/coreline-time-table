@@ -1,9 +1,10 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
-import * as isDev from 'electron-is-dev'
 import { join } from 'path'
 import { format as formatUrl } from 'url'
 import { googleSignIn } from './google-login'
 import { deleteToken, readToken, saveToken } from './utils'
+
+const isDev = process.env.NODE_ENV !== 'production';
 
 let mainWindow
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
@@ -14,7 +15,6 @@ function createWindow() {
     height: 680,
     minWidth: 900,
     minHeight: 680,
-    icon: join(__dirname, 'icons/coreline-logo.icns'),
   })
   mainWindow.loadURL(isDev ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}` : formatUrl({
     pathname: join(__dirname, 'index.html'),
@@ -22,18 +22,6 @@ function createWindow() {
     slashes: true
   }))
   mainWindow.on('closed', () => (mainWindow = null))
-
-  if (isDev) {
-    const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
-
-    installExtension(REACT_DEVELOPER_TOOLS)
-      .then(name => {
-        console.log(`Added Extension: ${name}`)
-      })
-      .catch(err => {
-        console.log('An error occurred: ', err)
-      })
-  }
 }
 
 app.on('ready', createWindow)

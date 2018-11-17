@@ -59,7 +59,7 @@ export class Profile extends React.Component<any, IState> {
             </Form>
           </div>
           <div>
-            <h1>Todo: profile pic</h1>
+            <h1>Todo: profile pic hehe</h1>
           </div>
         </div>
         <Modal title="Company password" visible={modalOpen} onCancel={this.closeModal}>

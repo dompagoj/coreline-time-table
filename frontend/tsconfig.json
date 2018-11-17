@@ -4,8 +4,6 @@
     "jsx": "react",
     "strict": false,
     "noUnusedLocals": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
   },
   "lib": [
     "es5",
