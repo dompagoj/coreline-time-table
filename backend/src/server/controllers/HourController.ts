@@ -81,10 +81,4 @@ export class HourController extends BaseController<
       .save()
       .then(created => this.accepted(created))
   }
-
-  @PUT('/:id')
-  public async update({ date, hours }: HourInput) {
-    const { user } = this.locals
-    this.badRequest('Not yet implemented')
-  }
 }

@@ -7,7 +7,7 @@ import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { Spinner } from '../spinner/Spinner'
 import { getDaysAfter, getDaysBefore } from '../utils/hours'
-import { inRange } from '../utils/misc'
+import { inRange, sum } from '../utils/misc'
 import { HoursModalContent } from './HoursModalContent'
 import { styles } from './styles'
 
@@ -52,7 +52,7 @@ export class Hours extends React.Component<any, IState> {
     return (
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div style={{}}>
+          <div>
             <span style={{ marginRight: '5px', fontWeight: 'bold', fontSize: '20px' }}>{currDate.format('MMMM')}</span>
             <span>{currDate.format('YYYY')}</span>
           </div>
@@ -71,7 +71,7 @@ export class Hours extends React.Component<any, IState> {
           <div>Sat</div>
           <div>Sun</div>
         </div>
-        <div className={styles.rowContainer}>
+        <div className={styles.rowContainer(currDate.daysInMonth() + daysBefore.length)}>
           {daysBefore.map(day => (
             <div onClick={this.goToPrevMonth} key={`${day}-before`} className={styles.disabledDayContainer}>
               <div className={styles.dayContent}>

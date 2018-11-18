@@ -1,7 +1,7 @@
 import Axios from 'axios'
 import { decode } from 'jsonwebtoken'
 import { action, computed, observable } from 'mobx'
-import { axios } from '../http/axios'
+import { axios } from '../../main/axios'
 import { User } from '../types/user'
 
 class AuthStore {

@@ -6,14 +6,7 @@ export const styles = {
     height: 100%;
     padding: 20px;
   `,
-
-  rowContainer: css`
-    display: grid;
-    height: calc(100% - 53px);
-    grid: auto-flow / repeat(7, 1fr);
-    /* grid-template: repeat(6, 1fr) / repeat(7, 1fr); */
-  `,
-
+  rowContainer,
   dayContainer: css`
     padding: 10px;
     border: 1px solid black;
@@ -61,4 +54,15 @@ export const styles = {
     border-radius: 25px;
     margin-bottom: 5px;
   `,
+}
+
+function rowContainer(days) {
+  const rows = Math.ceil(days / 7)
+  console.log({ days })
+
+  return css`
+    display: grid;
+    height: calc(100% - 53px);
+    grid-template: repeat(${rows}, 1fr) / repeat(7, 1fr);
+  `
 }

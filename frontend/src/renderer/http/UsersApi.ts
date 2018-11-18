@@ -1,7 +1,7 @@
 import Axios from 'axios'
+import { axios } from '../../main/axios'
 import { UserType } from '../types/enums'
 import { ID } from '../types/general'
-import { axios } from './axios'
 
 export interface GetUsersInput {
   companyId: ID

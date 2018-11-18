@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom'
 
 import { observer } from 'mobx-react'
-import { axios } from '../http/axios'
+import { axios } from '../../main/axios'
 import { authStore } from '../stores/AuthStore'
 import { GoogleLoginComponent } from './login-forms/GoogleLogin'
 import { MainLayout } from './MainLayout'

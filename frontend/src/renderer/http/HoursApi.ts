@@ -1,6 +1,6 @@
+import { axios } from '../../main/axios'
 import { authStore } from '../stores/AuthStore'
 import { ID } from '../types/general'
-import { axios } from './axios'
 
 interface GetHoursInput {
   companyId: ID
