@@ -4,4 +4,3 @@ require('reflect-metadata')
 
 require('./server/app')
 
-console.log('ENV VARIABLES: ', process.env)
