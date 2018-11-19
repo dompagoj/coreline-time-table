@@ -7,7 +7,7 @@
     "node": ">=8.10.0"
   },
   "scripts": {
-    "start": "node src/",
+    "start": "pm2 start src/index.js --name ctt",
     "dev": "nodemon",
     "db:start": "docker container start 5f5accb6fddd",
     "db:init": "docker-compose -f docker-compose.yml up -d"
