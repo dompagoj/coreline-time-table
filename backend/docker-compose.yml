@@ -5,6 +5,6 @@ services:
     ports:
       - '5430:5432'
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: ctt
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
