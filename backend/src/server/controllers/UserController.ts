@@ -25,9 +25,7 @@ export class UserController extends BaseController<Context, { companyId: string;
   @GET('/:id')
   public async one() {
     const { company } = this.locals
-    const {
-      user: { id },
-    } = this.req.ctx
+    const { id } = this.routeData
 
     const user = await User.findOne({
       where: {
@@ -47,9 +45,7 @@ export class UserController extends BaseController<Context, { companyId: string;
 
   @PUT('/:id')
   public async update({ username, type, authKey, avatar }: UserUpdateInput) {
-    const {
-      user: { id },
-    } = this.ctx
+    const { id } = this.ctx.user
 
     const { company } = this.locals
     const user = await User.findOne(id)

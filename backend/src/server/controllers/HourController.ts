@@ -11,7 +11,7 @@ import { BaseController } from './BaseController'
 
 export class HourController extends BaseController<
   Context,
-  { companyId: string; userId: string; dateId?: string },
+  { companyId: string; userId: string; dateId: string },
   { user: User }
 > {
   public static routes: Route[] = []
@@ -37,6 +37,7 @@ export class HourController extends BaseController<
     const { user } = this.locals
 
     const date = new Date(dateId)
+
     Hour.findOneOrFail({
       where: {
         date,

@@ -8,15 +8,22 @@ export const hourRouter = Router({ mergeParams: true })
 
 hourRouter.use('/', async (req: any, res, next) => {
   const { companyId, userId: userIdParams } = req.params
-  const {
-    user: { id: userId },
-  } = req.ctx
+  const { id: userId } = req.ctx.user
+
+  if (userIdParams && parseInt(userIdParams, 10) !== userId) {
+    const reqUser = await User.findOne(userId)
+    if (reqUser.type !== UserType.EMPLOYER) {
+      return res.status(401).end()
+    }
+  }
+
   const user = await User.findOne({
     where: {
-      id: userId,
+      id: userIdParams,
       companyId,
     },
   })
+
   if (!user) {
     return res
       .status(400)
@@ -24,11 +31,6 @@ hourRouter.use('/', async (req: any, res, next) => {
         error: `No user with id ${userId} under company with id ${companyId} found`,
       })
       .end()
-  }
-  if (user.type !== UserType.EMPLOYER) {
-    if (userIdParams !== user.id) {
-      return res.status(401)
-    }
   }
   res.locals.user = user
   next()
