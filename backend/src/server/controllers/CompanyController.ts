@@ -4,7 +4,7 @@ import { Context } from '../../data/types/Context'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
-export class CompanyController extends BaseController<Context> {
+export class CompanyController extends BaseController<Context, { id: string }> {
   public constructor(req, res, next) {
     super(req, res, next)
   }
@@ -52,5 +52,20 @@ export class CompanyController extends BaseController<Context> {
         this.accepted(company)
       })
       .catch(e => this.badRequest())
+  }
+  @POST('/:id/verify-key')
+  private async verifyCompanyAuthKey({ authKey }) {
+    const { id } = this.routeData
+    const company = await Company.findOne(id)
+
+    if (!company) {
+      return this.badRequest('No company found')
+    }
+
+    if (company.authKey !== authKey) {
+      return this.badRequest({ error: 'Wrong password' })
+    }
+
+    return this.accepted()
   }
 }

@@ -16,3 +16,7 @@ mainRouter.use('/companies', companyRouter)
 mainRouter.use('/companies/:companyId/users', userRouter)
 
 mainRouter.use('/companies/:companyId/users/:userId/hours', hourRouter)
+
+mainRouter.use('*', (req, res) => {
+  res.status(400).json({ error: 'Non existing route' })
+})

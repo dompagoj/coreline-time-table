@@ -9,19 +9,20 @@ const contentContainer = css`
 
 export class HoursModalContent extends React.Component<{
   currentAmount: number
-  onChange(amount: number),
+  onChange(amount: number)
+  onSubmit(e: any): any
 }> {
   public render() {
-    const { onChange, currentAmount } = this.props
+    const { onChange, currentAmount, onSubmit } = this.props
 
     return (
-      <Form className={contentContainer}>
+      <Form onSubmit={onSubmit}>
         <FormItem label="Hours">
-          <InputNumber defaultValue={currentAmount} onChange={onChange} min={0} max={12} />
+          <InputNumber autoFocus defaultValue={currentAmount} onChange={onChange} min={0} max={12} />
         </FormItem>
-        <FormItem validateStatus="warning" help="Not yet implemented">
+        {/* <FormItem validateStatus="warning" help="Not yet implemented">
           <Input addonBefore="Project" />
-        </FormItem>
+        </FormItem> */}
       </Form>
     )
   }

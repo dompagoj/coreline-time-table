@@ -6,6 +6,7 @@ import * as React from 'react'
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
 import { LoginResponse } from '../../types/login-response'
+import { axios } from '../../../main/axios'
 
 // @ts-ignore
 const electron = window.require('electron')
@@ -60,12 +61,15 @@ export class GoogleLoginComponent extends React.Component<any, { error: string |
   }
   public login = async () => {
     ipcRenderer.on('reply', async (event, arg) => {
-      const { token, user, error } = arg
+      const { token, user, error, authKey } = arg
       if (error) {
         return this.setState({ error })
       }
+      console.log({ token })
       authStore.token = token
       authStore.user = user
+      authStore.companyAuthKey = authKey
+      axios.defaults.headers.token = token
       routerStore.gotoHome()
     })
     ipcRenderer.send('login')

@@ -2,33 +2,23 @@ import Axios from 'axios'
 import { axios } from '../../main/axios'
 import { UserType } from '../types/enums'
 import { ID } from '../types/general'
-
-export interface GetUsersInput {
-  companyId: ID
-}
-export interface GetUserInput extends GetUsersInput {
-  userId: ID
-}
+import { authStore } from '../stores/AuthStore'
 
 export interface UpdateUserInput {
-  companyId: ID
   username: string
   type: UserType
   authKey: string
 }
 
 export class UsersApi {
-  public async getUsers({ companyId }: GetUsersInput) {
-    return axios.get(`companies/${companyId}/users`)
-  }
-
-  public async getUser({ userId, companyId }: GetUserInput) {
-    return axios.get(`companies/${companyId}/users/${userId}`)
+  public async getUsers() {
+    const { user } = authStore
+    return axios.get(`companies/${user.companyId}/users`)
   }
 
   public async updateUser(input: UpdateUserInput) {
-    const { companyId, ...data } = input
+    const { companyId, id } = authStore.user
 
-    return axios.put(`companies/${input.companyId}/users`, { ...data })
+    return axios.put(`companies/${companyId}/users/${id}`, { ...input })
   }
 }

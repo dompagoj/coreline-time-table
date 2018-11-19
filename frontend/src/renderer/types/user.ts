@@ -1,6 +1,6 @@
 import { UserType } from './enums'
 
-export interface User {
+export interface AuthUser {
   id: number
   username: string
   firstName?: string
@@ -9,4 +9,12 @@ export interface User {
   email?: string
   type?: UserType
   companyId?: number
+  avatar?: string
+}
+
+export interface User {
+  id: number
+  username: string
+  email: string
+  avatar?: string
 }

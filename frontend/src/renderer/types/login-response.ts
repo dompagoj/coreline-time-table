@@ -12,7 +12,8 @@ export interface LoginResponse extends AxiosResponse {
       lastName: string
       email: string
       type: UserType
-      companyId: number,
-    },
+      companyId: number
+    }
+    authKey: string
   }
 }

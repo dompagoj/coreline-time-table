@@ -7,7 +7,6 @@ import { Context } from '../../data/types/Context'
 import { HourInput } from '../../data/types/HourTypes'
 import { Route } from '../../data/types/routing'
 import { GET, POST, PUT } from '../controller-decorators'
-import { validateBody } from '../middlewares/validate-body'
 import { BaseController } from './BaseController'
 
 export class HourController extends BaseController<

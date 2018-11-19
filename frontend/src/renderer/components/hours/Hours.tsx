@@ -1,4 +1,4 @@
-import { Button, message, Modal } from 'antd'
+import { Button, message, Modal, Form } from 'antd'
 import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
@@ -19,6 +19,7 @@ interface IState {
   selectedDay: number
   selectedDayAmount: number
   hoursAmount: number
+  modalTitle: string
 }
 
 const MODAL_WIDTH = 400
@@ -36,12 +37,13 @@ export class Hours extends React.Component<any, IState> {
     hoursAmount: 0,
     openModal: false,
     modalStyle: {},
+    modalTitle: '',
   }
   public render() {
     if (hoursStore.loading) {
       return <Spinner />
     }
-    const { currDate, openModal, selectedDayAmount, modalStyle, today } = this.state
+    const { currDate, openModal, selectedDayAmount, modalStyle, today, modalTitle } = this.state
 
     const daysBefore: number[] = getDaysBefore(currDate)
 
@@ -79,19 +81,25 @@ export class Hours extends React.Component<any, IState> {
               </div>
             </div>
           ))}
-          {days.map(day => {
+          {days.map((day, index) => {
             const hours = hoursStore.getHour(currDate, day)
+
+            const saturday = (daysBefore.length + index + 2) % 7 === 0
+            const sunday = (daysBefore.length + index + 1) % 7 === 0
+            const weekend = saturday || sunday
 
             return (
               <div
                 // tslint:disable-next-line:jsx-no-string-ref
                 ref={`${day}-current`}
-                onClick={this.openModal(day, hours ? hours.amount : 0)}
+                onClick={this.openModal(day, hours ? hours.amount : 0, weekend)}
                 key={`${day}-current`}
                 className={styles.dayContainer}
                 style={{
                   backgroundColor: hours
                     ? LIGHT_GREEN
+                    : weekend
+                    ? '#d1d1d1'
                     : today.date() > day && today.month() === currDate.month()
                     ? LIGHT_RED
                     : 'white',
@@ -119,10 +127,16 @@ export class Hours extends React.Component<any, IState> {
           closable
           onCancel={this.closePopover}
           onOk={this.createHour}
+          okButtonProps={{ htmlType: 'submit' }}
           destroyOnClose
+          title={modalTitle}
           okText="Save"
         >
-          <HoursModalContent onChange={this.hoursAmountChange} currentAmount={selectedDayAmount} />
+          <HoursModalContent
+            onSubmit={this.createHour}
+            onChange={this.hoursAmountChange}
+            currentAmount={selectedDayAmount}
+          />
         </Modal>
       </div>
     )
@@ -157,7 +171,8 @@ export class Hours extends React.Component<any, IState> {
       currDate: moment(this.state.currDate).add(1, 'months'),
     })
   }
-  public openModal = (day, selectedDayAmount) => () => {
+  public openModal = (day, selectedDayAmount, weekend) => () => {
+    console.log('weekend? ', weekend)
     const element = this.refs[`${day}-current`]
     // @ts-ignore
     const rect = findDOMNode(element)!.getBoundingClientRect()
@@ -173,6 +188,7 @@ export class Hours extends React.Component<any, IState> {
       },
       selectedDay: day,
       selectedDayAmount,
+      modalTitle: weekend ? "You shouldn't work on the weekends" : '',
       openModal: true,
     })
   }
@@ -182,7 +198,9 @@ export class Hours extends React.Component<any, IState> {
     })
   }
 
-  public createHour = async () => {
+  public createHour = async e => {
+    e.preventDefault()
+
     const { currDate, selectedDay, hoursAmount } = this.state
     const day = moment(new Date(`${currDate.month() + 1}.${selectedDay + 1}.${currDate.year()}`))
     await hoursStore.createHour({

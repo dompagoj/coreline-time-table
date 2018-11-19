@@ -17,7 +17,7 @@ const spinnerContainerStyle = css`
 `
 
 export const Spinner = () => (
-  <div>
+  <div className={spinnerContainerStyle}>
     <Spin size="large" />
   </div>
 )

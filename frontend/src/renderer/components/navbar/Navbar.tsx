@@ -36,7 +36,7 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
           <Menu defaultSelectedKeys={this.state.activeMenu} onSelect={this.handleRoute} mode="inline" theme="dark">
             <Menu.Item key="/profile">
               <Icon type="user" />
-              {authStore.user && <span>{authStore.user.firstName}</span>}
+              {authStore.user && <span>{authStore.user.username}</span>}
             </Menu.Item>
             <Menu.Divider />
             <Menu.Item key="/hours">

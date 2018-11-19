@@ -6,21 +6,21 @@ export const styles = {
     height: 100%;
     padding: 20px;
   `,
-  rowContainer,
   dayContainer: css`
     padding: 10px;
     border: 1px solid black;
     margin: -1px -1px 0 0;
     &:hover {
-      background-color: rgba(127, 176, 255, 0.65);
-      transition: 0.8s ease-out;
+      background-color: rgba(127, 176, 255, 0.65) !important;
+      transition: 0.8s ease-out !important;
+      cursor: pointer !important;
     }
   `,
   disabledDayContainer: css`
     padding: 10px;
     border: 1px solid black;
     margin: -1px -1px 0 0;
-    background-color: lightgray;
+    background-color: darkgray;
   `,
 
   dayContent: css`
@@ -54,11 +54,11 @@ export const styles = {
     border-radius: 25px;
     margin-bottom: 5px;
   `,
+  rowContainer,
 }
 
 function rowContainer(days) {
   const rows = Math.ceil(days / 7)
-  console.log({ days })
 
   return css`
     display: grid;

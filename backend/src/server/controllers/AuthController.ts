@@ -23,17 +23,20 @@ export class AuthController extends BaseController {
     if (hd !== 'coreline.agency') {
       return this.badRequest({ error: 'Only coreline.agency domain is allowed' })
     }
-    let user = await User.findOne({
-      where: {
-        email,
-      },
-    })
+
     const company = await Company.findOne({
       where: { domain: hd },
     })
     if (!company) {
       return this.badRequest({ error: `No company with domain: ${hd}` })
     }
+
+    let user = await User.findOne({
+      where: {
+        email,
+      },
+    })
+
     if (!user) {
       user = await User.create({
         email,
@@ -45,11 +48,19 @@ export class AuthController extends BaseController {
         companyId: company.id,
         avatar: picture,
       }).save()
+    } else {
+      user.firstName = firstName
+      user.lastName = lastName
+      user.avatar = picture
+
+      await user.save()
     }
+
     const { googleToken: token, ...data } = user
     return this.accepted({
-      token: sign({ email, id: user.id, type: user.type }, config.jwtSecret),
+      token: sign({ email, id: user.id, type: user.type, companyId: company.id }, config.jwtSecret),
       user: data,
+      authKey: user.type === UserType.EMPLOYER ? company.authKey : '',
     })
   }
 

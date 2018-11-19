@@ -2,9 +2,8 @@ import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
 import { UserType } from '../../data/enums/UserType'
 import { Context } from '../../data/types/Context'
-import { UserInput, UserUpdateInput } from '../../data/types/UserTypes'
+import { UserUpdateInput } from '../../data/types/UserTypes'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
-import { validateBody } from '../middlewares/validate-body'
 import { BaseController } from './BaseController'
 
 export class UserController extends BaseController<Context, { companyId: string; id: string }, { company: Company }> {
@@ -17,29 +16,41 @@ export class UserController extends BaseController<Context, { companyId: string;
     const { companyId } = this.routeData
     const users = await User.find({
       where: { companyId },
+      select: ['id', 'avatar', 'email', 'username'],
     })
-    this.accepted(users)
+
+    return this.accepted(users)
   }
+
   @GET('/:id')
   public async one() {
-    const { companyId } = this.routeData
-    const { id } = this.req.params
+    const { company } = this.locals
+    const {
+      user: { id },
+    } = this.req.ctx
+
     const user = await User.findOne({
       where: {
         id,
-        companyId,
+        companyId: company.id,
       },
     })
     if (!user) {
-      this.badRequest({ error: 'No user found' })
+      return this.badRequest({ error: 'No user found' })
     }
     const { googleToken, ...userData } = user
-
-    return this.accepted(userData)
+    if (user.type === UserType.EMPLOYER) {
+      return this.accepted({ user: userData, authKey: company.authKey })
+    }
+    return this.accepted({ user: userData, authKey: '' })
   }
+
   @PUT('/:id')
   public async update({ username, type, authKey, avatar }: UserUpdateInput) {
-    const { id } = this.routeData
+    const {
+      user: { id },
+    } = this.ctx
+
     const { company } = this.locals
     const user = await User.findOne(id)
 
@@ -50,16 +61,16 @@ export class UserController extends BaseController<Context, { companyId: string;
     }
     user.username = username
     user.type = type
-    user.avatar = avatar
+    user.avatar = avatar ? avatar : user.avatar
     await user.save()
 
-    this.accepted(user)
+    return this.accepted(user)
   }
 
   @DELETE('/:id')
   public async delete() {
     User.delete(this.req.params.id)
       .then(this.accepted)
-      .catch(() => this.badRequest())
+      .catch(this.badRequest)
   }
 }

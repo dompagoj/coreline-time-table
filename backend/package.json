@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon",
-    "db:start": "docker container start 79b48208b00d",
+    "db:start": "docker container start 5f5accb6fddd",
     "db:init": "docker-compose -f docker-compose.yml up -d"
   },
   "author": "",
