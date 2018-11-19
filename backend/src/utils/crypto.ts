@@ -6,10 +6,9 @@ export async function verifyToken(token: string): Promise<VerifyTokenRes | undef
   return new Promise((resolve, reject) => {
     verify(token, config.jwtSecret, (err, decoded) => {
       if (err) {
-        console.log('ERROR while verifing')
         return resolve(undefined)
       }
-      resolve(decoded)
+      return resolve(decoded)
     })
   }) as any
 }
