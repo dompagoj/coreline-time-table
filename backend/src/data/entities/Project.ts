@@ -16,6 +16,5 @@ export class Project extends BaseEntity {
   public companyId: number
 
   @ManyToOne(type => Company, company => company.projects)
-  @JoinColumn({ name: 'company_id' })
   public company: Promise<Company>
 }

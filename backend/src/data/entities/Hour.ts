@@ -17,6 +17,5 @@ export class Hour extends BaseEntity {
   public date: Date
 
   @ManyToOne(type => User, user => user.hours, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
   public user: Promise<User>
 }

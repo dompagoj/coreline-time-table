@@ -2,15 +2,15 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
-  ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { UserType } from '../enums/UserType'
 import { Company } from './Company'
 import { Hour } from './Hour'
+import { Vote } from './Vote'
 
 @Entity()
 export class User extends BaseEntity {
@@ -42,9 +42,14 @@ export class User extends BaseEntity {
   public companyId: number
 
   @ManyToOne(type => Company, company => company.users, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'company_id' })
   public company: Promise<Company>
 
   @OneToMany(type => Hour, hour => hour.user)
   public hours: Promise<Hour[]>
+
+  @OneToOne(type => Vote, vote => vote.votedFor)
+  public vote: Vote
+
+  @OneToMany(type => Vote, vote => vote.voter)
+  public votes: Vote[]
 }

@@ -1,8 +1,9 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { Company } from './Company'
+import { Vote } from './Vote'
 
 @Entity()
-export class EOFMVote extends BaseEntity {
+export class Poll extends BaseEntity {
   @PrimaryGeneratedColumn()
   public id: number
 
@@ -10,6 +11,8 @@ export class EOFMVote extends BaseEntity {
   public companyId: number
 
   @ManyToOne(type => Company, company => company.EOFMVotes, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'company_id' })
   public company: Promise<Company>
+
+  @OneToMany(type => Vote, vote => vote.poll)
+  public votes: Promise<Vote[]>
 }
