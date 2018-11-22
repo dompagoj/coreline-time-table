@@ -1,11 +1,11 @@
-import { Button, Form, Input, Modal, Radio, message } from 'antd'
+import { Button, Form, Input, message, Modal, Radio } from 'antd'
 import * as React from 'react'
 const FormItem = Form.Item
 
 import { authStore } from '../../stores/AuthStore'
+import { userStore } from '../../stores/UserStore'
 import { UserType } from '../../types/enums'
 import { styles } from './styles'
-import { userStore } from '../../stores/UserStore'
 
 interface IState {
   modalOpen: boolean
@@ -13,7 +13,7 @@ interface IState {
   authKey: string
   userType?: UserType
   errors: {
-    authKey?: string
+    authKey?: string,
   }
 }
 

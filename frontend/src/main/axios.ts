@@ -1,5 +1,6 @@
 import Axios from 'axios'
-import { isDevelopment } from '.'
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 export const axios = Axios.create({
   baseURL: isDevelopment ? 'http://localhost:8000/' : 'http://207.154.213.120/',

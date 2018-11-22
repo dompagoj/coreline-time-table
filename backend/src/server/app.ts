@@ -2,6 +2,7 @@
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors'
 import * as express from 'express'
+import * as morgan from 'morgan'
 import { createConnection } from 'typeorm'
 
 import { config } from './config'
@@ -34,6 +35,19 @@ async function bootstrap() {
       subscribersDir: 'src/data/subscribers',
     },
   })
+
+  morgan.token('operation', (req, res) => {
+    return req.body.operationName
+  })
+  morgan.token('authorization', (req, res) => {
+    return req.headers.authorization
+  })
+
+  morgan.token('params', (req, res) => {
+    return JSON.stringify(req.params)
+  })
+
+  app.use(morgan(':date[clf] :method :url :status :params :operation :authorization'))
 
   app.use('', mainRouter)
 

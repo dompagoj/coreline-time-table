@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
-    "dist": "npm run compile && electron-builder",
+    "dist": "npm run compile && electron-builder --x64 --mac",
     "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
   },
   "dependencies": {
