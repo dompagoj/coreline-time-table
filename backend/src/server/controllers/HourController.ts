@@ -6,12 +6,12 @@ import { User } from '../../data/entities/User'
 import { Context } from '../../data/types/Context'
 import { HourInput } from '../../data/types/HourTypes'
 import { Route } from '../../data/types/routing'
-import { GET, POST, PUT } from '../controller-decorators'
+import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
 export class HourController extends BaseController<
   Context,
-  { companyId: string; userId: string; dateId: string },
+  { companyId: string; userId: string; dateId: string; id: string },
   { user: User }
 > {
   public static routes: Route[] = []
@@ -80,5 +80,13 @@ export class HourController extends BaseController<
     })
       .save()
       .then(created => this.accepted(created))
+  }
+
+  @DELETE('/:id')
+  public async deleteHour() {
+    const { id } = this.routeData
+    await Hour.delete(id)
+
+    return this.accepted()
   }
 }

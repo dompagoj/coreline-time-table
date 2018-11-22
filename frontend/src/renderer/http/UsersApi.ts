@@ -1,8 +1,7 @@
-import Axios from 'axios'
+import { stringify } from 'querystring'
 import { axios } from '../../main/axios'
-import { UserType } from '../types/enums'
-import { ID } from '../types/general'
 import { authStore } from '../stores/AuthStore'
+import { UserType } from '../types/enums'
 
 export interface UpdateUserInput {
   username: string
@@ -11,9 +10,10 @@ export interface UpdateUserInput {
 }
 
 export class UsersApi {
-  public async getUsers() {
+  public async getUsers(filters) {
     const { user } = authStore
-    return axios.get(`companies/${user.companyId}/users`)
+
+    return axios.get(`companies/${user.companyId}/users?${stringify(filters)}`)
   }
 
   public async updateUser(input: UpdateUserInput) {

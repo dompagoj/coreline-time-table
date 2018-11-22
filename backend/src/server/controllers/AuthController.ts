@@ -43,7 +43,6 @@ export class AuthController extends BaseController {
         firstName,
         lastName,
         type: UserType.EMPLOYEE,
-        googleToken,
         username: firstName,
         companyId: company.id,
         avatar: picture,
@@ -56,10 +55,9 @@ export class AuthController extends BaseController {
       await user.save()
     }
 
-    const { googleToken: token, ...data } = user
     return this.accepted({
       token: sign({ email, id: user.id, type: user.type, companyId: company.id }, config.jwtSecret),
-      user: data,
+      user,
       authKey: user.type === UserType.EMPLOYER ? company.authKey : '',
     })
   }

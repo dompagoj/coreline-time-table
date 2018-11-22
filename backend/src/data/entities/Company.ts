@@ -20,11 +20,11 @@ export class Company extends BaseEntity {
   public domain: string
 
   @OneToMany(type => User, user => user.company)
-  public users: Promise<User[]>
+  public users: User[]
 
   @OneToMany(type => Project, project => project.company)
-  public projects: Promise<Project[]>
+  public projects: Project[]
 
-  @OneToMany(type => Poll, poll => poll.company)
-  public EOFMVotes: Promise<Poll[]>
+  @OneToMany(type => Poll, poll => poll.company, { onDelete: 'CASCADE' })
+  public EOFMVotes: Poll[]
 }

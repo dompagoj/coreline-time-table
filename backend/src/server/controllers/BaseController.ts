@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { Route } from '../../data/types/routing'
 
 export abstract class BaseController<Context = any, Params = any, Locals = any> {
-  public static routes: Route[] = []
   protected req: Request & { ctx: Context }
   protected res: Response
   protected next: NextFunction
@@ -30,6 +29,7 @@ export abstract class BaseController<Context = any, Params = any, Locals = any> 
         .json({ data: object })
         .end()
     }
+
     return this.res
       .status(200)
       .json(format ? format(object) : object)
@@ -50,6 +50,7 @@ export abstract class BaseController<Context = any, Params = any, Locals = any> 
         .json({ error })
         .end()
     }
+
     return this.res
       .status(400)
       .json(format ? format(error) : error)

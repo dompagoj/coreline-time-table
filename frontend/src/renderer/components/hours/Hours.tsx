@@ -1,4 +1,4 @@
-import { Button, message, Modal, Form } from 'antd'
+import { Button, message, Modal } from 'antd'
 import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
@@ -97,7 +97,9 @@ export class Hours extends React.Component<any, IState> {
                 className={styles.dayContainer}
                 style={{
                   backgroundColor: hours
-                    ? LIGHT_GREEN
+                    ? hours.amount === 0 && !weekend
+                      ? '#ffe4aa'
+                      : LIGHT_GREEN
                     : weekend
                     ? '#d1d1d1'
                     : today.date() > day && today.month() === currDate.month()
@@ -106,7 +108,19 @@ export class Hours extends React.Component<any, IState> {
                 }}
               >
                 <div className={styles.dayContent}>
-                  <div className={this.isToday(day) ? styles.today : styles.day}>{day}</div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '20% auto',
+                      gridGap: '20px',
+                      justifyContent: 'spaceBetween',
+                    }}
+                  >
+                    {hours && (weekend || !this.beforeToday(day)) && (
+                      <Button onClick={this.deleteHour(currDate, day)} icon="delete" type="danger" shape="circle" />
+                    )}
+                    <div className={this.isToday(day) ? styles.today : styles.day}>{day}</div>
+                  </div>
                   {hours && <div className={styles.content}>{hours.amount} Hours</div>}
                 </div>
               </div>
@@ -127,7 +141,6 @@ export class Hours extends React.Component<any, IState> {
           closable
           onCancel={this.closePopover}
           onOk={this.createHour}
-          okButtonProps={{ htmlType: 'submit' }}
           destroyOnClose
           title={modalTitle}
           okText="Save"
@@ -154,6 +167,15 @@ export class Hours extends React.Component<any, IState> {
     return !(currDate.month() !== today.month() || currDate.year() !== today.year())
   }
 
+  public beforeToday = day => {
+    const { today, currDate } = this.state
+    if (today.month() > currDate.month() || today.year() > currDate.year()) {
+      return true
+    }
+
+    return today.date() > day && today.month() === currDate.month()
+  }
+
   public goToToday = () => {
     this.setState({
       currDate: moment(),
@@ -172,7 +194,6 @@ export class Hours extends React.Component<any, IState> {
     })
   }
   public openModal = (day, selectedDayAmount, weekend) => () => {
-    console.log('weekend? ', weekend)
     const element = this.refs[`${day}-current`]
     // @ts-ignore
     const rect = findDOMNode(element)!.getBoundingClientRect()
@@ -235,5 +256,12 @@ export class Hours extends React.Component<any, IState> {
     this.setState({
       hoursAmount: amount,
     })
+  }
+
+  public deleteHour = (currDate, day) => async e => {
+    e.stopPropagation()
+
+    await hoursStore.deleteHour(currDate, day)
+    message.warning('Deleted')
   }
 }

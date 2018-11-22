@@ -1,12 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm'
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { UserType } from '../enums/UserType'
 import { Company } from './Company'
 import { Hour } from './Hour'
@@ -26,9 +18,6 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   public lastName: string
 
-  @Column({ nullable: true })
-  public googleToken: string
-
   @Column({ unique: true })
   public email: string
 
@@ -42,10 +31,10 @@ export class User extends BaseEntity {
   public companyId: number
 
   @ManyToOne(type => Company, company => company.users, { nullable: false, onDelete: 'CASCADE' })
-  public company: Promise<Company>
+  public company: Company
 
   @OneToMany(type => Hour, hour => hour.user)
-  public hours: Promise<Hour[]>
+  public hours: Hour[]
 
   @OneToOne(type => Vote, vote => vote.votedFor)
   public vote: Vote

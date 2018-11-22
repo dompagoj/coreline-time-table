@@ -1,7 +1,7 @@
 import { action, computed, observable } from 'mobx'
 import { UpdateUserInput, UsersApi } from '../http/UsersApi'
 import { HTTPStatusCodes } from '../types/HTTP_STATUS_CODES'
-import { User } from '../types/user'
+import { User } from '../types/user-types'
 
 class UserStore {
   @observable
@@ -15,8 +15,8 @@ class UserStore {
   }
 
   @action.bound
-  public async getUsers() {
-    const { data, status } = await this.usersApi.getUsers()
+  public async getUsers(filters = {}) {
+    const { data, status } = await this.usersApi.getUsers(filters)
     this.users = data
   }
 
@@ -29,6 +29,7 @@ class UserStore {
     if (status === HTTPStatusCodes.OK) {
       return { data, error: '' }
     }
+
     return { data, error: data.error }
   }
 }

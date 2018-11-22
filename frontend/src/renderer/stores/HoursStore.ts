@@ -16,19 +16,19 @@ class HoursStore {
     this.hours = data
   }
 
-  public getHour(currDate, day) {
+  public getHour(currDate, day, returnIndex = false) {
     if (!this.hours) {
       return undefined
     }
     const selectedDay = moment(new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`))
 
-    const foundHour = this.hours.find(hour => {
+    const foundHourIndex = this.hours.findIndex(hour => {
       const date = moment(hour.date)
 
       return date.isSame(selectedDay)
     })
 
-    return foundHour
+    return returnIndex ? foundHourIndex : this.hours[foundHourIndex]
   }
 
   @action.bound
@@ -44,6 +44,14 @@ class HoursStore {
       this.hours.push(data)
     }
   }
+  @action.bound
+  public async deleteHour(currDate, day) {
+    const hourIndex = this.getHour(currDate, day, true)
+    await this.api.deleteHour(this.hours[hourIndex].id)
+
+    this.hours.splice(hourIndex, 1)
+  }
+
   @computed
   get loading() {
     return this.hours === null || this.hours === undefined

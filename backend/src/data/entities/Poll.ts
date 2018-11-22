@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { PollType } from '../enums/PollType'
 import { Company } from './Company'
 import { Vote } from './Vote'
 
@@ -10,9 +11,21 @@ export class Poll extends BaseEntity {
   @Column()
   public companyId: number
 
-  @ManyToOne(type => Company, company => company.EOFMVotes, { onDelete: 'CASCADE' })
-  public company: Promise<Company>
+  @Column({ enum: PollType })
+  public type: PollType
+
+  @Column({ default: new Date() })
+  public startDate: Date
+
+  @Column()
+  public endDate: Date
+
+  @Column({ default: true })
+  public active: boolean
+
+  @ManyToOne(type => Company, company => company.EOFMVotes)
+  public company: Company
 
   @OneToMany(type => Vote, vote => vote.poll)
-  public votes: Promise<Vote[]>
+  public votes: Vote[]
 }

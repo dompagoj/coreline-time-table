@@ -43,7 +43,7 @@ export const styles = {
   `,
   today: css`
     display: flex;
-    padding: 0 10px;
+    padding: 3px 15px;
     justify-content: center;
     color: white;
     width: 25%;

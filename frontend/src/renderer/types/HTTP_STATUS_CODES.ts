@@ -42,3 +42,7 @@ export enum HTTPStatusCodes {
   GATEWAY_TIMEOUT = 504,
   HTTP_VERSION_NOT_SUPPORTED = 505,
 }
+
+export function HTTPSuccess(code: HTTPStatusCodes) {
+  return code >= 200 && code < 300
+}

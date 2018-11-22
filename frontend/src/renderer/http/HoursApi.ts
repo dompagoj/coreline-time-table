@@ -38,4 +38,9 @@ export class HoursApi {
       hours,
     })
   }
+  public async deleteHour(id: string | number) {
+    const { user } = authStore
+
+    return axios.delete(`companies/${user.companyId}/users/${user.id}/hours/${id}`)
+  }
 }

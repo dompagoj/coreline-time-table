@@ -9,12 +9,14 @@
   "scripts": {
     "start": "pm2 start src/index.js --name ctt",
     "dev": "nodemon",
+    "lint": "tslint --fix \"./src/**/*.ts*\"",
     "db:start": "docker container start 5f5accb6fddd",
     "db:init": "docker-compose -f docker-compose.yml up -d"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-schedule": "^1.2.2",
     "body-parser": "^1.18.3",
     "class-validator": "^0.9.1",
     "cors": "^2.8.5",
@@ -24,6 +26,7 @@
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
+    "node-schedule": "^1.3.0",
     "pg": "7.5.0",
     "reflect-metadata": "^0.1.12",
     "ts-node": "^7.0.1",

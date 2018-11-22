@@ -1,11 +1,11 @@
 import { decode } from 'jsonwebtoken'
 import { action, computed, observable } from 'mobx'
 import { axios } from '../../main/axios'
-import { AuthUser } from '../types/user'
+import { User } from '../types/user-types'
 
 class AuthStore {
   @observable
-  public user: AuthUser
+  public user: User
 
   @observable
   public companyAuthKey: string

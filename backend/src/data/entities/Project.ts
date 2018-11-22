@@ -16,5 +16,5 @@ export class Project extends BaseEntity {
   public companyId: number
 
   @ManyToOne(type => Company, company => company.projects)
-  public company: Promise<Company>
+  public company: Company
 }

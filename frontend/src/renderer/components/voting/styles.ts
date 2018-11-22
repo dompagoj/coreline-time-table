@@ -12,9 +12,15 @@ export const styles = {
     padding: 15px;
   `,
   container: css`
-    margin: 20px;
+    padding: 20px;
     display: grid;
     grid-template-columns: auto auto auto;
+    grid-gap: 15px;
+  `,
+  countDownContainer: css`
+    padding: 20px;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
     grid-gap: 15px;
   `,
 }

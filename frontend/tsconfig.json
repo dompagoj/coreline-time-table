@@ -3,6 +3,7 @@
   "compilerOptions": {
     "jsx": "react",
     "strict": false,
+    "allowSyntheticDefaultImports": true,
     "noUnusedLocals": false
   },
   "lib": [

@@ -7,13 +7,13 @@ export class Vote extends BaseEntity {
   @PrimaryGeneratedColumn()
   public id: number
 
-  @ManyToOne(type => Poll, poll => poll.votes)
-  public poll: Promise<Poll>
+  @ManyToOne(type => Poll, poll => poll.votes, { onDelete: 'CASCADE' })
+  public poll: Poll
 
   @ManyToOne(type => User, user => user.votes)
-  public voter: Promise<User>
+  public voter: User
 
   @OneToOne(type => User, user => user.vote)
   @JoinColumn()
-  public votedFor: Promise<User>
+  public votedFor: User
 }

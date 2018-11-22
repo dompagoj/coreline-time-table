@@ -10,7 +10,7 @@ const contentContainer = css`
 export class HoursModalContent extends React.Component<{
   currentAmount: number
   onChange(amount: number)
-  onSubmit(e: any): any
+  onSubmit(e: any): any,
 }> {
   public render() {
     const { onChange, currentAmount, onSubmit } = this.props

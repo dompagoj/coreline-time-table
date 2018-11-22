@@ -14,9 +14,9 @@ export class UserController extends BaseController<Context, { companyId: string;
   @GET('/')
   public async all() {
     const { companyId } = this.routeData
+
     const users = await User.find({
-      where: { companyId },
-      select: ['id', 'avatar', 'email', 'username'],
+      where: { companyId, ...this.req.query },
     })
 
     return this.accepted(users)
@@ -36,11 +36,11 @@ export class UserController extends BaseController<Context, { companyId: string;
     if (!user) {
       return this.badRequest({ error: 'No user found' })
     }
-    const { googleToken, ...userData } = user
     if (user.type === UserType.EMPLOYER) {
-      return this.accepted({ user: userData, authKey: company.authKey })
+      return this.accepted({ user, authKey: company.authKey })
     }
-    return this.accepted({ user: userData, authKey: '' })
+
+    return this.accepted({ user, authKey: '' })
   }
 
   @PUT('/:id')

@@ -17,5 +17,5 @@ export class Hour extends BaseEntity {
   public date: Date
 
   @ManyToOne(type => User, user => user.hours, { onDelete: 'CASCADE' })
-  public user: Promise<User>
+  public user: User
 }

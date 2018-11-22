@@ -2,6 +2,9 @@ import { DecoratorOptions } from '../data/types/decorator-types'
 
 export function GET(route: string, options?: DecoratorOptions) {
   return (target: any, methodName: string) => {
+    const { routes } = target.constructor
+    target.constructor.routes = routes ? routes : []
+
     target.constructor.routes.push({
       route,
       method: 'get',
@@ -16,6 +19,9 @@ export function GET(route: string, options?: DecoratorOptions) {
 
 export function POST(route: string, options?: DecoratorOptions) {
   return (target: any, methodName: string) => {
+    const { routes } = target.constructor
+    target.constructor.routes = routes ? routes : []
+
     target.constructor.routes.push({
       route,
       method: 'post',
@@ -30,6 +36,9 @@ export function POST(route: string, options?: DecoratorOptions) {
 
 export function PUT(route: string, options?: DecoratorOptions) {
   return (target: any, methodName: string) => {
+    const { routes } = target.constructor
+    target.constructor.routes = routes ? routes : []
+
     target.constructor.routes.push({
       route,
       method: 'put',
@@ -44,6 +53,9 @@ export function PUT(route: string, options?: DecoratorOptions) {
 
 export function DELETE(route: string, options?: DecoratorOptions) {
   return (target: any, methodName: string) => {
+    const { routes } = target.constructor
+    target.constructor.routes = routes ? routes : []
+
     target.constructor.routes.push({
       route,
       method: 'delete',
