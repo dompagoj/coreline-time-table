@@ -4,7 +4,7 @@ import { format as formatUrl } from 'url'
 import { googleSignIn } from './google-login'
 import { deleteToken, readToken, saveToken } from './utils'
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+export const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let mainWindow: BrowserWindow | null = null
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
