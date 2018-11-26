@@ -68,7 +68,8 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
   public logout = () => {
     ipcRenderer.on('logout-reply', (event, result) => {
       if (result) {
-        routerStore.goto('/login')
+        authStore.token = undefined
+        routerStore.gotoLogin()
       }
     })
     ipcRenderer.send('logout')

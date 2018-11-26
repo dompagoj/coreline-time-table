@@ -5,6 +5,8 @@ import { Navbar } from './navbar/Navbar'
 
 import { observer } from 'mobx-react'
 import { authStore } from '../stores/AuthStore'
+import { UserType } from '../types/enums'
+import { EmployeerHours } from './employeer-hours/EmployeerHours'
 import { Hours } from './hours/Hours'
 import { Profile } from './profile/Profile'
 import { Voting } from './voting/Voting'
@@ -27,7 +29,7 @@ export class MainLayout extends React.Component {
           <Switch>
             <Redirect exact from="/" to="/profile" />
             <Route path="/profile" component={Profile} />
-            <Route path="/hours" component={Hours} />
+            <Route path="/hours" component={authStore.user.type === UserType.EMPLOYEE ? Hours : EmployeerHours} />
             <Route path="/voting" component={Voting} />
           </Switch>
         </div>

@@ -2,6 +2,7 @@ import { decode } from 'jsonwebtoken'
 import { action, computed, observable } from 'mobx'
 import { axios } from '../../main/axios'
 import { User } from '../types/user-types'
+import { routerStore } from './router/router-store'
 
 class AuthStore {
   @observable
@@ -11,7 +12,7 @@ class AuthStore {
   public companyAuthKey: string
 
   @observable
-  public token: string
+  public token?: string
 
   @computed
   get isLoggedIn() {
@@ -24,6 +25,9 @@ class AuthStore {
 
   @action
   public async getUser() {
+    if (!this.token) {
+      return routerStore.gotoLogin()
+    }
     const { id, companyId }: any = decode(this.token)
     const { data } = await axios.get(`companies/${companyId}/users/${id}`)
     this.user = data.user

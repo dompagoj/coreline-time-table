@@ -13,12 +13,11 @@ import { BaseController } from './BaseController'
 export class AuthController extends BaseController {
   @POST('/login')
   public async login({ googleToken }: { googleToken: string }) {
-    let payload: TokenPayload | null = null
-    try {
-      payload = await this.verify(googleToken)
-    } catch (e) {
+    const payload = await this.verify(googleToken)
+    if (!payload) {
       return this.badRequest({ error: 'Not valid google token' })
     }
+
     const { email, given_name: firstName, family_name: lastName, hd, picture } = payload
     if (hd !== 'coreline.agency') {
       return this.badRequest({ error: 'Only coreline.agency domain is allowed' })
@@ -68,6 +67,10 @@ export class AuthController extends BaseController {
       idToken: token,
       audience: config.googleClientId,
     })
+    if (!ticket) {
+      return null
+    }
+
     return ticket.getPayload()
   }
 }

@@ -1,7 +1,7 @@
 import { validate } from 'class-validator'
 import { Router } from 'express'
 
-export function strToBool(str: string): boolean {
+export function strToBool(str: string): boolean | null {
   if (str === 'true') {
     return true
   }

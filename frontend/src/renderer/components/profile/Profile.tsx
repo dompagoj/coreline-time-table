@@ -5,13 +5,14 @@ const FormItem = Form.Item
 import { authStore } from '../../stores/AuthStore'
 import { userStore } from '../../stores/UserStore'
 import { UserType } from '../../types/enums'
+import { Title } from '../utils/Title'
 import { styles } from './styles'
 
 interface IState {
   modalOpen: boolean
   username: string
   authKey: string
-  userType?: UserType
+  userType: UserType
   errors: {
     authKey?: string,
   }
@@ -32,8 +33,8 @@ export class Profile extends React.Component<any, IState> {
     const { modalOpen, authKey, userType, errors, username } = this.state
 
     return (
-      <div className={styles.container}>
-        <div className={styles.title}>Edit your profile</div>
+      <div>
+        <Title text="Edit your profile" />
         <div className={styles.formContainer}>
           <div>
             <Form onSubmit={this.updateProfile}>
@@ -136,8 +137,8 @@ export class Profile extends React.Component<any, IState> {
 
   public updateProfile = async e => {
     e.preventDefault()
-
     const { authKey, username, userType } = this.state
+
     const { data, error } = await userStore.updateUser({
       authKey,
       type: userType,

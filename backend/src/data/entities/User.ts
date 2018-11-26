@@ -13,10 +13,10 @@ export class User extends BaseEntity {
   public username: string
 
   @Column({ nullable: true })
-  public firstName: string
+  public firstName?: string
 
   @Column({ nullable: true })
-  public lastName: string
+  public lastName?: string
 
   @Column({ unique: true })
   public email: string

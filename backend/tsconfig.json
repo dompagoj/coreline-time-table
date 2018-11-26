@@ -21,6 +21,7 @@
     "rootDir": ".",
     "outDir": "./build",
     "emitDecoratorMetadata": true,
+    "strictNullChecks": true,
     "experimentalDecorators": true,
     "sourceMap": true
   }

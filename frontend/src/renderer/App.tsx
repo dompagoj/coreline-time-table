@@ -5,7 +5,7 @@ import { MainRouter } from './components/MainRouter'
 import { history } from './stores/router/router-store'
 
 class App extends React.Component {
-  render() {
+  public render() {
     return (
       <Router history={history}>
         <MainRouter />

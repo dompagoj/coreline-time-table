@@ -11,8 +11,8 @@ class HoursStore {
   public constructor(private api: HoursApi) {}
 
   @action.bound
-  public async getHours() {
-    const { data } = await this.api.getHours()
+  public async getHours(userId?: string) {
+    const { data } = await this.api.getHours(userId)
     this.hours = data
   }
 

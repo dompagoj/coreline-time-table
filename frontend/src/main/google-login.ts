@@ -6,14 +6,10 @@ import { parse } from 'url'
 import { LoginResponse } from '../renderer/types/login-response'
 import { axios } from './axios'
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
-
 const GOOGLE_AUTHORIZATION_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
-const GOOGLE_REDIRECT_URI = isDevelopment ?
-'coreline.time.table:localhost:8000'
-:
-'coreline.time.table:207.154.213.120'
+
+const GOOGLE_REDIRECT_URI = 'coreline.time.table:localhost'
 const GOOGLE_CLIENT_ID = '252217239009-2ud4h9klfmf8j8kl6lrtfrt677u9tl59.apps.googleusercontent.com'
 
 export async function googleSignIn() {
@@ -53,10 +49,6 @@ function signInWithPopup() {
       }
     }
 
-    authWindow.on('closed', () => {
-      throw new Error('Auth window closed by user')
-    })
-
     authWindow.webContents.on('will-navigate', (event, url) => {
       handleNavigation(url)
     })
@@ -89,5 +81,5 @@ async function fetchAccessTokens(code) {
 }
 
 async function signIn(googleToken): Promise<LoginResponse> {
- return axios.post('auth/login', { googleToken })
+  return axios.post('auth/login', { googleToken })
 }

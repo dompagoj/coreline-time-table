@@ -1,14 +1,14 @@
-import { Avatar, Button, Card, Icon, Modal, Progress } from 'antd'
+import { Avatar, Button, Card, Icon, Modal } from 'antd'
 import { observer } from 'mobx-react'
-import * as moment from 'moment'
 import React from 'react'
+import { eotmStore } from '../../stores/EOTMStore'
 import { userStore } from '../../stores/UserStore'
-import { votingStore } from '../../stores/VotingStore'
 import { UserType } from '../../types/enums'
+import { User } from '../../types/user-types'
 import { lukacErrors } from '../utils/lukac-errors'
+import { Title } from '../utils/Title'
+import { CountDown } from './CountDown'
 import { styles } from './styles'
-
-const daysStart = moment().daysInMonth() - 3
 
 interface State {
   interval: any
@@ -29,48 +29,14 @@ export class Voting extends React.Component<any, State> {
       return null
     }
 
-    if (!votingStore.poll && votingStore.startDate) {
-      const { days, minutes, hours, seconds } = votingStore.startDate
-
-      return (
-        <div style={{ padding: 20, textAlign: 'center' }}>
-          <Card title={<h2>Employee of the month vote will be live in</h2>}>
-            <div className={styles.countDownContainer}>
-              <Progress
-                trailColor="#2b2a2a"
-                strokeColor="red"
-                type="circle"
-                percent={100 - (days / daysStart) * 100}
-                format={() => `${days} Days`}
-              />
-              <Progress
-                strokeColor="darkBlue"
-                type="circle"
-                percent={100 - (hours / 24) * 100}
-                format={() => `${hours} Hours`}
-              />
-              <Progress
-                strokeColor="green"
-                type="circle"
-                percent={100 - (minutes / 60) * 100}
-                format={() => `${minutes} Minutes`}
-              />
-              <Progress
-                strokeColor="orange"
-                type="circle"
-                percent={100 - (seconds / 60) * 100}
-                format={() => `${seconds} Seconds`}
-              />
-            </div>
-          </Card>
-          {/* <Card style={{ marginTop: 25 }} title={<h3>Current winner</h3>} /> */}
-        </div>
-      )
+    if (!eotmStore.poll && eotmStore.startDate) {
+      return <CountDown startDate={eotmStore.startDate} />
     }
+    const userVote = eotmStore.getUserVote()
 
     return (
       <div>
-        <div className={styles.title}>Employee of the month vote</div>
+        <Title text="Employee of the month vote" />
         <div className={styles.container}>
           {userStore.users.map(user => {
             return (
@@ -81,11 +47,15 @@ export class Voting extends React.Component<any, State> {
                     <Icon type="heart" theme="twoTone" twoToneColor="#ff6dbb" />
                   </Button>,
                 ]}
+                style={(userVote && userVote.votedFor.id === user.id && { backgroundColor: '#cee0ff' }) || undefined}
                 hoverable
                 headStyle={{ fontSize: '16px', fontWeight: 'bold' }}
                 title={user.username}
               >
-                <Card.Meta avatar={<Avatar src={user.avatar} />} description={`Vote for ${user.username}!`} />
+                <Card.Meta
+                  avatar={<Avatar src={user.avatar} />}
+                  description={userVote ? `You voted for ${user.username}` : `Vote for ${user.username}!`}
+                />
               </Card>
             )
           })}
@@ -93,8 +63,8 @@ export class Voting extends React.Component<any, State> {
       </div>
     )
   }
-  public vote = user => async () => {
-    const { lukac } = await votingStore.newVote(user.id)
+  public vote = (user: User) => async () => {
+    const { lukac } = await eotmStore.newVote(user.id)
     if (lukac) {
       const { lukacErrorCount } = this.state
       const errorsLength = lukacErrors.length
@@ -113,31 +83,30 @@ export class Voting extends React.Component<any, State> {
     await userStore.getUsers({
       type: UserType.EMPLOYEE,
     })
-    await votingStore.getPoll()
+    await eotmStore.getPoll()
     this.setState({
       loading: false,
     })
-
-    if (votingStore.startDate) {
+    if (eotmStore.startDate) {
       const interval = setInterval(() => {
-        votingStore.startDate.seconds -= 1
+        eotmStore.startDate.seconds -= 1
 
-        const { days, hours, minutes, seconds } = votingStore.startDate
+        const { days, hours, minutes, seconds } = eotmStore.startDate
         if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
-          votingStore.getPoll()
+          eotmStore.getPoll()
           clearInterval(interval)
         }
-        if (votingStore.startDate.seconds === 0) {
-          votingStore.startDate.minutes -= 1
-          votingStore.startDate.seconds = 59
+        if (eotmStore.startDate.seconds === 0) {
+          eotmStore.startDate.minutes -= 1
+          eotmStore.startDate.seconds = 59
         }
-        if (votingStore.startDate.minutes === 0 && hours > 0) {
-          votingStore.startDate.hours -= 1
-          votingStore.startDate.minutes = 59
+        if (eotmStore.startDate.minutes === 0 && hours > 0) {
+          eotmStore.startDate.hours -= 1
+          eotmStore.startDate.minutes = 59
         }
-        if (votingStore.startDate.hours === 0 && days > 0) {
-          votingStore.startDate.days -= 1
-          votingStore.startDate.hours = 23
+        if (eotmStore.startDate.hours === 0 && days > 0) {
+          eotmStore.startDate.days -= 1
+          eotmStore.startDate.hours = 23
         }
       }, 1000)
       this.setState({

@@ -1,4 +1,5 @@
 import * as moment from 'moment'
+import { getRepository } from 'typeorm'
 
 import { Company } from '../../data/entities/Company'
 import { Poll } from '../../data/entities/Poll'
@@ -6,10 +7,11 @@ import { User } from '../../data/entities/User'
 import { Vote } from '../../data/entities/Vote'
 import { PollType } from '../../data/enums/PollType'
 import { Context } from '../../data/types/Context'
+import { getPollWinner } from '../../utils/general'
 import { GET, POST } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
-export class VotingController extends BaseController<
+export class VotingControllerEOTM extends BaseController<
   Context,
   { companyId: string; pollId: string },
   { company: Company }
@@ -19,7 +21,7 @@ export class VotingController extends BaseController<
   }
 
   @GET('/oftm')
-  public async getActivePollEOFM() {
+  public async getActivePollEOFMAndLastWinner() {
     const { companyId } = this.routeData
     const currDate = moment()
 
@@ -28,6 +30,15 @@ export class VotingController extends BaseController<
       .subtract(3, 'days')
       .subtract(12, 'hours')
 
+    const lastPoll = await getRepository(Poll)
+      .createQueryBuilder('poll')
+      .leftJoinAndSelect('poll.votes', 'vote')
+      .leftJoinAndSelect('vote.votedFor', 'user')
+      .where('EXTRACT(month from poll.start_date) = :lastMonth', { lastMonth: moment().month() })
+      .getOne()
+
+    const lastWinner = getPollWinner(lastPoll)
+
     if (currDate.isBefore(startDate)) {
       const diff = startDate.diff(currDate, 'hours', true)
       const days = Math.floor(diff / 24)
@@ -35,7 +46,7 @@ export class VotingController extends BaseController<
       const minutes = Math.floor(((diff - days * 24) % 1) * 60)
       const seconds = Math.floor(((((diff - days * 24) % 1) * 60) % 1) * 60)
 
-      return this.accepted({ startDate: { days, hours, minutes, seconds }, poll: undefined })
+      return this.accepted({ startDate: { days, hours, minutes, seconds }, poll: undefined, lastWinner })
     }
 
     const poll = await Poll.findOne({
@@ -47,12 +58,7 @@ export class VotingController extends BaseController<
       relations: ['votes', 'votes.votedFor', 'votes.voter'],
     })
 
-    if (!poll || currDate.isAfter(poll.endDate)) {
-      if (poll) {
-        poll.active = false
-        await poll.save()
-      }
-
+    if (!poll) {
       const newPoll = await Poll.create({
         endDate: moment()
           .endOf('month')
@@ -61,10 +67,10 @@ export class VotingController extends BaseController<
         companyId: parseInt(companyId, 10),
       }).save()
 
-      return this.accepted({ poll: newPoll, startDate: undefined })
+      return this.accepted({ poll: newPoll, startDate: undefined, lastWinner })
     }
 
-    return this.accepted({ poll, startDate: undefined })
+    return this.accepted({ poll, startDate: undefined, lastWinner })
   }
 
   @POST('/oftm/:pollId')

@@ -4,7 +4,7 @@ import { ID } from './random'
 export class CompanyInput {
   @ValidateIf(o => !!o)
   @Min(0)
-  public id?: ID = null
+  public id?: ID = undefined
 
   @IsString()
   public name: string

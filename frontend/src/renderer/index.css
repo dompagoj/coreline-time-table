@@ -28,3 +28,11 @@ code {
   flex-direction: column !important;
   justify-content: space-between !important;
 }
+
+.ant-input-group {
+  height: 100%;
+}
+
+.ant-input {
+  height: 100%;
+}

@@ -5,7 +5,7 @@ import { RouterStore, syncHistoryWithStore } from 'mobx-react-router'
 const hashHistory = createHashHistory()
 
 export class MobxRouterStore extends RouterStore {
-  @action 
+  @action
   public goto(path: string) {
     this.history.push(`${path}`)
   }
@@ -28,6 +28,10 @@ export class MobxRouterStore extends RouterStore {
   @action
   public gotoCalendar() {
     this.history.push('/hours')
+  }
+  @action
+  public gotoLogin() {
+    this.history.push('/login')
   }
 }
 

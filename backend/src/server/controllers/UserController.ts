@@ -50,6 +50,10 @@ export class UserController extends BaseController<Context, { companyId: string;
     const { company } = this.locals
     const user = await User.findOne(id)
 
+    if (!user) {
+      return this.badRequest({ error: `User with username ${username} doesn\'t exist` })
+    }
+
     if (type === UserType.EMPLOYER) {
       if (company.authKey !== authKey) {
         return this.badRequest({ error: 'Wrong password' })

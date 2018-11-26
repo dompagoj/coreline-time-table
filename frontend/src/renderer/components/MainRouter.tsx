@@ -5,7 +5,7 @@ import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-
 import { observer } from 'mobx-react'
 import { axios } from '../../main/axios'
 import { authStore } from '../stores/AuthStore'
-import { GoogleLoginComponent } from './login-forms/GoogleLogin'
+import { LoginComponent } from './login-forms/Login'
 import { MainLayout } from './MainLayout'
 import { Spinner } from './spinner/Spinner'
 
@@ -25,7 +25,7 @@ export class MainRouterComponent extends React.Component<RouteComponentProps, { 
 
     return (
       <Switch>
-        <Route exact path="/login" component={GoogleLoginComponent} />
+        <Route exact path="/login" component={LoginComponent} />
         {!authStore.isLoggedIn && <Redirect to="/login" />}
         <Route path="/" component={MainLayout} />
       </Switch>

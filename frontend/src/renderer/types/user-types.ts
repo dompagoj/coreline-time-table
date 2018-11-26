@@ -5,8 +5,12 @@ export interface User {
   username: string
   firstName?: string
   lastName?: string
-  email?: string
-  type?: UserType
-  companyId?: number
+  email: string
+  type: UserType
+  companyId: number
   avatar?: string
+}
+
+export interface UserFilters {
+  type?: UserType
 }

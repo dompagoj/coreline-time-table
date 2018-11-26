@@ -23,10 +23,11 @@ export interface CreateHoursInput {
 }
 
 export class HoursApi {
-  public async getHours() {
+  public async getHours(userId?: string) {
     const { user } = authStore
+    const id = userId ? userId : user.id
 
-    return axios.get(`/companies/${user.companyId}/users/${user.id}/hours`)
+    return axios.get(`/companies/${user.companyId}/users/${id}/hours`)
   }
 
   public async createHour(input: CreateHoursInput) {

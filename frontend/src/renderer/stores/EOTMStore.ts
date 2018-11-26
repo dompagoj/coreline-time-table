@@ -1,33 +1,40 @@
-import { action, computed, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { VotingApi } from '../http/VotingApi'
 import { HTTPSuccess } from '../types/HTTP_STATUS_CODES'
 import { Poll } from '../types/poll-types'
+import { User } from '../types/user-types'
 import { authStore } from './AuthStore'
 
-interface StartDate {
+export interface StartDate {
   days: number
   hours: number
   minutes: number
   seconds: number
 }
 
-export class VotingStore {
+export class EOTMStore {
   @observable
   public poll: Poll
 
   @observable
   public startDate: StartDate
 
+  @observable
+  public lastWinner: User
+
   public constructor(private api: VotingApi) {}
 
   @action.bound
   public async getPoll() {
-    const { data, status } = await this.api.getPoll()
+    const { data, status } = await this.api.getEOTMPoll()
 
-    const { poll, startDate } = data
+    const { poll, startDate, lastWinner } = data
 
-    this.startDate = startDate
-    this.poll = poll
+    runInAction(() => {
+      this.lastWinner = lastWinner
+      this.startDate = startDate
+      this.poll = poll
+    })
   }
 
   @action.bound
@@ -50,6 +57,14 @@ export class VotingStore {
 
     return { newVote }
   }
+
+  public getUserVote() {
+    const { votes } = this.poll
+
+    return votes.find(vote => {
+      return vote.voter.id === authStore.user.id
+    })
+  }
 }
 const votingApiInstance = new VotingApi()
-export const votingStore = new VotingStore(votingApiInstance)
+export const eotmStore = new EOTMStore(votingApiInstance)

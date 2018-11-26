@@ -8,6 +8,7 @@ export async function verifyToken(token: string): Promise<VerifyTokenRes | undef
       if (err) {
         return resolve(undefined)
       }
+
       return resolve(decoded)
     })
   }) as any

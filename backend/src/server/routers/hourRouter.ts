@@ -11,7 +11,7 @@ hourRouter.use('/', async (req: any, res, next) => {
   const { id: userId } = req.ctx.user
 
   if (userIdParams && parseInt(userIdParams, 10) !== userId) {
-    const reqUser = await User.findOne(userId)
+    const reqUser = await User.findOneOrFail(userId)
     if (reqUser.type !== UserType.EMPLOYER) {
       return res.status(401).end()
     }

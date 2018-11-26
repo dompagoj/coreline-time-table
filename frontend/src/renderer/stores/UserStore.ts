@@ -1,11 +1,11 @@
 import { action, computed, observable } from 'mobx'
 import { UpdateUserInput, UsersApi } from '../http/UsersApi'
 import { HTTPStatusCodes } from '../types/HTTP_STATUS_CODES'
-import { User } from '../types/user-types'
+import { User, UserFilters } from '../types/user-types'
 
 class UserStore {
   @observable
-  public users: User[]
+  public users: User[] = []
 
   constructor(public usersApi: UsersApi) {}
 
@@ -15,7 +15,7 @@ class UserStore {
   }
 
   @action.bound
-  public async getUsers(filters = {}) {
+  public async getUsers(filters: UserFilters = {}) {
     const { data, status } = await this.usersApi.getUsers(filters)
     this.users = data
   }

@@ -8,12 +8,18 @@ import { verifyToken } from '../../utils/crypto'
 export function verifyJWT() {
   return async (req: Request & { ctx: Context }, res: Response, next) => {
     if (!req.headers.token) {
-      return res.status(401).end()
+      return res
+        .status(401)
+        .json({ error: 'Invalid token' })
+        .end()
     }
     const user = await verifyToken(req.headers.token as string)
 
     if (!user) {
-      return res.status(401).end()
+      return res
+        .status(401)
+        .json({ error: 'Invalid token' })
+        .end()
     }
 
     req.ctx = {
@@ -29,7 +35,7 @@ export async function verifyCompany(req, res, next) {
   const { companyId: reqUserCompanyId, id: reqUserId } = req.ctx.user
 
   if (reqUserCompanyId !== parseInt(companyId, 10)) {
-    const reqUser = await User.findOne(reqUserId)
+    const reqUser = await User.findOneOrFail(reqUserId)
     if (reqUser.type !== UserType.ADMIN) {
       return res.status(401).end()
     }

@@ -39,15 +39,11 @@ async function bootstrap() {
   morgan.token('operation', (req, res) => {
     return req.body.operationName
   })
-  morgan.token('authorization', (req, res) => {
-    return req.headers.authorization
-  })
-
   morgan.token('params', (req, res) => {
     return JSON.stringify(req.params)
   })
 
-  app.use(morgan(':date[clf] :method :url :status :params :operation :authorization'))
+  app.use(morgan(':date[clf] :method :url :status :params :operation'))
 
   app.use('', mainRouter)
 

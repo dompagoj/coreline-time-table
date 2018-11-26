@@ -1,10 +1,10 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
+import isDev from 'electron-is-dev'
 import { join } from 'path'
 import { format as formatUrl } from 'url'
+
 import { googleSignIn } from './google-login'
 import { deleteToken, readToken, saveToken } from './utils'
-
-const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let mainWindow: BrowserWindow | null = null
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
@@ -16,7 +16,7 @@ function createMainWindow() {
     minWidth: 900,
     minHeight: 680,
   })
-  if (isDevelopment) {
+  if (isDev) {
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
   } else {
     window.loadURL(
@@ -64,6 +64,7 @@ app.on('ready', () => {
 
 ipcMain.on('login', async (event, arg) => {
   const { data, status } = await googleSignIn()
+
   if (status >= 400) {
     return event.sender.send('reply', { error: data.error })
   }

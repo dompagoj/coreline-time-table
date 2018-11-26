@@ -1,9 +1,16 @@
 import Axios from 'axios'
-
-const isDevelopment = process.env.NODE_ENV !== 'production'
+import { ipcRenderer } from 'electron'
+import isDev from 'electron-is-dev'
 
 export const axios = Axios.create({
-  baseURL: isDevelopment ? 'http://localhost:8000/' : 'http://207.154.213.120/',
-  // baseURL: process.env.ELECTRON_WEBPACK_APP_BACKEND_URL,
+  baseURL: 'http://localhost:8000/',
+  // baseURL: isDev ? 'http://localhost:8000/' : 'http://207.154.213.120/',
   validateStatus: status => status >= 200 && status < 500,
 })
+// axios.interceptors.response.use(response => {
+//   if (response.data && response.data.error === 'Invalid token') {
+//     ipcRenderer.send('logout')
+//   }
+
+//   return response
+// })
