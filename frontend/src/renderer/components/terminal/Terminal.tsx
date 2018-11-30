@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react'
 import React from 'react'
 
 import { terminalStore } from '../../stores/TerminalStore'
@@ -8,6 +9,7 @@ interface State {
   input: string
 }
 
+@observer
 export class Terminal extends React.Component<any, State> {
   public state: State = {
     input: '',
@@ -16,13 +18,19 @@ export class Terminal extends React.Component<any, State> {
 
   public render() {
     const { input } = this.state
-    console.log({ input })
 
     return (
       <div className={styles.container}>
-        <h1 style={{ color: 'white' }}>Terminal!</h1>
+        <h2 style={{ color: 'white', textAlign: 'center', fontWeight: 'bold' }}>CTT Terminal</h2>
+        {terminalStore.executed.map((command, i) => (
+          <div key={i} style={{ display: 'flex' }}>
+            <span className={styles.arrow}>==></span>
+            <div className={styles.input}>{command}</div>
+          </div>
+        ))}
         <div onClick={this.focus} style={{ height: '100%', width: '100%' }}>
           <TerminalLine
+            executeInput={this.executeInput}
             value={input}
             onChange={this.onChange}
             inputRef={this.inputRef}
@@ -41,5 +49,18 @@ export class Terminal extends React.Component<any, State> {
   }
   public focus = () => {
     this.inputRef.current!.focus()
+  }
+  public executeInput = e => {
+    if (e.keyCode === 13) {
+      const { input } = this.state
+
+      terminalStore.addExecuted(input)
+      this.setState({
+        input: '',
+      })
+      if (input === 'clear') {
+        terminalStore.executed = []
+      }
+    }
   }
 }
