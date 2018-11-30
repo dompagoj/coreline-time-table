@@ -4,10 +4,12 @@ import { SelectParam } from 'antd/lib/menu'
 import { IpcRenderer } from 'electron'
 import { css } from 'emotion'
 import { observer } from 'mobx-react'
+import { bind, unbind } from 'mousetrap'
 import * as React from 'react'
 
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
+import { Terminal } from '../terminal/Terminal'
 
 // @ts-ignore
 const electron = window.require('electron')
@@ -18,10 +20,13 @@ const siderContainer = css`
   flex-direction: column;
   justify-content: space-between;
 `
+interface State {
+  activeMenu: string[]
+}
 
 @observer
-export class Navbar extends React.Component<any, { activeMenu: string[] }> {
-  public state = {
+export class Navbar extends React.Component<any, State> {
+  public state: State = {
     activeMenu: [],
   }
   public render() {
@@ -33,7 +38,12 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
     return (
       <Layout>
         <Layout.Sider theme="dark" defaultCollapsed collapsible>
-          <Menu defaultSelectedKeys={this.state.activeMenu} onSelect={this.handleRoute} mode="inline" theme="dark">
+          <Menu
+            selectedKeys={activeMenu}
+            onSelect={this.handleRoute}
+            mode="inline"
+            theme="dark"
+          >
             <Menu.Item key="/profile">
               <Icon type="user" />
               {authStore.user && <span>{authStore.user.username}</span>}
@@ -63,6 +73,23 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
     this.setState({
       activeMenu: pathname === '/' ? ['/profile'] : [pathname],
     })
+    bind('command+1', () => {
+      this.setActiveTab('/profile')
+      routerStore.gotoProfile()
+    })
+    bind('command+2', () => {
+      this.setActiveTab('/hours')
+      routerStore.gotoCalendar()
+    })
+    bind('command+3', () => {
+      this.setActiveTab('/voting')
+      routerStore.gotoVoting()
+    })
+  }
+  public componentWillUnmount = () => {
+    unbind('command+1')
+    unbind('command+2')
+    unbind('command+3')
   }
 
   public logout = () => {
@@ -73,6 +100,9 @@ export class Navbar extends React.Component<any, { activeMenu: string[] }> {
       }
     })
     ipcRenderer.send('logout')
+  }
+  public setActiveTab = (tab: string) => {
+    this.setState({ activeMenu: [tab] })
   }
 
   public handleRoute = (e: SelectParam) => {

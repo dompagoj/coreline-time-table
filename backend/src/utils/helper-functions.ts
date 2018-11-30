@@ -1,15 +1,10 @@
 import { validate } from 'class-validator'
 import { Router } from 'express'
 
-export function strToBool(str: string): boolean | null {
+export function strToBool(str: string): boolean {
   if (str === 'true') {
     return true
-  }
-  if (str === 'false') {
-    return false
-  }
-
-  return null
+  } else { return false }
 }
 
 export function registerRoutes(router: Router, Controller: any) {
