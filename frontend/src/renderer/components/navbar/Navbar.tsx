@@ -9,7 +9,6 @@ import * as React from 'react'
 
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
-import { Terminal } from '../terminal/Terminal'
 
 // @ts-ignore
 const electron = window.require('electron')
@@ -38,12 +37,7 @@ export class Navbar extends React.Component<any, State> {
     return (
       <Layout>
         <Layout.Sider theme="dark" defaultCollapsed collapsible>
-          <Menu
-            selectedKeys={activeMenu}
-            onSelect={this.handleRoute}
-            mode="inline"
-            theme="dark"
-          >
+          <Menu selectedKeys={activeMenu} onSelect={this.handleRoute} mode="inline" theme="dark">
             <Menu.Item key="/profile">
               <Icon type="user" />
               {authStore.user && <span>{authStore.user.username}</span>}
@@ -73,23 +67,23 @@ export class Navbar extends React.Component<any, State> {
     this.setState({
       activeMenu: pathname === '/' ? ['/profile'] : [pathname],
     })
-    bind('command+1', () => {
+    bind('mod+1', () => {
       this.setActiveTab('/profile')
       routerStore.gotoProfile()
     })
-    bind('command+2', () => {
+    bind('mod+2', () => {
       this.setActiveTab('/hours')
       routerStore.gotoCalendar()
     })
-    bind('command+3', () => {
+    bind('mod+3', () => {
       this.setActiveTab('/voting')
       routerStore.gotoVoting()
     })
   }
   public componentWillUnmount = () => {
-    unbind('command+1')
-    unbind('command+2')
-    unbind('command+3')
+    unbind('mod+1')
+    unbind('mod+2')
+    unbind('mod+3')
   }
 
   public logout = () => {

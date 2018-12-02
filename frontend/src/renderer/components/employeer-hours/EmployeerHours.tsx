@@ -2,10 +2,13 @@ import { AutoComplete, Avatar, Calendar, Card, Input } from 'antd'
 import { observer } from 'mobx-react'
 import moment from 'moment'
 import React from 'react'
+
 import { hoursStore } from '../../stores/HoursStore'
 import { userStore } from '../../stores/UserStore'
 import { User } from '../../types/user-types'
+import { getHoursTableDataSource } from '../utils/misc'
 import { Title } from '../utils/Title'
+import { HoursTable } from './HoursTable'
 import { styles } from './styles'
 
 const Option = AutoComplete.Option
@@ -40,6 +43,7 @@ export class EmployeerHours extends React.Component<any, State> {
           <div className={styles.searchStyle}>
             <AutoComplete
               value={searchInput}
+              autoFocus
               onSearch={this.handleSearch}
               style={{ width: '100%' }}
               dataSource={filteredUsers.map(renderOption)}
@@ -75,7 +79,13 @@ export class EmployeerHours extends React.Component<any, State> {
                   />
                 </div>
                 <div>
-                  <h2 className={styles.hoursTitle}>{`Hours in ${currDate.format('MMMM')}`}</h2>
+                  <h2 className={styles.hoursTitle}>{`Hours in ${currDate.format('MMMM')} (${currDate.format(
+                    'YYYY',
+                  )})`}</h2>
+                  <HoursTable
+                    totalHours={this.getMonthHours(hoursStore.hours)}
+                    dataSource={getHoursTableDataSource(this.getMonthHours(hoursStore.hours), currDate.month() + 1)}
+                  />
                 </div>
               </div>
             </Card>
@@ -115,9 +125,16 @@ export class EmployeerHours extends React.Component<any, State> {
       currDate: date,
     })
   }
-  public getTotalHours = (hours: any[]) => {
+  public getMonthHours = (hours: any[]) => {
+    const { currDate } = this.state
+
     return hours.reduce((sum, hour) => {
-      return (sum += hour.amount)
+      const hourDate = new Date(hour.date)
+      if (currDate.month() + 1 === hourDate.getMonth() + 1 && currDate.year() === hourDate.getFullYear()) {
+        sum += hour.amount
+      }
+
+      return sum
     }, 0)
   }
 }

@@ -2,25 +2,28 @@ import { observer } from 'mobx-react'
 import React from 'react'
 
 import { terminalStore } from '../../stores/TerminalStore'
+import { executeCommand, findCommand } from './commands'
 import { styles } from './styles'
 import { TerminalLine } from './terminal-line'
 
 interface State {
   input: string
+  inputColor: string
 }
 
 @observer
 export class Terminal extends React.Component<any, State> {
   public state: State = {
     input: '',
+    inputColor: 'white',
   }
   private inputRef = React.createRef<HTMLInputElement>()
 
   public render() {
-    const { input } = this.state
+    const { input, inputColor } = this.state
 
     return (
-      <div className={styles.container}>
+      <div onClick={this.focus} className={styles.container}>
         <h2 style={{ color: 'white', textAlign: 'center', fontWeight: 'bold' }}>CTT Terminal</h2>
         {terminalStore.executed.map((command, i) => (
           <div key={i} style={{ display: 'flex' }}>
@@ -28,11 +31,12 @@ export class Terminal extends React.Component<any, State> {
             <div className={styles.input}>{command}</div>
           </div>
         ))}
-        <div onClick={this.focus} style={{ height: '100%', width: '100%' }}>
+        <div style={{ width: '100%' }}>
           <TerminalLine
             executeInput={this.executeInput}
             value={input}
             onChange={this.onChange}
+            inputColor={inputColor}
             inputRef={this.inputRef}
           />
         </div>
@@ -43,24 +47,25 @@ export class Terminal extends React.Component<any, State> {
     this.setState({
       [e.target.name]: e.target.value,
     } as any)
+    const command = findCommand(e.target.value)
+
+    command ? this.setState({ inputColor: 'green' }) : this.setState({ inputColor: 'red' })
   }
+
   public componentDidMount = () => {
     this.inputRef.current!.focus()
   }
+
   public focus = () => {
     this.inputRef.current!.focus()
   }
+
   public executeInput = e => {
     if (e.keyCode === 13) {
       const { input } = this.state
+      executeCommand(input)
 
-      terminalStore.addExecuted(input)
-      this.setState({
-        input: '',
-      })
-      if (input === 'clear') {
-        terminalStore.executed = []
-      }
+      return this.setState({ input: '' })
     }
   }
 }

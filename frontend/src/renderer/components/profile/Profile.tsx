@@ -85,7 +85,14 @@ export class Profile extends React.Component<any, IState> {
         >
           <Form onSubmit={this.verifyAuthKey}>
             <Form.Item validateStatus={errors.authKey ? 'error' : 'success'} help={errors.authKey}>
-              <Input type="password" name="authKey" addonBefore="Password" value={authKey} onChange={this.onChange} />
+              <Input
+                autoFocus
+                type="password"
+                name="authKey"
+                addonBefore="Password"
+                value={authKey}
+                onChange={this.onChange}
+              />
             </Form.Item>
           </Form>
         </Modal>

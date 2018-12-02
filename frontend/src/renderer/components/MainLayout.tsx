@@ -1,15 +1,15 @@
 import { css } from 'emotion'
+import { observer } from 'mobx-react'
 import * as Mousetrap from 'mousetrap'
 import * as React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
-import { Navbar } from './navbar/Navbar'
 
-import { observer } from 'mobx-react'
 import { authStore } from '../stores/AuthStore'
 import { terminalStore } from '../stores/TerminalStore'
 import { UserType } from '../types/enums'
 import { EmployeerHours } from './employeer-hours/EmployeerHours'
 import { Hours } from './hours/Hours'
+import { Navbar } from './navbar/Navbar'
 import { Profile } from './profile/Profile'
 import { Terminal } from './terminal/Terminal'
 import { Voting } from './voting/Voting'
@@ -45,7 +45,7 @@ export class MainLayout extends React.Component {
       authStore.getUser()
     }
     Mousetrap.prototype.stopCallback = () => false
-    Mousetrap.bind('command+t', () => {
+    Mousetrap.bind('mod+t', () => {
       const { visible } = terminalStore
       terminalStore.visible = !visible
     })

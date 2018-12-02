@@ -5,23 +5,18 @@ import { styles } from './styles'
 interface Props {
   value: string
   inputRef: any
-  noInput?: boolean
+  inputColor: string
   onChange(e: any): void
   executeInput(e: any): void
 }
 
-export function TerminalLine({
-  noInput = false,
-  executeInput,
-  inputRef,
-  onChange,
-  value,
-}: Props) {
+export function TerminalLine({ executeInput, inputRef, inputColor, onChange, value }: Props) {
   return (
     <div style={{ display: 'flex' }}>
       <span className={styles.arrow}>==></span>
       <input
         name="input"
+        style={{ color: inputColor }}
         className={styles.input}
         type="text"
         ref={inputRef}

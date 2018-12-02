@@ -22,3 +22,12 @@ export function sum(array: number[]) {
 export function getLogoSrc() {
   return 'data:image/jpeg;base64,' + readFileSync(join(__static, '/logo.png')).toString('base64')
 }
+
+export function getHoursTableDataSource(hours: number, currMonth) {
+  return [
+    {
+      key: `${hours}-${currMonth}`,
+      hours,
+    },
+  ]
+}

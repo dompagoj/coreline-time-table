@@ -25,6 +25,17 @@ export class LoginComponent extends React.Component<any, { error: string | null 
           <img style={{ height: 50, width: 50, margin: '0 10px' }} src={getLogoSrc()} />
           <h3 className={styles.title}>Coreline time table</h3>
         </div>
+        {error && (
+          <Alert
+            style={{ width: '57%', margin: '20px auto' }}
+            message="Error"
+            description={this.state.error}
+            type="error"
+            showIcon
+            closable
+            onClose={this.closePopup}
+          />
+        )}
         <Card
           style={{ width: '57%', marginTop: 45 }}
           headStyle={{ textAlign: 'center' }}
@@ -55,17 +66,6 @@ export class LoginComponent extends React.Component<any, { error: string | null 
             </Button>
           </Form>
         </Card>
-        {error && (
-          <Alert
-            style={{ width: '100%', marginTop: '20px' }}
-            message="Error"
-            description={this.state.error}
-            type="error"
-            showIcon
-            closable
-            onClose={this.closePopup}
-          />
-        )}
       </div>
     )
   }

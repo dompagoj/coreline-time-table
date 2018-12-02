@@ -6,7 +6,7 @@ import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { Spinner } from '../spinner/Spinner'
-import { getDaysAfter, getDaysBefore } from '../utils/hours'
+import { dateFromNums, getDaysAfter, getDaysBefore } from '../utils/hours'
 import { inRange, sum } from '../utils/misc'
 import { HoursModalContent } from './HoursModalContent'
 import { styles } from './styles'
@@ -209,7 +209,7 @@ export class Hours extends React.Component<any, IState> {
       },
       selectedDay: day,
       selectedDayAmount,
-      modalTitle: weekend ? "You shouldn't work on the weekends" : '',
+      modalTitle: weekend ? 'You shouldn\'t work on the weekends' : '',
       openModal: true,
     })
   }
@@ -223,9 +223,10 @@ export class Hours extends React.Component<any, IState> {
     e.preventDefault()
 
     const { currDate, selectedDay, hoursAmount } = this.state
-    const day = moment(new Date(`${currDate.month() + 1}.${selectedDay + 1}.${currDate.year()}`))
+    const date = dateFromNums(currDate.month() + 1, selectedDay + 1, currDate.year())
+
     await hoursStore.createHour({
-      date: new Date(day.toDate()),
+      date,
       hours: {
         amount: hoursAmount,
       },

@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber } from 'antd'
+import { Form, InputNumber } from 'antd'
 import { css } from 'emotion'
 import * as React from 'react'
 const FormItem = Form.Item
@@ -20,9 +20,6 @@ export class HoursModalContent extends React.Component<{
         <FormItem label="Hours">
           <InputNumber autoFocus defaultValue={currentAmount} onChange={onChange} min={0} max={12} />
         </FormItem>
-        {/* <FormItem validateStatus="warning" help="Not yet implemented">
-          <Input addonBefore="Project" />
-        </FormItem> */}
       </Form>
     )
   }

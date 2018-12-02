@@ -40,3 +40,7 @@ export function getDaysAfter(currDate: moment.Moment) {
       )
     : []
 }
+
+export function dateFromNums(month: number, day: number, year: number) {
+  return new Date(`${month}.${day}.${year}`)
+}

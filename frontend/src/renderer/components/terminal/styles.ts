@@ -4,12 +4,13 @@ export const styles = {
   container: css`
     z-index: 100;
     position: absolute;
-    bottom: 15px;
+    bottom: 40px;
     right: 15px;
     height: 300px;
-    width: 450px;
+    width: 500px;
     background-color: #2b2b2b;
     color: white;
+    overflow-y: auto;
     border: 1px solid black;
     padding: 10px;
   `,

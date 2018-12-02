@@ -5,7 +5,7 @@ export const styles = {
     padding: 20px;
   `,
   searchStyle: css`
-    width: 35%;
+    width: 50%;
     margin: 0 auto;
   `,
   avatar: css`
