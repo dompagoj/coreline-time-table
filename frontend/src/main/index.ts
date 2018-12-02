@@ -15,6 +15,7 @@ function createMainWindow() {
     height: 680,
     minWidth: 900,
     minHeight: 680,
+    icon: join(__static, 'icon.png'),
   })
   if (isDev) {
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
