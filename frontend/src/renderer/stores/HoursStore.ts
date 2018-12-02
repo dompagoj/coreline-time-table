@@ -10,7 +10,6 @@ class HoursStore {
 
   public constructor(private api: HoursApi) {}
 
-  @action.bound
   public async getHours(userId?: string) {
     const { data } = await this.api.getHours(userId)
     this.hours = data
@@ -50,6 +49,17 @@ class HoursStore {
     await this.api.deleteHour(this.hours[hourIndex].id)
 
     this.hours.splice(hourIndex, 1)
+  }
+
+  public getMonthHours(currDate: moment.Moment) {
+    return this.hours.reduce((sum, hour) => {
+      const hourDate = new Date(hour.date)
+      if (currDate.month() + 1 === hourDate.getMonth() + 1 && currDate.year() === hourDate.getFullYear()) {
+        sum += hour.amount
+      }
+
+      return sum
+    }, 0)
   }
 
   @computed

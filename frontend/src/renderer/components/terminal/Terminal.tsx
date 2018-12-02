@@ -60,10 +60,10 @@ export class Terminal extends React.Component<any, State> {
     this.inputRef.current!.focus()
   }
 
-  public executeInput = e => {
+  public executeInput = async e => {
     if (e.keyCode === 13) {
       const { input } = this.state
-      executeCommand(input)
+      await executeCommand(input)
 
       return this.setState({ input: '' })
     }

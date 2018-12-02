@@ -9,16 +9,12 @@ import * as React from 'react'
 
 import { authStore } from '../../stores/AuthStore'
 import { routerStore } from '../../stores/router/router-store'
+import { UserType } from '../../types/enums'
 
 // @ts-ignore
 const electron = window.require('electron')
 const ipcRenderer: IpcRenderer = electron.ipcRenderer
 
-const siderContainer = css`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`
 interface State {
   activeMenu: string[]
 }
@@ -45,7 +41,7 @@ export class Navbar extends React.Component<any, State> {
             <Menu.Divider />
             <Menu.Item key="/hours">
               <Icon type="clock-circle" />
-              <span>Hours</span>
+              <span>{authStore.user.type === UserType.EMPLOYEE ? 'Hours' : 'Employer dashboard'}</span>
             </Menu.Item>
             <Menu.Item key="/voting">
               <Icon type="usergroup-add" />

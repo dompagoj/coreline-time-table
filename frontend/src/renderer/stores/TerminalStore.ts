@@ -5,6 +5,9 @@ class TerminalStore {
   public visible: boolean = false
 
   @observable
+  public input: string
+
+  @observable
   public executed: string[] = []
 
   @action.bound

@@ -3,6 +3,7 @@ import { observer } from 'mobx-react'
 import moment from 'moment'
 import React from 'react'
 
+import { generalStateStore } from '../../stores/GeneralState'
 import { hoursStore } from '../../stores/HoursStore'
 import { userStore } from '../../stores/UserStore'
 import { User } from '../../types/user-types'
@@ -16,7 +17,6 @@ const Option = AutoComplete.Option
 interface State {
   filteredUsers: User[]
   selectedUser?: User
-  searchInput: string
   calendarMode: 'year' | 'month'
   currDate: moment.Moment
 }
@@ -26,7 +26,6 @@ export class EmployeerHours extends React.Component<any, State> {
   public state: State = {
     filteredUsers: [],
     selectedUser: undefined,
-    searchInput: '',
     calendarMode: 'year',
     currDate: moment().subtract(1, 'month'),
   }
@@ -34,7 +33,8 @@ export class EmployeerHours extends React.Component<any, State> {
     if (userStore.loading) {
       return null
     }
-    const { filteredUsers, selectedUser, searchInput, currDate, calendarMode } = this.state
+    const { filteredUsers, selectedUser, currDate, calendarMode } = this.state
+    const { userSearchInput } = generalStateStore
 
     return (
       <div>
@@ -42,7 +42,7 @@ export class EmployeerHours extends React.Component<any, State> {
         <div className={styles.searchContainer}>
           <div className={styles.searchStyle}>
             <AutoComplete
-              value={searchInput}
+              value={userSearchInput}
               autoFocus
               onSearch={this.handleSearch}
               style={{ width: '100%' }}
@@ -50,12 +50,7 @@ export class EmployeerHours extends React.Component<any, State> {
               optionLabelProp="text"
               onSelect={this.onSelect}
             >
-              <Input
-                value={searchInput}
-                size="large"
-                placeholder="Employee email or username"
-                style={{ height: '50px' }}
-              />
+              <Input size="large" placeholder="Employee email or username" style={{ height: '50px' }} />
             </AutoComplete>
           </div>
         </div>
@@ -83,8 +78,8 @@ export class EmployeerHours extends React.Component<any, State> {
                     'YYYY',
                   )})`}</h2>
                   <HoursTable
-                    totalHours={this.getMonthHours(hoursStore.hours)}
-                    dataSource={getHoursTableDataSource(this.getMonthHours(hoursStore.hours), currDate.month() + 1)}
+                    totalHours={hoursStore.getMonthHours(currDate)}
+                    dataSource={getHoursTableDataSource(hoursStore.getMonthHours(currDate), currDate.month() + 1)}
                   />
                 </div>
               </div>
@@ -96,19 +91,25 @@ export class EmployeerHours extends React.Component<any, State> {
   }
   public async componentDidMount() {
     await userStore.getUsers()
+    const selectedUser = userStore.users.find(user => user.username === generalStateStore.userSearchInput)
+
+    if (selectedUser) {
+      this.setState({ selectedUser })
+    }
   }
   public onSelect = async username => {
     const selectedUser = userStore.users.find(user => user.username === username)
+    generalStateStore.userSearchInput = username
+
     this.setState({
-      searchInput: username,
       selectedUser,
     })
     await hoursStore.getHours((selectedUser && selectedUser.id.toString()) || undefined)
   }
 
   public handleSearch = value => {
+    generalStateStore.userSearchInput = value
     this.setState({
-      searchInput: value,
       filteredUsers: !value
         ? []
         : userStore.users.filter(user => user.username.startsWith(value) || user.email.startsWith(value)),
@@ -124,18 +125,6 @@ export class EmployeerHours extends React.Component<any, State> {
       calendarMode: mode,
       currDate: date,
     })
-  }
-  public getMonthHours = (hours: any[]) => {
-    const { currDate } = this.state
-
-    return hours.reduce((sum, hour) => {
-      const hourDate = new Date(hour.date)
-      if (currDate.month() + 1 === hourDate.getMonth() + 1 && currDate.year() === hourDate.getFullYear()) {
-        sum += hour.amount
-      }
-
-      return sum
-    }, 0)
   }
 }
 

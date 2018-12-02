@@ -13,7 +13,7 @@ const commands: Command[] = [
   {
     name: 'clear',
     action: () => {
-      return (terminalStore.executed = [])
+      terminalStore.executed = []
     },
   },
   {
@@ -30,10 +30,22 @@ const commands: Command[] = [
       const year = y || currDate.year()
       const date = dateFromNums(month, day, year)
 
-      return hoursStore.createHour({
+      hoursStore.createHour({
         date,
         hours: { amount: parseInt(value, 10) },
       })
+    },
+  },
+  {
+    name: 'hours',
+    action: async () => {
+      if (!hoursStore.hours) {
+        await hoursStore.getHours()
+      }
+
+      const sum = hoursStore.getMonthHours(moment())
+
+      return `Total hours this month: ${sum}`
     },
   },
 ]
@@ -42,16 +54,18 @@ export function findCommand(input: string) {
   return commands.find(command => command.name === input.split(' ')[0])
 }
 
-export function executeCommand(input: string) {
+export async function executeCommand(input: string) {
   const command = findCommand(input)
   if (!command) {
-    return terminalStore.addExecuted(`Command not found: ${input}`)
+    return terminalStore.addExecuted(input !== '' ? `Command not found: ${input}` : '')
   }
   terminalStore.addExecuted(input)
-
   const params = parseArgs(input.split(' '))
+  const result = await command.action(params._[1], params)
 
-  return command.action(params._[1], params)
+  if (result && !Array.isArray(result)) {
+    return terminalStore.addExecuted(result)
+  }
 }
 
 interface Add {

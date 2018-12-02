@@ -12,12 +12,13 @@ export function HoursTable(props: Props) {
   return (
     <Table
       dataSource={props.dataSource}
+      bordered
       size="small"
       pagination={false}
       footer={() => <TableFooter totalHours={props.totalHours} />}
     >
-      <Column title="Project" dataIndex="project" />
       <Column title="Hours" dataIndex="hours" />
+      <Column title="Project" dataIndex="project" />
     </Table>
   )
 }
