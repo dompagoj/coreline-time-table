@@ -13,7 +13,7 @@ export class Hour extends BaseEntity {
   @Column()
   public userId: number
 
-  @Column({ type: 'date', default: new Date(), unique: true })
+  @Column({ type: 'date', default: new Date() })
   public date: Date
 
   @ManyToOne(type => User, user => user.hours, { onDelete: 'CASCADE' })

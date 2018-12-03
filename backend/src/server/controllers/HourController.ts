@@ -64,6 +64,7 @@ export class HourController extends BaseController<
     const hour = await Hour.findOne({
       where: {
         date,
+        userId: user.id,
       },
     })
     if (hour) {
