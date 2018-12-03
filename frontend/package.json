@@ -52,7 +52,8 @@
   "build": {
     "appId": "com.coreline.timetable",
     "mac": {
-      "category": "calendar"
+      "category": "calendar",
+      "icon": "./static/icon.512x512.png"
     }
   }
 }
