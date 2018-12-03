@@ -6,6 +6,7 @@ import React from 'react'
 import { generalStateStore } from '../../stores/GeneralState'
 import { hoursStore } from '../../stores/HoursStore'
 import { userStore } from '../../stores/UserStore'
+import { UserType } from '../../types/enums'
 import { User } from '../../types/user-types'
 import { getHoursTableDataSource } from '../utils/misc'
 import { Title } from '../utils/Title'
@@ -90,7 +91,9 @@ export class EmployeerHours extends React.Component<any, State> {
     )
   }
   public async componentDidMount() {
-    await userStore.getUsers()
+    await userStore.getUsers({
+      type: UserType.EMPLOYEE,
+    })
     const selectedUser = userStore.users.find(user => user.username === generalStateStore.userSearchInput)
 
     if (selectedUser) {
