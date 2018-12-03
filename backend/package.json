@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "pm2 start src/index.js --name ctt",
+    "restart": "pm2 restart ctt",
     "dev": "nodemon",
     "lint": "tslint --fix \"./src/**/*.ts*\"",
     "db:start": "docker container start 5f5accb6fddd",
