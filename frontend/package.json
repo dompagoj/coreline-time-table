@@ -1,11 +1,18 @@
 {
   "name": "coreline-time-table",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "author": {
+    "email": "domagoj.zivanovic@gmail.com",
+    "name": "Domagoj Zivanovic"
+  },
+  "description": "Company time table",
   "license": "MIT",
+  "repository": "git@github.com:dompagoj/coreline-time-table.git",
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
     "dist": "npm run compile && electron-builder --x64 --mac",
+    "publish": "npm run compile && electron-builder --x64 --mac -p always",
     "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
   },
   "dependencies": {
@@ -45,7 +52,8 @@
   "build": {
     "appId": "com.coreline.timetable",
     "mac": {
-      "category": "calendar"
+      "category": "calendar",
+      "icon": "./static/icon.512x512.png"
     }
   }
 }
