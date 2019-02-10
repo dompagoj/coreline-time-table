@@ -28,6 +28,7 @@ export const styles = {
   dayContent: css`
     padding: 0 5px 0 0;
     text-align: end;
+    overflow-y: auto;
   `,
 
   header: css`
@@ -41,6 +42,7 @@ export const styles = {
     margin-bottom: 5px;
   `,
   content: css`
+    padding: 5px 0;
     border-bottom: 3px solid lightgreen;
   `,
   today: css`

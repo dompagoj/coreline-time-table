@@ -3,11 +3,11 @@ import { User } from '../../data/entities/User'
 import { UserType } from '../../data/enums/UserType'
 import { Context } from '../../data/types/Context'
 import { UserUpdateInput } from '../../data/types/UserTypes'
-import { DELETE, GET, POST, PUT } from '../controller-decorators'
+import { DELETE, GET, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
 export class UserController extends BaseController<Context & { company: Company }, { companyId: string; id: string }> {
-  constructor(req, res, next) {
+  public constructor(req, res, next) {
     super(req, res, next)
   }
 

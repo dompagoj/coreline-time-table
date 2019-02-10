@@ -30,15 +30,15 @@ export class User extends BaseEntity {
   @Column()
   public companyId: number
 
-  @ManyToOne(type => Company, company => company.users, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => Company, company => company.users, { nullable: false, onDelete: 'CASCADE' })
   public company: Company
 
-  @OneToMany(type => Hour, hour => hour.user)
+  @OneToMany(() => Hour, hour => hour.user)
   public hours: Hour[]
 
-  @OneToOne(type => Vote, vote => vote.votedFor)
+  @OneToOne(() => Vote, vote => vote.votedFor)
   public vote: Vote
 
-  @OneToMany(type => Vote, vote => vote.voter)
+  @OneToMany(() => Vote, vote => vote.voter)
   public votes: Vote[]
 }

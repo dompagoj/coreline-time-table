@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { Project } from '../../types/project-types'
+import { Hour } from '../../types/hours-types'
 
 export enum COLORS {
   LIGHT_YELLOW = '#fdfff7',
@@ -45,9 +46,17 @@ export function getHoursTableDataSource(projects: Project[], currMonth: number) 
     return {
       key: `${project.id}-${currMonth}`,
       hours: sum(project.hours.map(h => h.amount)),
-      project: project.name
+      project: project.name,
     }
   })
+}
+
+export function groupNoProjectHours(hours: Hour[]) {
+  return {
+    key: 'noProject',
+    hours: sum(hours.map(h => h.amount)),
+    project: 'Not specified',
+  }
 }
 
 export function getBase64(file: Blob): Promise<string> {

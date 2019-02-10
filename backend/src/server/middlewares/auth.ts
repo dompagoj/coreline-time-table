@@ -2,31 +2,30 @@ import { Request, Response } from 'express'
 import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
 import { UserType } from '../../data/enums/UserType'
-import { Context } from '../../data/types/Context'
 import { verifyToken } from '../../utils/crypto'
 
 export async function verifyJWT(req: Request, res: Response, next) {
-    if (!req.headers.token) {
-      return res
-        .status(401)
-        .json({ error: 'Invalid token' })
-        .end()
-    }
-    const user = await verifyToken(req.headers.token as string)
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ error: 'Invalid token' })
-        .end()
-    }
-
-    res.locals = {
-      user,
-    }
-
-    next()
+  if (!req.headers.token) {
+    return res
+      .status(401)
+      .json({ error: 'Invalid token' })
+      .end()
   }
+  const user = await verifyToken(req.headers.token as string)
+
+  if (!user) {
+    return res
+      .status(401)
+      .json({ error: 'Invalid token' })
+      .end()
+  }
+
+  res.locals = {
+    user,
+  }
+
+  next()
+}
 
 export async function verifyCompany(req, res, next) {
   const { companyId } = req.params

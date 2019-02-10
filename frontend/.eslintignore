@@ -1,0 +1,5 @@
+node_modules
+src/registerServiceWorker
+config-overrides.js
+public/main.js
+dist

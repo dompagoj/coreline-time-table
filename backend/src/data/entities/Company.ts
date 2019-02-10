@@ -19,12 +19,12 @@ export class Company extends BaseEntity {
   @Column()
   public domain: string
 
-  @OneToMany(type => User, user => user.company)
+  @OneToMany(() => User, user => user.company)
   public users: User[]
 
-  @OneToMany(type => Project, project => project.company)
+  @OneToMany(() => Project, project => project.company)
   public projects: Project[]
 
-  @OneToMany(type => Poll, poll => poll.company, { onDelete: 'CASCADE' })
+  @OneToMany(() => Poll, poll => poll.company, { onDelete: 'CASCADE' })
   public polls: Poll[]
 }

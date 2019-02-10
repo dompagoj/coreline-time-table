@@ -7,10 +7,10 @@ class UserStore {
   @observable
   public users: User[] = []
 
-  constructor(public usersApi: UsersApi) {}
+  public constructor(public usersApi: UsersApi) {}
 
   @computed
-  get loading() {
+  public get loading() {
     return this.users === null || this.users === undefined
   }
 

@@ -10,11 +10,15 @@ import { sum } from '../utils/misc'
 import { Title } from '../utils/Title'
 import { NewProjectForm } from './NewProjectForm'
 import { styles } from './styles'
+import { UpdateProjectForm } from './UpdateProjectForm'
+import { authStore } from '../../stores/AuthStore'
+import { UserType } from '../../types/enums'
 
 interface State {
   drawerVisible: boolean
   search: string
   activeTab: 'active' | 'all'
+  selectedProject?: Partial<Project>
 }
 
 @observer
@@ -29,7 +33,7 @@ export class Projects extends React.Component<any, State> {
     if (projectStore.loading) {
       return <Spinner />
     }
-    const { drawerVisible, search, activeTab } = this.state
+    const { drawerVisible, search, activeTab, selectedProject } = this.state
 
     return (
       <div>
@@ -54,14 +58,18 @@ export class Projects extends React.Component<any, State> {
           onClose={this.closeDrawer}
           destroyOnClose
           width={'50%'}
-          title="Create a new project"
+          title={selectedProject ? 'Update project' : 'Create a new project'}
         >
-          <NewProjectForm onCreate={this.onCreate} />
+          {
+            selectedProject
+              ? <UpdateProjectForm initialValues={selectedProject} onUpdate={this.onUpdate} />
+              : <NewProjectForm onCreate={this.onCreate} />
+          }
         </Drawer>
         {projectStore.activeProjects.length === 0 && activeTab === 'active' ? (
           <div style={{ textAlign: 'center', fontSize: '25px', padding: 25 }}>
             <span>
-              Your company has no active projects, click{' '}
+              Your company has no active projects, click {' '}
               <a onClick={this.openDrawer}>here</a> to create one
             </span>
           </div>
@@ -69,6 +77,8 @@ export class Projects extends React.Component<any, State> {
           <Card className={styles.tableContainer}>
             <Table
               columns={projectsTableColumns}
+              // @ts-ignore
+              onRow={this.onRow}
               dataSource={this.getTableData(search)}
             />
           </Card>
@@ -87,6 +97,14 @@ export class Projects extends React.Component<any, State> {
     await projectStore.createProject(project)
   }
 
+  public onUpdate = async ({ id, ...data }: Project) => {
+    this.setState({
+      drawerVisible: false,
+      selectedProject: undefined,
+    })
+    await projectStore.updateProject(id, data)
+  }
+
   public getTableData(search: string) {
     const projects =
       this.state.activeTab === 'active'
@@ -101,15 +119,30 @@ export class Projects extends React.Component<any, State> {
         key: project.id,
         name: project.name,
         status: project.status,
-        hours: project.hours ? sum(project.hours.map(p => p.amount)) : 0
+        hours: project.hours ? sum(project.hours.map(p => p.amount)) : 0,
+        avatar: project.avatar,
+        creatorId: project.creatorId,
       }))
   }
+  public onRow = ({ key: id, name, avatar }) => ({
+    onClick: () => {
+      this.setState({
+        selectedProject: {
+          id,
+          name,
+          avatar,
+        },
+        drawerVisible: true,
+      })
+    }
+  });
+
 
   public openDrawer = () => {
     this.setState({ drawerVisible: true })
   }
   public closeDrawer = () => {
-    this.setState({ drawerVisible: false })
+    this.setState({ drawerVisible: false, selectedProject: undefined })
   }
   public onChange = event => {
     // @ts-ignore
@@ -124,7 +157,7 @@ export class Projects extends React.Component<any, State> {
   }
 }
 
-const TabExtraContent = props => (
+const TabExtraContent = (props: any) => (
   <div className={styles.extraContent}>
     <Input
       onChange={props.onChange}
@@ -137,14 +170,12 @@ const TabExtraContent = props => (
   </div>
 )
 
-const projectsTableColumns: Array<
-  ColumnProps<{
-    key: string | number;
-    name: any;
-    status: any;
-    hours: any;
-  }>
-> = [
+const projectsTableColumns: ColumnProps<{
+  key: string | number;
+  name: any;
+  status: any;
+  hours: any;
+}>[] = [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -187,6 +218,7 @@ const projectsTableColumns: Array<
         <div className={styles.actionsContainer}>
           <Button
             className="tab-button"
+            disabled={authStore.user.type !== UserType.EMPLOYER && authStore.user.id !== project.creatorId}
             onClick={() => projectStore.deleteProject(project.key)}
             type="danger"
             shape="circle-outline"

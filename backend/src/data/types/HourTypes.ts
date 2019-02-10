@@ -1,7 +1,3 @@
-import { Min } from 'class-validator'
-import { Omit } from '../../utils/general'
-import { ID } from './random'
-
 interface Hours {
   amount: number
   projectId?: number

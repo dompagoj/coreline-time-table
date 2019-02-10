@@ -23,9 +23,9 @@ export class Hour extends BaseEntity {
   @Column({ nullable: true })
   public projectId?: number
 
-  @ManyToOne(type => Project, project => project.hours, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => Project, project => project.hours, { onDelete: 'SET NULL', nullable: true })
   public project?: Project
 
-  @ManyToOne(type => User, user => user.hours, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.hours, { onDelete: 'CASCADE' })
   public user: User
 }

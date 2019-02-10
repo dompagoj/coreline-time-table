@@ -7,13 +7,13 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import { authStore } from '../stores/AuthStore'
 import { terminalStore } from '../stores/TerminalStore'
 import { UserType } from '../types/enums'
-import { EmployerHours } from './employeer-hours/EmployerHours'
+import { EmployerDashboard } from './employeer-hours/EmployerDashboard'
 import { Hours } from './hours/Hours'
 import { Navbar } from './navbar/Navbar'
 import { Profile } from './profile/Profile'
 import { Projects } from './projects/Projects'
 import { Terminal } from './terminal/Terminal'
-import { Voting } from './voting/Voting'
+import { UserDashboard } from './user-dashboard/UserDashboard'
 
 const routerContainer = css`
   width: 100%;
@@ -34,7 +34,8 @@ export class MainLayout extends React.Component {
             <Redirect exact from="/" to="/profile" />
             <Route path="/profile" component={Profile} />
             <Route path="/hours" component={Hours} />
-            {authStore.user.type === UserType.EMPLOYER && <Route path="/employer" component={EmployerHours} />}
+            <Route path="/employer" component={EmployerDashboard} />
+            <Route path="/user-dashboard" component={UserDashboard} />
             <Route path="/projects" component={Projects} />
           </Switch>
           {terminalStore.visible && <Terminal />}

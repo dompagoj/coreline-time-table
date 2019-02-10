@@ -1,3 +1,3 @@
 import { NextFunction, Request, Response } from 'express'
 
-export type ExpressFunction = (req: Request, res: Response, next: NextFunction) => any
+export type ExpressFunction<T> = (req: Request, res: Response, next: NextFunction) => T

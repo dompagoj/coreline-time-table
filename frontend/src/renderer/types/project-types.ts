@@ -3,9 +3,10 @@ import { Hour } from './hours-types'
 export interface Project {
   id: string | number
   name: string
-  avatar: string | undefined
+  avatar?: string
   status: ProjectStatus
   hours: Hour[]
+  creatorId: number
 }
 
 export enum ProjectStatus {

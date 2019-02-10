@@ -1,7 +1,6 @@
-import { IsEmail, IsEnum, IsString, Length, Min, ValidateIf } from 'class-validator'
+import { IsEmail, IsEnum, IsString, Length, Min } from 'class-validator'
 
 import { UserType } from '../enums/UserType'
-import { ID } from './random'
 
 export class UserInput {
   @Length(5, 20)

@@ -21,7 +21,7 @@ export class CompanyController extends BaseController<Context, { id: string }> {
     const { id } = this.routeData
     Company.findOneOrFail(id)
       .then(company => this.accepted(company))
-      .catch(e => this.badRequest(`Company with an id ${id} doesn't exists`))
+      .catch(() => this.badRequest(`Company with an id ${id} doesn't exists`))
   }
 
   @POST('/')
@@ -31,7 +31,7 @@ export class CompanyController extends BaseController<Context, { id: string }> {
     })
       .save()
       .then(company => this.accepted(company))
-      .catch(e => this.badRequest('Company already exists'))
+      .catch(() => this.badRequest('Company already exists'))
   }
 
   @DELETE('/:id')
@@ -39,7 +39,7 @@ export class CompanyController extends BaseController<Context, { id: string }> {
     const { id } = this.routeData
     Company.delete(id)
       .then(() => this.accepted('Delete successful'))
-      .catch(e => this.badRequest())
+      .catch(() => this.badRequest())
   }
 
   @PUT('/:id')
@@ -51,7 +51,7 @@ export class CompanyController extends BaseController<Context, { id: string }> {
       .then(company => {
         this.accepted(company)
       })
-      .catch(e => this.badRequest())
+      .catch(() => this.badRequest())
   }
   @POST('/:id/verify-key')
   private async verifyCompanyAuthKey({ authKey }) {

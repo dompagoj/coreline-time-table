@@ -7,13 +7,13 @@ export class Vote extends BaseEntity {
   @PrimaryGeneratedColumn()
   public id: number
 
-  @ManyToOne(type => Poll, poll => poll.votes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Poll, poll => poll.votes, { onDelete: 'CASCADE' })
   public poll: Poll
 
-  @ManyToOne(type => User, user => user.votes)
+  @ManyToOne(() => User, user => user.votes)
   public voter: User
 
-  @OneToOne(type => User, user => user.vote)
+  @OneToOne(() => User, user => user.vote)
   @JoinColumn()
   public votedFor: User
 }

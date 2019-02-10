@@ -2,26 +2,24 @@ import { Button, message, Modal } from 'antd'
 import { observer } from 'mobx-react'
 import * as moment from 'moment'
 import * as React from 'react'
-
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { projectStore } from '../../stores/ProjectStore'
 import { ID } from '../../types/general'
 import { Hour } from '../../types/hours-types'
-import { Spinner } from '../spinner/Spinner'
 import { dateFromNums, getDaysAfter, getDaysBefore } from '../utils/hours'
 import { inRange, sum, validateFieldsPromise } from '../utils/misc'
 import { HoursModalForm } from './HoursModalContent'
 import { styles } from './styles'
 
-interface IState {
+
+interface State {
   loading: boolean
   currDate: moment.Moment
   today: moment.Moment
   openModal: boolean
   modalStyle: React.CSSProperties
   selectedDay: number
-  selectedHourId: ID | null
   initialValues: any
   modalTitle: string
 }
@@ -30,18 +28,19 @@ const MODAL_WIDTH = 400
 const MODAL_HEIGHT = 150
 const LIGHT_RED = '#ff8e8ef0'
 const LIGHT_GREEN = '#b7ffd7f0'
+const YELLOW= '#ffe4aa'
 
 @observer
-export class Hours extends React.Component<any, IState> {
-  public state: IState = {
+export class Hours extends React.Component<any, State> {
+  private formRef = React.createRef<any>()
+  public state: State = {
     loading: false,
     currDate: moment(),
     today: moment(),
     selectedDay: 0,
-    selectedHourId: null,
     openModal: false,
     modalStyle: {},
-    initialValues: {},
+    initialValues: null,
     modalTitle: '',
   }
   public render() {
@@ -49,11 +48,8 @@ export class Hours extends React.Component<any, IState> {
       return null
     }
     const { currDate, openModal, modalStyle, today, modalTitle, initialValues } = this.state
-
     const daysBefore: number[] = getDaysBefore(currDate)
-
     const daysAfter: number[] = getDaysAfter(currDate)
-
     const days = inRange(currDate.daysInMonth())
 
     return (
@@ -95,46 +91,62 @@ export class Hours extends React.Component<any, IState> {
             </div>
           ))}
           {days.map((day, index) => {
-            const hours = hoursStore.getHour(currDate, day) as Hour | undefined
-
+            const hours = hoursStore.findHours(currDate, day)
+            if (!hours) {
+              return null
+            }
             const saturday = (daysBefore.length + index + 2) % 7 === 0
             const sunday = (daysBefore.length + index + 1) % 7 === 0
             const weekend = saturday || sunday
 
             return (
               <div
-                // tslint:disable-next-line:jsx-no-string-ref
                 ref={`${day}-current`}
                 onClick={this.openModal(day, weekend, hours)}
                 key={`${day}-current`}
                 className={styles.dayContainer}
                 style={{
-                  backgroundColor: hours
-                    ? hours.amount === 0 && !weekend
-                      ? '#ffe4aa'
+                  backgroundColor: hours.length > 0
+                    ? sum(hours.map(h => h.amount)) === 0 && !weekend
+                      ? YELLOW
                       : LIGHT_GREEN
                     : weekend
-                    ? '#d1d1d1'
-                    : today.date() > day && today.month() === currDate.month()
-                    ? LIGHT_RED
-                    : 'white',
+                      ? '#d1d1d1'
+                      : today.date() > day && today.month() === currDate.month()
+                        ? LIGHT_RED
+                        : 'white',
                 }}
               >
                 <div className={styles.dayContent}>
                   <div
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: '20% auto',
-                      gridGap: '20px',
-                      justifyContent: 'spaceBetween',
+                      display: 'flex',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    {hours && (weekend || !this.beforeToday(day)) && (
-                      <Button onClick={this.deleteHour(hours.id)} icon="delete" type="danger" shape="circle" />
+                    {hours.length > 0 && (weekend || !this.beforeToday(day)) && (
+                      <Button
+                        onClick={this.deleteHours(hours.map(h => h.id))}
+                        icon="delete"
+                        type="danger"
+                        shape="circle"
+                      />
                     )}
                     <div className={this.isToday(day) ? styles.today : styles.day}>{day}</div>
                   </div>
-                  {hours && <div className={styles.content}>{hours.amount} Hours</div>}
+                  {
+                    hours.length < 3 
+                      ? 
+                      hours.map(hour => (
+                        <div key={hour.id} className={styles.content}>{hour.amount} Hours {hour.project && `(${hour.project.name[0].toUpperCase()})`}</div>
+                      ))
+                      : <>
+                        {hours.slice(0, 2).map(hour => {
+                          return <div key={hour.id} className={styles.content}>{hour.amount} Hours {hour.project && `(${hour.project.name[0].toUpperCase()})`}</div>
+                        })}
+                        <span>...</span>
+                      </>
+                  }
                 </div>
               </div>
             )
@@ -151,13 +163,17 @@ export class Hours extends React.Component<any, IState> {
           style={modalStyle}
           width={MODAL_WIDTH}
           visible={openModal}
-          onCancel={this.closeModal}
-          onOk={this.onSubmit}
           destroyOnClose
-          // title={modalTitle}
+          title={modalTitle}
           okText="Save"
+          footer={
+            <>
+              <Button onClick={this.closeModal}>Cancel</Button>
+              <Button onClick={this.onSubmit} type="primary">Save</Button>
+            </>
+          }
         >
-          <HoursModalForm ref="form" onSubmit={this.onSubmit} initialValues={initialValues} />
+          <HoursModalForm ref={this.formRef} onSubmit={this.onSubmit} initialValues={initialValues} />
         </Modal>
       </div>
     )
@@ -165,7 +181,9 @@ export class Hours extends React.Component<any, IState> {
   public async componentDidMount() {
     this.setState({ loading: true })
     await Promise.all([
-      hoursStore.getHours(),
+      hoursStore.getHours({
+        include: ['project']
+      }),
       projectStore.getProjects()
     ])
     this.setState({ loading: false })
@@ -191,7 +209,8 @@ export class Hours extends React.Component<any, IState> {
 
   public goToToday = async () => {
     await hoursStore.getHours({
-      where: { month: this.state.today.month() + 1 }
+      where: { month: this.state.today.month() + 1 },
+      include: ['project'],
     })
     this.setState({
       currDate: moment(),
@@ -201,7 +220,8 @@ export class Hours extends React.Component<any, IState> {
   public goToPrevMonth = async () => {
     const currDate = moment(this.state.currDate).add(-1, 'months')
     await hoursStore.getHours({
-      where: { month: currDate.month() + 1 }
+      where: { month: currDate.month() + 1 },
+      include: ['project'],
     })
     this.setState({
       currDate,
@@ -211,38 +231,37 @@ export class Hours extends React.Component<any, IState> {
   public goToNextMonth = async () => {
     const currDate = moment(this.state.currDate).add(1, 'months')
     await hoursStore.getHours({
-      where: { month: currDate.month() + 1 }
+      where: { month: currDate.month() + 1 },
+      include: ['project'],
     })
     this.setState({
       currDate,
     })
   }
-  public openModal = (day: number, weekend: boolean, hours) => () => {
+  public openModal = (day: number, weekend: boolean, hours: Hour[]) => () => {
+    // eslint-disable-next-line react/no-string-refs
     const element = this.refs[`${day}-current`]
     // @ts-ignore
-    const rect = findDOMNode(element)!.getBoundingClientRect()
+    // eslint-disable-next-line react/no-find-dom-node
+    const node: Element | null = findDOMNode(element)
+    if (!node) {
+      return
+    }
+    const rect = node.getBoundingClientRect()
 
     const { top, right } = rect
 
     const modalXOffset = this.checkifOutOfBoundsX(right)
     const modalYOffset = this.checkIfOutOfBoundsY(top)
 
-    const modalTitle = weekend ? 'You shouldn\'t work on the weekends' : hours ? 'Update entry' : 'New entry'
-
-    const initialValues = {
-      amount: hours ? hours.amount : undefined,
-      projectId: hours ? hours.projectId : undefined,
-      description: hours ? hours.description : '',
-    }
-
+    const modalTitle = weekend ? 'You shouldn\'t work on the weekends' : hours.length > 0 ? '' : 'New entry'
     this.setState({
       modalStyle: {
         top: top - modalYOffset,
         right: modalXOffset,
       },
       selectedDay: day,
-      selectedHourId: hours && hours.id,
-      initialValues,
+      initialValues: hours,
       modalTitle,
       openModal: true,
     })
@@ -253,52 +272,35 @@ export class Hours extends React.Component<any, IState> {
     })
   }
 
-  public createHour = async e => {
-    if (e) {
-      e.preventDefault()
-    }
-    // @ts-ignore
-    const { errors, values } = await validateFieldsPromise(this.refs.form.validateFields)
-    if (errors) {
-      return message.error('Something went wrong...')
-    }
-    const { amount, description, projectId } = values
+  public createHour = async (data) => {
 
     const { currDate, selectedDay } = this.state
     const date = dateFromNums(currDate.month() + 1, selectedDay, currDate.year())
     await hoursStore.createHour({
       date,
-      hours: { amount, projectId, description },
+      hours: data,
     })
 
-    this.setState({ openModal: false, initialValues: null, selectedHourId: null })
+    this.setState({ openModal: false, initialValues: null })
     message.success('Confirmed')
   }
 
-  public updateHour = async e => {
-    if (e) {
-      e.preventDefault()
-    }
-    // @ts-ignore
-    const { errors, values } = await validateFieldsPromise(this.refs.form.validateFields)
-    if (errors) {
-      return message.error('Something went wrong...')
-    }
-    const { amount, description, projectId } = values
+  public updateHour = async (data) => {
 
-    await hoursStore.updateHour({
-      id: this.state.selectedHourId!,
-      amount,
-      projectId,
-      description
-    })
+    await hoursStore.updateHour(data)
 
-    this.setState({ openModal: false, initialValues: null, selectedHourId: null })
+    this.setState({ openModal: false, initialValues: null })
     message.success('Updated')
   }
 
-  public onSubmit = (e) => {
-    this.state.selectedHourId ? this.updateHour(e) : this.createHour(e)
+  public onSubmit = async (e) => {
+    // @ts-ignore
+    const { errors, values } = await validateFieldsPromise(this.formRef.current.validateFields)
+    if (errors) {
+      return
+    }
+    const { id, ...data } = values
+    id ? this.updateHour({ id, ...data }) : this.createHour(data)
   }
 
   public checkIfOutOfBoundsY = top => {
@@ -320,10 +322,11 @@ export class Hours extends React.Component<any, IState> {
     return defaultXOffset
   }
 
-  public deleteHour = (id) => async e => {
+  public deleteHours = (ids: ID[]) => async e => {
     e.stopPropagation()
 
-    await hoursStore.deleteHour(id)
+    await hoursStore.deleteHours(ids)
+    await hoursStore.getHours()
     message.warning('Deleted')
   }
 }

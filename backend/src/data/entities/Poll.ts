@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { PollType } from '../enums/PollType'
 import { Company } from './Company'
 import { Vote } from './Vote'
@@ -23,9 +23,9 @@ export class Poll extends BaseEntity {
   @Column({ default: true })
   public active: boolean
 
-  @ManyToOne(type => Company, company => company.polls)
+  @ManyToOne(() => Company, company => company.polls)
   public company: Company
 
-  @OneToMany(type => Vote, vote => vote.poll)
+  @OneToMany(() => Vote, vote => vote.poll)
   public votes: Vote[]
 }

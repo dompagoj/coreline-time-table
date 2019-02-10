@@ -19,9 +19,8 @@ export class CustomNamingStragegy extends DefaultNamingStrategy implements Namin
   }
 
   public joinTableName(firstTableName: string,
-                       secondTableName: string,
-                       firstPropertyName: string,
-                       secondPropertyName: string): string {
+    secondTableName: string,
+    firstPropertyName: string): string {
     return snakeCase(firstTableName + '_' + firstPropertyName.replace(/\./gi, '_') + '_' + secondTableName)
   }
 

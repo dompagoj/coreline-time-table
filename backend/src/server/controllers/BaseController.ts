@@ -8,7 +8,7 @@ export abstract class BaseController<Context = any, Params = any> {
   protected url: string
   protected ctx: Context
 
-  constructor(req: Request & { ctx: Context }, res: Response, next: NextFunction) {
+  public constructor(req: Request & { ctx: Context }, res: Response, next: NextFunction) {
     this.req = req
     this.res = res
     this.next = next

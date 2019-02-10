@@ -16,6 +16,12 @@ import { UserType } from '../../types/enums'
 const electron = window.require('electron')
 const ipcRenderer: IpcRenderer = electron.ipcRenderer
 
+const navbarStyle = css`
+  .ant-layout-sider-trigger {
+    background-color: ${generalStateStore.themeMode.primary};
+  }
+`
+
 interface State {
   activeMenu: string[]
 }
@@ -55,12 +61,20 @@ export class Navbar extends React.Component<any, State> {
               <Icon type="clock-circle" />
               <span>Hours</span>
             </Menu.Item>
-            {authStore.user.type === UserType.EMPLOYER && (
-              <Menu.Item key="/employer">
-                <Icon type="bar-chart" />
-                <span>Employer dashboard</span>
-              </Menu.Item>
-            )}
+            {
+              authStore.user.type === UserType.EMPLOYER 
+                ? 
+                <Menu.Item key="/employer">
+                  <Icon type="bar-chart" />
+                  <span>Employer dashboard</span>
+                </Menu.Item>
+                : 
+                <Menu.Item key="/user-dashboard">
+                  <Icon type="bar-chart" />
+                  <span>User dashboard</span>
+                </Menu.Item> 
+                
+            }
             <Menu.Item key="/projects">
               <Icon type="tool" />
               <span>Projects</span>
@@ -138,9 +152,3 @@ export class Navbar extends React.Component<any, State> {
     routerStore.goto(e.key)
   }
 }
-
-const navbarStyle = css`
-  .ant-layout-sider-trigger {
-    background-color: ${generalStateStore.themeMode.primary};
-  }
-`

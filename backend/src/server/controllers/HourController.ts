@@ -7,6 +7,8 @@ import { Context } from '../../data/types/Context'
 import { CreateHourInput, UpdateHourInput } from '../../data/types/HourTypes'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
+import { getArray } from '../../utils/utils';
+import { Project } from '../../data/entities/Project';
 
 export class HourController extends BaseController<
   Context & { user: User },
@@ -19,13 +21,23 @@ export class HourController extends BaseController<
   @GET('/')
   public async all() {
     const { user } = this.ctx
-    const hours = await getRepository(Hour)
+    const { month, include, projectNull } = this.req.query
+    const builder = Hour
       .createQueryBuilder('hour')
       .where('EXTRACT(month from hour.date) = :month',
-        { month: this.req.query.month || moment().month() + 1 })
+        { month: month || moment().month() + 1 })
       .andWhere('hour.user_id = :userId', { userId: user.id })
-      .getMany()
 
+    if (projectNull) {
+      builder.andWhere('hour.project_id is null')
+    }
+
+    if (include) {
+      getArray(include).forEach(i => {
+        builder.leftJoinAndSelect(`hour.${i}`, i)
+      })
+    }
+    const hours = await builder.getMany()
     this.accepted(hours)
   }
 
@@ -43,7 +55,7 @@ export class HourController extends BaseController<
       },
     })
       .then(hour => this.accepted(moment(hour.date).month()))
-      .catch(e => this.badRequest(`No hour with id ${dateId} found`))
+      .catch(() => this.badRequest(`No hour with id ${dateId} found`))
   }
 
   @POST('/')
@@ -68,61 +80,26 @@ export class HourController extends BaseController<
       return this.badRequest(`No hour with id ${id} found`)
     }
     Object.assign(hour, hours)
+    const project = await Project.findOne(hours.projectId)
+    hour.project = project
     await hour.save()
 
     return this.accepted(hour)
   }
 
-  // @PUT('/')
-  // public async updateOrCreate({ date: rawDate, hours }: HourInput) {
-  //   const { user } = this.ctx
-  //   const { amount, projectId, description } = hours
-  //   const date = moment(rawDate).utc().add(1, 'day').format('YYYY-MM-DD')
-
-  //   const hour = await Hour.findOne({
-  //     where: {
-  //       date,
-  //       userId: user.id,
-  //     },
-  //   })
-  //   if (hour) {
-  //     hour.amount = amount
-  //     hour.projectId = projectId || hour.projectId
-  //     hour.description = description || hour.description
-  //     await hour.save()
-
-  //     return this.accepted({ hour, updated: true })
-  //   }
-
-  //   Hour.create({
-  //     amount,
-  //     date,
-  //     userId: user.id,
-  //     projectId,
-  //     description,
-  //   })
-  //     .save()
-  //     .then(created => this.accepted(created))
-  // }
-
-  @DELETE('/:id')
+  @DELETE('/')
   public async deleteHour() {
-    const { id } = this.routeData
-    await Hour.delete(id)
+    const { ids } = this.req.query
+    if (!Array.isArray(ids)) {
+      await Hour.delete(ids)
 
-    return this.accepted()
-  }
-
-  @GET('/projects')
-  public async getHourswithProjects() {
-    const { userId } = this.routeData
-    const hours = await getRepository(Hour)
+      return this.accepted()
+    }
+    await getRepository(Hour)
       .createQueryBuilder('hour')
-      .leftJoinAndSelect('hour.project', 'project')
-      .where('EXTRACT(month from hour.date) = :month',
-        { month: this.req.query.month || moment().month() + 1 })
-      .andWhere('hour.user_id = :userId', { userId })
-      .getMany()
+      .delete()
+      .where('hour.id IN (:...ids)', { ids })
+      .execute()
 
     return this.accepted()
   }

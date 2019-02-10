@@ -2,7 +2,6 @@ import { ipcRenderer } from 'electron'
 import { decode } from 'jsonwebtoken'
 import { action, computed, observable } from 'mobx'
 import { axios } from '../../main/axios'
-import { HTTPStatusCodes } from '../types/HTTP_STATUS_CODES'
 import { User } from '../types/user-types'
 import { routerStore } from './router/router-store'
 
@@ -17,11 +16,11 @@ class AuthStore {
   public token?: string
 
   @computed
-  get isLoggedIn() {
+  public get isLoggedIn() {
     return this.token !== null && this.token !== undefined
   }
   @computed
-  get loading() {
+  public get loading() {
     return this.user === null || this.user === undefined
   }
 
@@ -49,3 +48,4 @@ class AuthStore {
   }
 }
 export const authStore = new AuthStore()
+

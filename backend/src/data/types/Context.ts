@@ -1,10 +1,10 @@
 import { UserType } from '../enums/UserType'
-import { ID } from './random'
+import { EntityID } from './random'
 
 export interface Context {
   user: {
-    id: ID
+    id: EntityID
     email: string
-    type: UserType,
-  }
+    type: UserType
+  };
 }

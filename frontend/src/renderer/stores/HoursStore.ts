@@ -3,6 +3,7 @@ import * as moment from 'moment'
 
 import { successCode } from '../components/utils/misc'
 import { CreateHourInput, HoursApi, UpdateHourInput } from '../http/HoursApi'
+import { ID } from '../types/general'
 import { GetHoursOptions, Hour } from '../types/hours-types'
 
 class HoursStore {
@@ -16,11 +17,17 @@ class HoursStore {
     this.hours = data
   }
 
-  public findHours(currDate: moment.Moment, day: number, returnIndex = false) {
-    if (!this.hours) {
-      return undefined
-    }
+  public async getHoursFunctional(options?: GetHoursOptions) {
+    const { data } = await this.api.getHours(options)
+
+    return data
+  }
+
+  public findHours(currDate: moment.Moment, day: number) {
     const selectedDay = moment(new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`))
+    if (!this.hours) {
+      return null
+    }
 
     return this.hours.filter(hour => {
       const date = moment(hour.date)
@@ -59,33 +66,13 @@ class HoursStore {
     if (!successCode(status)) {
       return
     }
-    console.log({ data })
     const hourIndex = this.hours.findIndex(hour => hour.id === data.id)
     this.hours[hourIndex] = data
   }
 
-  // @action.bound
-  // public async createHour(input: CreateHoursInput) {
-  //   const { data, status } = await this.api.createHour(input)
-  //   if (!successCode(status)) {
-  //     return
-  //   }
-  //   if (data.updated) {
-  //     const hourIndex = this.hours.findIndex(hour => moment(hour.date).isSame(moment(data.hour.date)))
-  //     this.hours[hourIndex] = data.hour
-  //   } else {
-  //     this.hours.push(data)
-  //   }
-  // }
   @action.bound
-  public async deleteHour(id) {
-    const hourIndex = this.hours.findIndex(h => h.id === id)
-    if (!hourIndex) {
-      return
-    }
-    await this.api.deleteHour(id)
-
-    this.hours.splice(hourIndex, 1)
+  public async deleteHours(ids: ID[]) {
+    await this.api.deleteHours(ids)
   }
 
   public getMonthHours(currDate: moment.Moment) {
@@ -99,12 +86,12 @@ class HoursStore {
     }, 0)
   }
 
-  public async getHoursWithProjects(options?: GetHoursOptions) {
-    const { data } = await this.api.getHoursWithProjects(options)
-  }
+  // public async getHoursWithProjects(options?: GetHoursOptions) {
+  //   const { data } = await this.api.getHoursWithProjects(options)
+  // }
 
   @computed
-  get loading() {
+  public get loading() {
     return this.hours === null || this.hours === undefined
   }
 }

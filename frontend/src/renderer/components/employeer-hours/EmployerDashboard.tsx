@@ -8,7 +8,7 @@ import { hoursStore } from '../../stores/HoursStore'
 import { projectStore } from '../../stores/ProjectStore'
 import { userStore } from '../../stores/UserStore'
 import { User } from '../../types/user-types'
-import { getHoursTableDataSource, getProjectsTotalHours, sum } from '../utils/misc'
+import { getHoursTableDataSource, getProjectsTotalHours, sum, groupNoProjectHours } from '../utils/misc'
 import { Title } from '../utils/Title'
 import { HoursTable } from './HoursTable'
 import { styles } from './styles'
@@ -20,21 +20,24 @@ interface State {
   selectedUser?: User
   calendarMode: 'year' | 'month'
   currDate: moment.Moment
+  noProjectHours?: any
+  loading: boolean
 }
 
 @observer
-export class EmployerHours extends React.Component<any, State> {
+export class EmployerDashboard extends React.Component<any, State> {
   public state: State = {
+    loading: true,
     filteredUsers: [],
     selectedUser: undefined,
     calendarMode: 'year',
     currDate: moment().subtract(1, 'month'),
   }
   public render() {
-    if (userStore.loading) {
+    const { loading, filteredUsers, selectedUser, currDate, calendarMode } = this.state
+    if (loading) {
       return null
     }
-    const { filteredUsers, selectedUser, currDate, calendarMode } = this.state
     const { userSearchInput } = generalStateStore
 
     return (
@@ -47,6 +50,7 @@ export class EmployerHours extends React.Component<any, State> {
               autoFocus
               onSearch={this.handleSearch}
               style={{ width: '100%' }}
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
               dataSource={filteredUsers.map(renderOption)}
               optionLabelProp="text"
               onSelect={this.onSelect}>
@@ -54,7 +58,7 @@ export class EmployerHours extends React.Component<any, State> {
             </AutoComplete>
           </div>
         </div>
-        {selectedUser && !projectStore.loading && (
+        {selectedUser && (
           <div style={{ padding: '10px 20px' }}>
             <Card
               headStyle={{ textAlign: 'center' }}
@@ -80,6 +84,7 @@ export class EmployerHours extends React.Component<any, State> {
                   <HoursTable
                     totalHours={getProjectsTotalHours(projectStore.projects)}
                     dataSource={getHoursTableDataSource(projectStore.projects, currDate.month() + 1)}
+                    noProjectHours={this.state.noProjectHours}
                   />
                 </div>
               </div>
@@ -91,6 +96,7 @@ export class EmployerHours extends React.Component<any, State> {
   }
   public async componentDidMount() {
     await userStore.getUsers()
+    this.setState({ loading: false })
     const selectedUser = userStore.users.find(user => user.username === generalStateStore.userSearchInput)
 
     if (selectedUser) {
@@ -104,10 +110,7 @@ export class EmployerHours extends React.Component<any, State> {
     this.setState({
       selectedUser,
     })
-    await projectStore.getProjectsWithHours({
-      userId: selectedUser && selectedUser.id || undefined,
-      where: { month: this.state.currDate.month() + 1 }
-    })
+    await this.fetchHours(undefined, selectedUser)
 
   }
 
@@ -122,10 +125,7 @@ export class EmployerHours extends React.Component<any, State> {
   public onDateSelect = async (date: moment.Moment) => {
     if (date.month() !== this.state.currDate.month()) {
       const { selectedUser } = this.state
-      await projectStore.getProjectsWithHours({
-         userId: selectedUser && selectedUser.id || undefined,
-         where: { month: date.month() + 1 }
-      })
+      await this.fetchHours(date, selectedUser)
     }
     this.setState({
       currDate: date,
@@ -135,6 +135,32 @@ export class EmployerHours extends React.Component<any, State> {
     this.setState({
       calendarMode: mode,
       currDate: date,
+    })
+  }
+
+  public fetchHours = async (date?: moment.Moment, user?: User) => {
+    const selectedUser = user ? user : this.state.selectedUser
+    if (!selectedUser)
+      return
+    const month = date ? date.month() + 1 : this.state.currDate.month() + 1
+
+    const [_, noProjectHours] = await Promise.all([
+      projectStore.getProjectsWithHours({
+        userId: selectedUser.id,
+        where: { month }
+      }),
+      hoursStore.getHoursFunctional({
+        userId: selectedUser.id,
+        where: {
+          month,
+          projectNull: true,
+        }
+      })
+    ])
+
+    this.setState({ 
+      noProjectHours: groupNoProjectHours(noProjectHours),
+      loading: false
     })
   }
 }

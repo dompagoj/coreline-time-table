@@ -1,7 +1,8 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { ProjectStatus } from '../enums/ProjectStatus'
-import { Company } from './Company'
-import { Hour } from './Hour'
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ProjectStatus } from '../enums/ProjectStatus';
+import { Company } from './Company';
+import { Hour } from './Hour';
+import { User } from './User';
 
 @Entity()
 export class Project extends BaseEntity {
@@ -20,9 +21,15 @@ export class Project extends BaseEntity {
   @Column({ enum: ProjectStatus })
   public status: ProjectStatus
 
-  @OneToMany(type => Hour, hour => hour.project)
+  @Column()
+  public creatorId: number
+
+  @OneToMany(() => Hour, hour => hour.project)
   public hours: Hour[]
 
-  @ManyToOne(type => Company, company => company.projects)
+  @ManyToOne(() => User, { nullable: false })
+  public creator: User
+
+  @ManyToOne(() => Company, company => company.projects)
   public company: Company
 }

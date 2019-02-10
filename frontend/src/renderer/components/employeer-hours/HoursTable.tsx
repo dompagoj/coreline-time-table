@@ -6,12 +6,16 @@ const { Column } = Table
 interface Props {
   dataSource: any
   totalHours: number
+  noProjectHours?: any
 }
 
 export function HoursTable(props: Props) {
+  const { noProjectHours } = props
+  const dataSource = noProjectHours ? [...props.dataSource, noProjectHours] : props.dataSource
+
   return (
     <Table
-      dataSource={props.dataSource}
+      dataSource={dataSource}
       bordered
       size="small"
       pagination={false}
@@ -23,4 +27,4 @@ export function HoursTable(props: Props) {
   )
 }
 
-const TableFooter = ({ totalHours }) => <div>Total: {totalHours} h</div>
+const TableFooter = ({ totalHours }: {totalHours: number}) => <div>Total: {totalHours} h</div>

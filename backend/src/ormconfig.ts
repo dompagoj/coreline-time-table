@@ -1,6 +1,7 @@
 import { config } from './server/config'
 import { CustomNamingStragegy } from './server/CustomNamingStragegy'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const connectionOptions: any = {
   type: config.dbType,
   database: config.dbName,
@@ -8,7 +9,7 @@ export const connectionOptions: any = {
   port: config.dbPort,
   username: config.dbUsername,
   password: config.dbPassword,
-  synchronize: config.dbSync,
+  synchronize: false,
   logging: config.dbLogging,
   namingStrategy: new CustomNamingStragegy(),
   entities: config.nodeEnv !== 'production' ? ['src/data/entities/**/*.ts'] : ['src/data/entities/**/.js'],

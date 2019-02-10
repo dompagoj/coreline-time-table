@@ -1,11 +1,12 @@
 // tslint:disable-next-line:no-var-requires
 require('dotenv').config()
 /* tslint:disable:no-console */
+import 'reflect-metadata'
+
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import express from 'express'
 import morgan from 'morgan'
-import 'reflect-metadata'
 import { createConnection } from 'typeorm'
 
 import { connectionOptions } from '../ormconfig'
@@ -20,10 +21,10 @@ async function bootstrap() {
 
   await createConnection(connectionOptions)
 
-  morgan.token('operation', (req, res) => {
+  morgan.token('operation', (req) => {
     return req.body.operationName
   })
-  morgan.token('params', (req, res) => {
+  morgan.token('params', (req) => {
     return JSON.stringify(req.params)
   })
 

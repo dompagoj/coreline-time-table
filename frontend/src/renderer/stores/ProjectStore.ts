@@ -22,12 +22,12 @@ class ProjectStore {
   }
 
   @computed
-  get loading() {
+  public get loading() {
     return this.projects === undefined
   }
 
   @computed
-  get activeProjects() {
+  public get activeProjects() {
     return this.projects.filter(p => p.status === ProjectStatus.ACTIVE)
   }
 
@@ -56,3 +56,4 @@ class ProjectStore {
 }
 
 export const projectStore = new ProjectStore(new ProjectsApi())
+

@@ -1,8 +1,6 @@
 import { OAuth2Client } from 'google-auth-library'
 import { sign } from 'jsonwebtoken'
 
-// tslint:disable-next-line:no-submodule-imports
-import { TokenPayload } from 'google-auth-library/build/src/auth/loginticket'
 import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
 import { UserType } from '../../data/enums/UserType'

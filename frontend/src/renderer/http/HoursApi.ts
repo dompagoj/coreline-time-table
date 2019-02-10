@@ -21,13 +21,21 @@ export type UpdateHourInput = Hours
 
 export class HoursApi {
   public async getHours(options?: GetHoursOptions) {
+    let queryString
     const { user } = authStore
     const id = options && options.userId || user.id
+    if (options) {
+      const { include, where } = options
+      queryString = stringify({
+        include: include,
+        ...where,
+      })
+    }
 
     return axios.get(
       `/companies/${user.companyId}/users/${id}/hours?${
-        stringify(options && options.where)}`
-      )
+        queryString}`
+    )
   }
 
   public async createHour(input: CreateHourInput) {
@@ -46,19 +54,19 @@ export class HoursApi {
     return axios.put(`/companies/${user.companyId}/users/${user.id}/hours/${input.id}`, input)
   }
 
-  public async deleteHour(id: string | number) {
+  public async deleteHours(ids: ID[]) {
     const { user } = authStore
 
-    return axios.delete(`companies/${user.companyId}/users/${user.id}/hours/${id}`)
+    return axios.delete(`companies/${user.companyId}/users/${user.id}/hours/?${stringify({ ids })}`)
   }
 
-  public async getHoursWithProjects(options?: GetHoursOptions) {
-     const { user } = authStore
-     const id = options && options.userId || user.id
+  // public async getHoursWithProjects(options?: GetHoursOptions) {
+  //    const { user } = authStore
+  //    const id = options && options.userId || user.id
 
-     return axios.get(
-      `/companies/${user.companyId}/users/${id}/hours/projects?${
-        stringify(options && options.where)}`
-      )
-  }
+  //    return axios.get(
+  //     `/companies/${user.companyId}/users/${id}/hours/projects?${
+  //       stringify(options && options.where)}`
+  //     )
+  // }
 }

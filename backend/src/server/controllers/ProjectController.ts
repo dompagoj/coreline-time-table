@@ -11,9 +11,9 @@ import { BaseController } from './BaseController'
 
 export class ProjectController extends BaseController<
   Context & { company: Company },
-  { companyId: string; id: string, userId: string }
+  { companyId: string; id: string }
 > {
-  constructor(req, res, next) {
+  public constructor(req, res, next) {
     super(req, res, next)
   }
 
@@ -38,6 +38,7 @@ export class ProjectController extends BaseController<
       avatar,
       status: status || ProjectStatus.ACTIVE,
       companyId: parseInt(companyId, 10),
+      creatorId: this.ctx.user.id,
     }).save()
 
     return this.accepted(project)

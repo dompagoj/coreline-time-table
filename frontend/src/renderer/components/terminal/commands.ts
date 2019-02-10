@@ -16,26 +16,26 @@ const commands: Command[] = [
       terminalStore.executed = []
     },
   },
-  {
-    name: 'add',
-    action: async (value, params: Add) => {
-      if (!value) {
-        return terminalStore.addExecuted('Amount missing')
-      }
-      const { d, m, y } = params
+  // {
+  //   name: 'add',
+  //   action: async (value, params: Add) => {
+  //     if (!value) {
+  //       return terminalStore.addExecuted('Amount missing')
+  //     }
+  //     const { d, m, y } = params
 
-      const currDate = moment()
-      const month = m || currDate.month() + 1
-      const day = d || currDate.date()
-      const year = y || currDate.year()
-      const date = dateFromNums(month, day, year)
+  //     const currDate = moment()
+  //     const month = m || currDate.month() + 1
+  //     const day = d || currDate.date()
+  //     const year = y || currDate.year()
+  //     const date = dateFromNums(month, day, year)
 
-      hoursStore.createHour({
-        date,
-        hours: { amount: parseInt(value, 10) },
-      })
-    },
-  },
+  //     hoursStore.createHour({
+  //       date,
+  //       hours: { amount: parseInt(value, 10) },
+  //     })
+  //   },
+  // },
   {
     name: 'hours',
     action: async () => {

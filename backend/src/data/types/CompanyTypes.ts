@@ -1,10 +1,10 @@
 import { IsString, Min, ValidateIf } from 'class-validator'
-import { ID } from './random'
+import { EntityID } from './random'
 
 export class CompanyInput {
   @ValidateIf(o => !!o)
   @Min(0)
-  public id?: ID = undefined
+  public id?: EntityID = undefined
 
   @IsString()
   public name: string

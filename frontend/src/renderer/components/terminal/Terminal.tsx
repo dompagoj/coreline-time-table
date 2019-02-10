@@ -53,11 +53,15 @@ export class Terminal extends React.Component<any, State> {
   }
 
   public componentDidMount = () => {
-    this.inputRef.current!.focus()
+    if (this.inputRef.current) {
+      this.inputRef.current.focus()
+    }
   }
 
   public focus = () => {
-    this.inputRef.current!.focus()
+    if (this.inputRef.current) {
+      this.inputRef.current.focus()
+    }
   }
 
   public executeInput = async e => {
