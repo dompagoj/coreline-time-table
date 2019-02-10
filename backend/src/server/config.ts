@@ -9,6 +9,8 @@ export const config = {
   dbPassword: process.env.DB_PASSWORD!,
   dbSync: strToBool(process.env.DB_SYNC!),
   dbLogging: strToBool(process.env.DB_LOGGING!),
+  nodeEnv: process.env.NODE_ENV!,
   jwtSecret: process.env.JWT_SECRET!,
+  port: parseInt(process.env.PORT!, 10),
   googleClientId: process.env.GOOGLE_CLIENT_ID!,
 }

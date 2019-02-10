@@ -2,12 +2,13 @@ import { Icon, Layout, Menu } from 'antd'
 // tslint:disable-next-line:no-submodule-imports
 import { SelectParam } from 'antd/lib/menu'
 import { IpcRenderer } from 'electron'
-import { css } from 'emotion'
 import { observer } from 'mobx-react'
 import { bind, unbind } from 'mousetrap'
 import * as React from 'react'
 
+import { css } from 'emotion'
 import { authStore } from '../../stores/AuthStore'
+import { generalStateStore } from '../../stores/GeneralState'
 import { routerStore } from '../../stores/router/router-store'
 import { UserType } from '../../types/enums'
 
@@ -22,7 +23,7 @@ interface State {
 @observer
 export class Navbar extends React.Component<any, State> {
   public state: State = {
-    activeMenu: [],
+    activeMenu: []
   }
   public render() {
     const { activeMenu } = this.state
@@ -31,9 +32,20 @@ export class Navbar extends React.Component<any, State> {
     }
 
     return (
-      <Layout>
-        <Layout.Sider theme="dark" defaultCollapsed collapsible>
-          <Menu selectedKeys={activeMenu} onSelect={this.handleRoute} mode="inline" theme="dark">
+      <Layout className={navbarStyle}>
+        <Layout.Sider
+          theme={generalStateStore.mode}
+          defaultCollapsed
+          collapsible
+          style={{ backgroundColor: generalStateStore.themeMode.primary }}
+        >
+          <Menu
+            style={{ backgroundColor: generalStateStore.themeMode.primary }}
+            selectedKeys={activeMenu}
+            onSelect={this.handleRoute}
+            mode="inline"
+            theme={generalStateStore.mode}
+          >
             <Menu.Item key="/profile">
               <Icon type="user" />
               {authStore.user && <span>{authStore.user.username}</span>}
@@ -41,16 +53,28 @@ export class Navbar extends React.Component<any, State> {
             <Menu.Divider />
             <Menu.Item key="/hours">
               <Icon type="clock-circle" />
-              <span>{authStore.user.type === UserType.EMPLOYEE ? 'Hours' : 'Employer dashboard'}</span>
+              <span>Hours</span>
             </Menu.Item>
-            <Menu.Item key="/voting">
-              <Icon type="usergroup-add" />
-              <span>Voting</span>
+            {authStore.user.type === UserType.EMPLOYER && (
+              <Menu.Item key="/employer">
+                <Icon type="bar-chart" />
+                <span>Employer dashboard</span>
+              </Menu.Item>
+            )}
+            <Menu.Item key="/projects">
+              <Icon type="tool" />
+              <span>Projects</span>
             </Menu.Item>
           </Menu>
-          <Menu onClick={this.logout} selectable={false} mode="inline" theme="dark">
+          <Menu
+            style={{ backgroundColor: generalStateStore.themeMode.primary }}
+            onClick={this.logout}
+            selectable={false}
+            mode="inline"
+            theme={generalStateStore.mode}
+          >
             <Menu.Item>
-              <Icon type="logout" />
+              <Icon type="logout" theme="outlined" />
               <span>Logout</span>
             </Menu.Item>
           </Menu>
@@ -61,7 +85,7 @@ export class Navbar extends React.Component<any, State> {
   public componentDidMount = () => {
     const { pathname } = routerStore.location
     this.setState({
-      activeMenu: pathname === '/' ? ['/profile'] : [pathname],
+      activeMenu: pathname === '/' ? ['/profile'] : [pathname]
     })
     bind('mod+1', () => {
       this.setActiveTab('/profile')
@@ -71,15 +95,27 @@ export class Navbar extends React.Component<any, State> {
       this.setActiveTab('/hours')
       routerStore.gotoCalendar()
     })
-    bind('mod+3', () => {
-      this.setActiveTab('/voting')
-      routerStore.gotoVoting()
-    })
+    if (authStore.user.type === UserType.EMPLOYER) {
+      bind('mod+3', () => {
+        this.setActiveTab('/employer')
+        routerStore.gotoEmployerDashboard()
+      })
+      bind('mod+4', () => {
+        this.setActiveTab('/projects')
+        routerStore.gotoProjects()
+      })
+    } else {
+      bind('mod+3', () => {
+        this.setActiveTab('/projects')
+        routerStore.gotoProjects()
+      })
+    }
   }
   public componentWillUnmount = () => {
     unbind('mod+1')
     unbind('mod+2')
     unbind('mod+3')
+    unbind('mod+4')
   }
 
   public logout = () => {
@@ -97,8 +133,14 @@ export class Navbar extends React.Component<any, State> {
 
   public handleRoute = (e: SelectParam) => {
     this.setState({
-      activeMenu: [e.key],
+      activeMenu: [e.key]
     })
     routerStore.goto(e.key)
   }
 }
+
+const navbarStyle = css`
+  .ant-layout-sider-trigger {
+    background-color: ${generalStateStore.themeMode.primary};
+  }
+`

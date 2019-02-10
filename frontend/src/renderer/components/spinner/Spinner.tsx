@@ -1,4 +1,4 @@
-import { Spin } from 'antd'
+import { Icon, Spin } from 'antd'
 import { css } from 'emotion'
 import * as React from 'react'
 
@@ -18,6 +18,6 @@ const spinnerContainerStyle = css`
 
 export const Spinner = () => (
   <div className={spinnerContainerStyle}>
-    <Spin size="large" />
+    <Spin indicator={<Icon type="loading" spin/>} size="large" />
   </div>
 )

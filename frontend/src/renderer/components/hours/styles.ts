@@ -1,10 +1,12 @@
 import { css } from 'emotion'
+import { generalStateStore } from '../../stores/GeneralState'
 
 export const styles = {
   container: css`
     min-width: 400px;
     height: 100%;
     padding: 20px;
+    /* background-color: ${generalStateStore.themeMode.secondary} */
   `,
   dayContainer: css`
     padding: 10px;
@@ -63,6 +65,7 @@ function rowContainer(days) {
   return css`
     display: grid;
     height: calc(100% - 53px);
+    width: 100%;
     grid-template: repeat(${rows}, 1fr) / repeat(7, 1fr);
   `
 }

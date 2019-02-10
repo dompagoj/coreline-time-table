@@ -1,12 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { Route } from '../../data/types/routing'
 
-export abstract class BaseController<Context = any, Params = any, Locals = any> {
+export abstract class BaseController<Context = any, Params = any> {
   protected req: Request & { ctx: Context }
   protected res: Response
   protected next: NextFunction
   protected routeData: Params
-  protected locals: Locals
   protected url: string
   protected ctx: Context
 
@@ -16,8 +14,7 @@ export abstract class BaseController<Context = any, Params = any, Locals = any> 
     this.next = next
     this.routeData = req.params
     this.url = req.url
-    this.locals = res.locals
-    this.ctx = req.ctx
+    this.ctx = res.locals
   }
   protected accepted<U>(object?: U, format?: (object: U) => any) {
     if (!object) {

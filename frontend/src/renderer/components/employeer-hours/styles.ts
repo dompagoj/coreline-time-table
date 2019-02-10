@@ -16,7 +16,7 @@ export const styles = {
     object-fit: contain;
   `,
   container: css`
-    padding: 20px;
+    padding: 5px 20px;
     display: grid;
     grid-template-columns: 35% 65%;
     grid-gap: 25px;
@@ -27,4 +27,9 @@ export const styles = {
     text-align: center;
     border-bottom: 1px solid gray;
   `,
+  cardTitle: css`
+    .ant-card-head-title {
+      padding: 0 !important;
+    }
+  `
 }

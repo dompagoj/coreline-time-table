@@ -36,3 +36,27 @@ code {
 .ant-input {
   height: 100%;
 }
+
+.ant-tabs-extra-content {
+  margin-right: 30px;
+}
+
+.button-green {
+  background-color: #1aaa55;
+  color: white;
+  font-weight: bold;
+}
+.button-green:hover {
+  background-color: #168f48;
+}
+.button-green:focus {
+  background-color: #168f48; 
+}
+
+.hidden {
+  display: none
+}
+
+.ant-card-head-title {
+  padding: 5px 0 !important;
+}

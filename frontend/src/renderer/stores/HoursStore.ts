@@ -3,19 +3,20 @@ import * as moment from 'moment'
 
 import { successCode } from '../components/utils/misc'
 import { CreateHoursInput, HoursApi } from '../http/HoursApi'
+import { GetHoursOptions, Hour } from '../types/hours-types'
 
 class HoursStore {
   @observable
-  public hours: any[]
+  public hours: Hour[]
 
   public constructor(private api: HoursApi) {}
 
-  public async getHours(userId?: string) {
-    const { data } = await this.api.getHours(userId)
+  public async getHours(options?: GetHoursOptions) {
+    const { data } = await this.api.getHours(options)
     this.hours = data
   }
 
-  public getHour(currDate, day, returnIndex = false) {
+  public getHour(currDate: moment.Moment, day: number, returnIndex = false) {
     if (!this.hours) {
       return undefined
     }
@@ -37,15 +38,18 @@ class HoursStore {
       return
     }
     if (data.updated) {
-      const hourIndex = this.hours.findIndex(hour => hour.date === data.hour.date)
+      const hourIndex = this.hours.findIndex(hour => moment(hour.date).isSame(moment(data.hour.date)))
       this.hours[hourIndex] = data.hour
     } else {
       this.hours.push(data)
     }
   }
   @action.bound
-  public async deleteHour(currDate, day) {
-    const hourIndex = this.getHour(currDate, day, true)
+  public async deleteHour(currDate: moment.Moment, day) {
+    const hourIndex = this.getHour(currDate, day, true) as number
+    if (!hourIndex) {
+      return
+    }
     await this.api.deleteHour(this.hours[hourIndex].id)
 
     this.hours.splice(hourIndex, 1)
@@ -60,6 +64,10 @@ class HoursStore {
 
       return sum
     }, 0)
+  }
+
+  public async getHoursWithProjects(options?: GetHoursOptions) {
+    const { data } = await this.api.getHoursWithProjects(options)
   }
 
   @computed

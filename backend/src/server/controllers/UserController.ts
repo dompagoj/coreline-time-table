@@ -6,7 +6,7 @@ import { UserUpdateInput } from '../../data/types/UserTypes'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
-export class UserController extends BaseController<Context, { companyId: string; id: string }, { company: Company }> {
+export class UserController extends BaseController<Context & { company: Company }, { companyId: string; id: string }> {
   constructor(req, res, next) {
     super(req, res, next)
   }
@@ -24,7 +24,7 @@ export class UserController extends BaseController<Context, { companyId: string;
 
   @GET('/:id')
   public async one() {
-    const { company } = this.locals
+    const { company } = this.ctx
     const { id } = this.routeData
 
     const user = await User.findOne({
@@ -47,7 +47,7 @@ export class UserController extends BaseController<Context, { companyId: string;
   public async update({ username, type, authKey, avatar }: UserUpdateInput) {
     const { id } = this.ctx.user
 
-    const { company } = this.locals
+    const { company } = this.ctx
     const user = await User.findOne(id)
 
     if (!user) {
@@ -69,7 +69,7 @@ export class UserController extends BaseController<Context, { companyId: string;
 
   @DELETE('/:id')
   public async delete() {
-    User.delete(this.req.params.id)
+    User.delete(this.routeData.id)
       .then(this.accepted)
       .catch(this.badRequest)
   }

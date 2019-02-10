@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
     "lib": [
-      "es5",
-      "es6",
-      "dom",
       "es2015.core",
       "es2015.collection",
       "es2015.generator",
@@ -13,16 +10,31 @@
       "es2015.reflect",
       "es2015.symbol",
       "es2015.symbol.wellknown",
-      "esnext.asynciterable"
+      "esnext.asynciterable",
+      "es2017"
     ],
-    "target": "es5",
     "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es6",
     "moduleResolution": "node",
     "rootDir": ".",
-    "outDir": "./build",
+    "outDir": "./.build",
     "emitDecoratorMetadata": true,
     "strictNullChecks": true,
     "experimentalDecorators": true,
-    "sourceMap": true
-  }
+    "inlineSourceMap": true,
+    "listFiles": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+    "src/app-dev.ts",
+    "build/"
+  ],
+  "include": ["src/**/*"]
 }

@@ -5,8 +5,7 @@ import { UserType } from '../../data/enums/UserType'
 import { Context } from '../../data/types/Context'
 import { verifyToken } from '../../utils/crypto'
 
-export function verifyJWT() {
-  return async (req: Request & { ctx: Context }, res: Response, next) => {
+export async function verifyJWT(req: Request, res: Response, next) {
     if (!req.headers.token) {
       return res
         .status(401)
@@ -22,18 +21,16 @@ export function verifyJWT() {
         .end()
     }
 
-    req.ctx = {
+    res.locals = {
       user,
     }
 
     next()
   }
-}
 
 export async function verifyCompany(req, res, next) {
   const { companyId } = req.params
-  const { companyId: reqUserCompanyId, id: reqUserId } = req.ctx.user
-
+  const { companyId: reqUserCompanyId, id: reqUserId } = res.locals.user
   if (reqUserCompanyId !== parseInt(companyId, 10)) {
     const reqUser = await User.findOneOrFail(reqUserId)
     if (reqUser.type !== UserType.ADMIN) {
@@ -44,11 +41,41 @@ export async function verifyCompany(req, res, next) {
   const company = await Company.findOne(companyId)
   if (!company) {
     return res
-      .json({ error: 'Invalid company id' })
       .status(400)
+      .json({ error: 'Invalid company id' })
       .end()
   }
   res.locals.company = company
 
+  next()
+}
+
+export async function verifyUser(req, res, next) {
+  const { companyId, userId: userIdParams } = req.params
+  const { id: userId } = res.locals.user
+
+  if (userIdParams && parseInt(userIdParams, 10) !== userId) {
+    const reqUser = await User.findOneOrFail(userId)
+    if (reqUser.type !== UserType.EMPLOYER) {
+      return res.status(401).end()
+    }
+  }
+
+  const user = await User.findOne({
+    where: {
+      id: userIdParams,
+      companyId,
+    },
+  })
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({
+        error: `No user with id ${userId} under company with id ${companyId} found`,
+      })
+      .end()
+  }
+  res.locals.user = user
   next()
 }

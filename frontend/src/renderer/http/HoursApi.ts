@@ -1,20 +1,18 @@
+import { stringify } from 'querystring'
 import { axios } from '../../main/axios'
 import { authStore } from '../stores/AuthStore'
 import { ID } from '../types/general'
+import { GetHoursOptions } from '../types/hours-types'
 
 interface GetHoursInput {
   companyId: ID
   userId: ID
 }
 
-interface ProjectHours {
-  projectId: number
-  hours: number
-}
-
 interface Hours {
   amount: number
-  projects?: ProjectHours[] | null
+  projectId?: number
+  description?: string
 }
 
 export interface CreateHoursInput {
@@ -23,11 +21,14 @@ export interface CreateHoursInput {
 }
 
 export class HoursApi {
-  public async getHours(userId?: string) {
+  public async getHours(options?: GetHoursOptions) {
     const { user } = authStore
-    const id = userId ? userId : user.id
+    const id = options && options.userId || user.id
 
-    return axios.get(`/companies/${user.companyId}/users/${id}/hours`)
+    return axios.get(
+      `/companies/${user.companyId}/users/${id}/hours?${
+        stringify(options && options.where)}`
+      )
   }
 
   public async createHour(input: CreateHoursInput) {
@@ -35,7 +36,7 @@ export class HoursApi {
     const { user } = authStore
 
     return axios.put(`/companies/${user.companyId}/users/${user.id}/hours`, {
-      date,
+      date: date.toUTCString(),
       hours,
     })
   }
@@ -43,5 +44,15 @@ export class HoursApi {
     const { user } = authStore
 
     return axios.delete(`companies/${user.companyId}/users/${user.id}/hours/${id}`)
+  }
+
+  public async getHoursWithProjects(options?: GetHoursOptions) {
+     const { user } = authStore
+     const id = options && options.userId || user.id
+
+     return axios.get(
+      `/companies/${user.companyId}/users/${id}/hours/projects?${
+        stringify(options && options.where)}`
+      )
   }
 }

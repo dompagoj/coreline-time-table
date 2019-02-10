@@ -7,10 +7,11 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import { authStore } from '../stores/AuthStore'
 import { terminalStore } from '../stores/TerminalStore'
 import { UserType } from '../types/enums'
-import { EmployeerHours } from './employeer-hours/EmployeerHours'
+import { EmployerHours } from './employeer-hours/EmployerHours'
 import { Hours } from './hours/Hours'
 import { Navbar } from './navbar/Navbar'
 import { Profile } from './profile/Profile'
+import { Projects } from './projects/Projects'
 import { Terminal } from './terminal/Terminal'
 import { Voting } from './voting/Voting'
 
@@ -32,17 +33,18 @@ export class MainLayout extends React.Component {
           <Switch>
             <Redirect exact from="/" to="/profile" />
             <Route path="/profile" component={Profile} />
-            <Route path="/hours" component={authStore.user.type === UserType.EMPLOYEE ? Hours : EmployeerHours} />
-            <Route path="/voting" component={Voting} />
+            <Route path="/hours" component={Hours} />
+            {authStore.user.type === UserType.EMPLOYER && <Route path="/employer" component={EmployerHours} />}
+            <Route path="/projects" component={Projects} />
           </Switch>
           {terminalStore.visible && <Terminal />}
         </div>
       </div>
     )
   }
-  public componentDidMount() {
+  public async componentDidMount() {
     if (!authStore.user) {
-      authStore.getUser()
+      await authStore.getUser()
     }
     Mousetrap.prototype.stopCallback = () => false
     Mousetrap.bind('mod+t', () => {

@@ -1,12 +1,15 @@
+// tslint:disable-next-line:no-var-requires
+require('dotenv').config()
 /* tslint:disable:no-console */
-import * as bodyParser from 'body-parser'
-import * as cors from 'cors'
-import * as express from 'express'
-import * as morgan from 'morgan'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import express from 'express'
+import morgan from 'morgan'
+import 'reflect-metadata'
 import { createConnection } from 'typeorm'
 
+import { connectionOptions } from '../ormconfig'
 import { config } from './config'
-import { CustomNamingStragegy } from './CustomNamingStragegy'
 import { mainRouter } from './routers/MainRouter'
 
 async function bootstrap() {
@@ -15,26 +18,7 @@ async function bootstrap() {
   app.use(cors())
   app.use(bodyParser.json())
 
-  await createConnection({
-    // @ts-ignore
-    type: config.dbType,
-    database: config.dbName,
-    host: config.dbHost,
-    port: config.dbPort,
-    username: config.dbUsername,
-    password: config.dbPassword,
-    synchronize: config.dbSync,
-    logging: config.dbLogging,
-    namingStrategy: new CustomNamingStragegy(),
-    entities: ['src/data/entities/**.ts'],
-    migrations: ['src/data/migrations/**.ts'],
-    subscribers: ['src/data/subscribers/**.ts'],
-    cli: {
-      entitiesDir: 'src/data/entities',
-      migrationsDir: 'src/data/migrations',
-      subscribersDir: 'src/data/subscribers',
-    },
-  })
+  await createConnection(connectionOptions)
 
   morgan.token('operation', (req, res) => {
     return req.body.operationName
@@ -47,9 +31,9 @@ async function bootstrap() {
 
   app.use('', mainRouter)
 
-  app.listen(8000, () => {
-    console.log('server started on port 8000!')
+  app.listen(config.port, () => {
+    console.log(`Server started on port: ${config.port}`)
   })
 }
-// tslint:disable-next-line:no-console
+
 bootstrap().catch(console.error)

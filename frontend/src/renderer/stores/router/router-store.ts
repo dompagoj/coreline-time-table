@@ -21,14 +21,19 @@ export class MobxRouterStore extends RouterStore {
   }
 
   @action
-  public gotoVoting() {
-    this.history.push('/voting')
-  }
-
-  @action
   public gotoCalendar() {
     this.history.push('/hours')
   }
+
+  @action
+  public gotoEmployerDashboard() {
+    this.history.push('/employer')
+  }
+
+  public gotoProjects() {
+    this.history.push('/projects')
+  }
+
   @action
   public gotoLogin() {
     this.history.push('/login')

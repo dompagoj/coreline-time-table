@@ -19,9 +19,6 @@ export class AuthController extends BaseController {
     }
 
     const { email, given_name: firstName, family_name: lastName, hd, picture } = payload
-    if (hd !== 'coreline.agency') {
-      return this.badRequest({ error: 'Only coreline.agency domain is allowed' })
-    }
 
     const company = await Company.findOne({
       where: { domain: hd },

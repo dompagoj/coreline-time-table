@@ -5,45 +5,47 @@ import * as React from 'react'
 
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
+import { projectStore } from '../../stores/ProjectStore'
+import { Hour } from '../../types/hours-types'
 import { Spinner } from '../spinner/Spinner'
 import { dateFromNums, getDaysAfter, getDaysBefore } from '../utils/hours'
-import { inRange, sum } from '../utils/misc'
-import { HoursModalContent } from './HoursModalContent'
+import { inRange, sum, validateFieldsPromise } from '../utils/misc'
+import { HoursModalForm } from './HoursModalContent'
 import { styles } from './styles'
 
 interface IState {
+  loading: boolean
   currDate: moment.Moment
   today: moment.Moment
   openModal: boolean
   modalStyle: React.CSSProperties
   selectedDay: number
-  selectedDayAmount: number
-  hoursAmount: number
+  initialValues: any
   modalTitle: string
 }
 
 const MODAL_WIDTH = 400
 const MODAL_HEIGHT = 150
-const LIGHT_RED = '#ff8e8e'
-const LIGHT_GREEN = '#b7ffd7'
+const LIGHT_RED = '#ff8e8ef0'
+const LIGHT_GREEN = '#b7ffd7f0'
 
 @observer
 export class Hours extends React.Component<any, IState> {
   public state: IState = {
+    loading: false,
     currDate: moment(),
     today: moment(),
     selectedDay: 0,
-    selectedDayAmount: 0,
-    hoursAmount: 0,
     openModal: false,
     modalStyle: {},
+    initialValues: {},
     modalTitle: '',
   }
   public render() {
-    if (hoursStore.loading) {
-      return <Spinner />
+    if (this.state.loading) {
+      return null
     }
-    const { currDate, openModal, selectedDayAmount, modalStyle, today, modalTitle } = this.state
+    const { currDate, openModal, modalStyle, today, modalTitle, initialValues } = this.state
 
     const daysBefore: number[] = getDaysBefore(currDate)
 
@@ -55,7 +57,15 @@ export class Hours extends React.Component<any, IState> {
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
-            <span style={{ marginRight: '5px', fontWeight: 'bold', fontSize: '20px' }}>{currDate.format('MMMM')}</span>
+            <span
+              style={{
+                marginRight: '5px',
+                fontWeight: 'bold',
+                fontSize: '20px',
+              }}
+            >
+              {currDate.format('MMMM')}
+            </span>
             <span>{currDate.format('YYYY')}</span>
           </div>
           <div>
@@ -82,7 +92,7 @@ export class Hours extends React.Component<any, IState> {
             </div>
           ))}
           {days.map((day, index) => {
-            const hours = hoursStore.getHour(currDate, day)
+            const hours = hoursStore.getHour(currDate, day) as Hour | undefined
 
             const saturday = (daysBefore.length + index + 2) % 7 === 0
             const sunday = (daysBefore.length + index + 1) % 7 === 0
@@ -92,7 +102,7 @@ export class Hours extends React.Component<any, IState> {
               <div
                 // tslint:disable-next-line:jsx-no-string-ref
                 ref={`${day}-current`}
-                onClick={this.openModal(day, hours ? hours.amount : 0, weekend)}
+                onClick={this.openModal(day, weekend, hours)}
                 key={`${day}-current`}
                 className={styles.dayContainer}
                 style={{
@@ -145,17 +155,18 @@ export class Hours extends React.Component<any, IState> {
           title={modalTitle}
           okText="Save"
         >
-          <HoursModalContent
-            onSubmit={this.createHour}
-            onChange={this.hoursAmountChange}
-            currentAmount={selectedDayAmount}
-          />
+          <HoursModalForm ref="form" onSubmit={this.createHour} initialValues={initialValues} />
         </Modal>
       </div>
     )
   }
   public async componentDidMount() {
-    await hoursStore.getHours()
+    this.setState({ loading: true })
+    await Promise.all([
+      hoursStore.getHours(),
+      projectStore.getProjects()
+    ])
+    this.setState({ loading: false })
   }
 
   public isToday = day => {
@@ -182,18 +193,26 @@ export class Hours extends React.Component<any, IState> {
     })
   }
 
-  public goToPrevMonth = () => {
+  public goToPrevMonth = async () => {
+    const currDate = moment(this.state.currDate).add(-1, 'months')
+    await hoursStore.getHours({
+      where: { month: currDate.month() + 1 }
+    })
     this.setState({
-      currDate: moment(this.state.currDate).add(-1, 'months'),
+      currDate,
     })
   }
 
-  public goToNextMonth = () => {
+  public goToNextMonth = async () => {
+    const currDate = moment(this.state.currDate).add(1, 'months')
+    await hoursStore.getHours({
+      where: { month: currDate.month() + 1 }
+    })
     this.setState({
-      currDate: moment(this.state.currDate).add(1, 'months'),
+      currDate,
     })
   }
-  public openModal = (day, selectedDayAmount, weekend) => () => {
+  public openModal = (day: number, weekend: boolean, hours) => () => {
     const element = this.refs[`${day}-current`]
     // @ts-ignore
     const rect = findDOMNode(element)!.getBoundingClientRect()
@@ -202,14 +221,23 @@ export class Hours extends React.Component<any, IState> {
 
     const modalXOffset = this.checkifOutOfBoundsX(right)
     const modalYOffset = this.checkIfOutOfBoundsY(top)
+
+    const modalTitle = weekend ? 'You shouldn\'t work on the weekends' : hours ? 'Update entry' : 'New entry'
+
+    const initialValues = {
+      amount: hours ? hours.amount : undefined,
+      projectId: hours ? hours.projectId : undefined,
+      description: hours ? hours.description : '',
+    }
+
     this.setState({
       modalStyle: {
         top: top - modalYOffset,
         right: modalXOffset,
       },
       selectedDay: day,
-      selectedDayAmount,
-      modalTitle: weekend ? 'You shouldn\'t work on the weekends' : '',
+      initialValues,
+      modalTitle,
       openModal: true,
     })
   }
@@ -220,18 +248,25 @@ export class Hours extends React.Component<any, IState> {
   }
 
   public createHour = async e => {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
+    // @ts-ignore
+    const { errors, values } = await validateFieldsPromise(this.refs.form.validateFields)
+    if (errors) {
+      return
+    }
+    const { amount, description, projectId } = values
 
-    const { currDate, selectedDay, hoursAmount } = this.state
-    const date = dateFromNums(currDate.month() + 1, selectedDay + 1, currDate.year())
+    const { currDate, selectedDay } = this.state
+    const date = dateFromNums(currDate.month() + 1, selectedDay, currDate.year())
 
     await hoursStore.createHour({
       date,
-      hours: {
-        amount: hoursAmount,
-      },
+      hours: { amount, projectId, description },
     })
-    this.setState({ openModal: false, hoursAmount: 0 })
+
+    this.setState({ openModal: false })
     message.success('Confirmed')
   }
   public checkIfOutOfBoundsY = top => {
@@ -251,12 +286,6 @@ export class Hours extends React.Component<any, IState> {
     }
 
     return defaultXOffset
-  }
-
-  public hoursAmountChange = amount => {
-    this.setState({
-      hoursAmount: amount,
-    })
   }
 
   public deleteHour = (currDate, day) => async e => {

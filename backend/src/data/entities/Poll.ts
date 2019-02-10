@@ -14,7 +14,7 @@ export class Poll extends BaseEntity {
   @Column({ enum: PollType })
   public type: PollType
 
-  @Column({ default: new Date() })
+  @Column()
   public startDate: Date
 
   @Column()
@@ -23,7 +23,7 @@ export class Poll extends BaseEntity {
   @Column({ default: true })
   public active: boolean
 
-  @ManyToOne(type => Company, company => company.EOFMVotes)
+  @ManyToOne(type => Company, company => company.polls)
   public company: Company
 
   @OneToMany(type => Vote, vote => vote.poll)

@@ -10,6 +10,7 @@
     "indent": [true, "spaces", 2],
     "object-literal-sort-keys": false,
     "jsx-no-lambda": false,
+    "trailing-comma": false,
     "no-console": false,
     "newline-before-return": true,
     "interface-name": false,

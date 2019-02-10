@@ -26,7 +26,7 @@ const commands: Command[] = [
 
       const currDate = moment()
       const month = m || currDate.month() + 1
-      const day = (d && d + 1) || currDate.date() + 1
+      const day = d || currDate.date()
       const year = y || currDate.year()
       const date = dateFromNums(month, day, year)
 

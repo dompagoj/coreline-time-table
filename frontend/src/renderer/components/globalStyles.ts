@@ -9,6 +9,6 @@ export const globalStyles = {
     text-align: center;
     border-bottom: 2px solid rgba(193, 193, 193, 0.4);
     box-shadow: 0px 1px 1px rgba(193, 193, 193, 0.2);
-    padding: 15px;
+    padding: 9.5px;
   `,
 }

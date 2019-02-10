@@ -1,5 +1,6 @@
-import * as moment from 'moment'
+import moment from 'moment'
 
+import { getRepository } from 'typeorm'
 import { Hour } from '../../data/entities/Hour'
 import { Project } from '../../data/entities/Project'
 import { User } from '../../data/entities/User'
@@ -10,31 +11,30 @@ import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
 export class HourController extends BaseController<
-  Context,
-  { companyId: string; userId: string; dateId: string; id: string },
-  { user: User }
+  Context & { user: User },
+  { companyId: string; userId: string; dateId: string; id: string }
 > {
-  public static routes: Route[] = []
-
   public constructor(req, res, next) {
     super(req, res, next)
   }
 
   @GET('/')
   public async all() {
-    const { user } = this.locals
-    const hours = await Hour.find({
-      where: {
-        userId: user.id,
-      },
-    })
+    const { user } = this.ctx
+    const hours = await getRepository(Hour)
+      .createQueryBuilder('hour')
+      .where('EXTRACT(month from hour.date) = :month',
+        { month: this.req.query.month || moment().month() + 1 })
+      .andWhere('hour.user_id = :userId', { userId: user.id })
+      .getMany()
+
     this.accepted(hours)
   }
 
   @GET('/:dateId')
   public async one() {
     const { dateId } = this.routeData
-    const { user } = this.locals
+    const { user } = this.ctx
 
     const date = new Date(dateId)
 
@@ -49,18 +49,11 @@ export class HourController extends BaseController<
   }
 
   @PUT('/')
-  public async updateOrCreate({ date, hours }: HourInput) {
-    const { user } = this.locals
-    const { amount, projects } = hours
-    // if (projects) {
-    //   await Promise.all(
-    //     projects.map(async project => {
-    //       const dbProject = await Project.findOneOrFail(project.projectId)
-    //       dbProject.hours += project.hours
-    //       await dbProject.save()
-    //     }),
-    //   )
-    // }
+  public async updateOrCreate({ date: rawDate, hours }: HourInput) {
+    const { user } = this.ctx
+    const { amount, projectId, description } = hours
+    const date = moment(rawDate).utc().add(1, 'day').format('YYYY-MM-DD')
+
     const hour = await Hour.findOne({
       where: {
         date,
@@ -69,6 +62,8 @@ export class HourController extends BaseController<
     })
     if (hour) {
       hour.amount = amount
+      hour.projectId = projectId || hour.projectId
+      hour.description = description || hour.description
       await hour.save()
 
       return this.accepted({ hour, updated: true })
@@ -78,6 +73,8 @@ export class HourController extends BaseController<
       amount,
       date,
       userId: user.id,
+      projectId,
+      description,
     })
       .save()
       .then(created => this.accepted(created))
@@ -87,6 +84,20 @@ export class HourController extends BaseController<
   public async deleteHour() {
     const { id } = this.routeData
     await Hour.delete(id)
+
+    return this.accepted()
+  }
+
+  @GET('/projects')
+  public async getHourswithProjects() {
+    const { userId } = this.routeData
+    const hours = await getRepository(Hour)
+      .createQueryBuilder('hour')
+      .leftJoinAndSelect('hour.project', 'project')
+      .where('EXTRACT(month from hour.date) = :month',
+        { month: this.req.query.month || moment().month() + 1 })
+      .andWhere('hour.user_id = :userId', { userId })
+      .getMany()
 
     return this.accepted()
   }

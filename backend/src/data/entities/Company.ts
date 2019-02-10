@@ -26,5 +26,5 @@ export class Company extends BaseEntity {
   public projects: Project[]
 
   @OneToMany(type => Poll, poll => poll.company, { onDelete: 'CASCADE' })
-  public EOFMVotes: Poll[]
+  public polls: Poll[]
 }

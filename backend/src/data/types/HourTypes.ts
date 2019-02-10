@@ -1,14 +1,11 @@
 import { Min } from 'class-validator'
 import { ID } from './random'
 
-interface ProjectHours {
-  projectId: number
-  hours: number
-}
-
 interface Hours {
+  id: string | number
   amount: number
-  projects?: ProjectHours[] | null
+  projectId?: number
+  description?: string
 }
 
 export class HourInput {

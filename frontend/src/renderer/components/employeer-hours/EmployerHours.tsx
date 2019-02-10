@@ -5,10 +5,10 @@ import React from 'react'
 
 import { generalStateStore } from '../../stores/GeneralState'
 import { hoursStore } from '../../stores/HoursStore'
+import { projectStore } from '../../stores/ProjectStore'
 import { userStore } from '../../stores/UserStore'
-import { UserType } from '../../types/enums'
 import { User } from '../../types/user-types'
-import { getHoursTableDataSource } from '../utils/misc'
+import { getHoursTableDataSource, getProjectsTotalHours, sum } from '../utils/misc'
 import { Title } from '../utils/Title'
 import { HoursTable } from './HoursTable'
 import { styles } from './styles'
@@ -23,7 +23,7 @@ interface State {
 }
 
 @observer
-export class EmployeerHours extends React.Component<any, State> {
+export class EmployerHours extends React.Component<any, State> {
   public state: State = {
     filteredUsers: [],
     selectedUser: undefined,
@@ -49,18 +49,17 @@ export class EmployeerHours extends React.Component<any, State> {
               style={{ width: '100%' }}
               dataSource={filteredUsers.map(renderOption)}
               optionLabelProp="text"
-              onSelect={this.onSelect}
-            >
+              onSelect={this.onSelect}>
               <Input size="large" placeholder="Employee email or username" style={{ height: '50px' }} />
             </AutoComplete>
           </div>
         </div>
-        {selectedUser && !hoursStore.loading && (
+        {selectedUser && !projectStore.loading && (
           <div style={{ padding: '10px 20px' }}>
             <Card
               headStyle={{ textAlign: 'center' }}
               title={
-                <h2 style={{ margin: 0 }}>
+                <h2 style={{ margin: 0, padding: '0' }}>
                   {selectedUser.firstName} {selectedUser.lastName}
                 </h2>}
             >
@@ -79,8 +78,8 @@ export class EmployeerHours extends React.Component<any, State> {
                     'YYYY',
                   )})`}</h2>
                   <HoursTable
-                    totalHours={hoursStore.getMonthHours(currDate)}
-                    dataSource={getHoursTableDataSource(hoursStore.getMonthHours(currDate), currDate.month() + 1)}
+                    totalHours={getProjectsTotalHours(projectStore.projects)}
+                    dataSource={getHoursTableDataSource(projectStore.projects, currDate.month() + 1)}
                   />
                 </div>
               </div>
@@ -91,9 +90,7 @@ export class EmployeerHours extends React.Component<any, State> {
     )
   }
   public async componentDidMount() {
-    await userStore.getUsers({
-      type: UserType.EMPLOYEE,
-    })
+    await userStore.getUsers()
     const selectedUser = userStore.users.find(user => user.username === generalStateStore.userSearchInput)
 
     if (selectedUser) {
@@ -107,7 +104,11 @@ export class EmployeerHours extends React.Component<any, State> {
     this.setState({
       selectedUser,
     })
-    await hoursStore.getHours((selectedUser && selectedUser.id.toString()) || undefined)
+    await projectStore.getProjectsWithHours({
+      userId: selectedUser && selectedUser.id || undefined,
+      where: { month: this.state.currDate.month() + 1 }
+    })
+
   }
 
   public handleSearch = value => {
@@ -118,7 +119,14 @@ export class EmployeerHours extends React.Component<any, State> {
         : userStore.users.filter(user => user.username.startsWith(value) || user.email.startsWith(value)),
     })
   }
-  public onDateSelect = (date: moment.Moment) => {
+  public onDateSelect = async (date: moment.Moment) => {
+    if (date.month() !== this.state.currDate.month()) {
+      const { selectedUser } = this.state
+      await projectStore.getProjectsWithHours({
+         userId: selectedUser && selectedUser.id || undefined,
+         where: { month: date.month() + 1 }
+      })
+    }
     this.setState({
       currDate: date,
     })
