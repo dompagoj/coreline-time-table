@@ -2,11 +2,9 @@ import moment from 'moment'
 
 import { getRepository } from 'typeorm'
 import { Hour } from '../../data/entities/Hour'
-import { Project } from '../../data/entities/Project'
 import { User } from '../../data/entities/User'
 import { Context } from '../../data/types/Context'
-import { HourInput } from '../../data/types/HourTypes'
-import { Route } from '../../data/types/routing'
+import { CreateHourInput, UpdateHourInput } from '../../data/types/HourTypes'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
 
@@ -48,37 +46,64 @@ export class HourController extends BaseController<
       .catch(e => this.badRequest(`No hour with id ${dateId} found`))
   }
 
-  @PUT('/')
-  public async updateOrCreate({ date: rawDate, hours }: HourInput) {
+  @POST('/')
+  public async create({ date: rawDate, hours }: CreateHourInput) {
     const { user } = this.ctx
-    const { amount, projectId, description } = hours
     const date = moment(rawDate).utc().add(1, 'day').format('YYYY-MM-DD')
 
-    const hour = await Hour.findOne({
-      where: {
-        date,
-        userId: user.id,
-      },
-    })
-    if (hour) {
-      hour.amount = amount
-      hour.projectId = projectId || hour.projectId
-      hour.description = description || hour.description
-      await hour.save()
-
-      return this.accepted({ hour, updated: true })
-    }
-
-    Hour.create({
-      amount,
+    const hour = await Hour.create({
       date,
+      ...hours,
       userId: user.id,
-      projectId,
-      description,
-    })
-      .save()
-      .then(created => this.accepted(created))
+    }).save()
+
+    return this.accepted(hour)
   }
+
+  @PUT('/:id')
+  public async update(hours: UpdateHourInput) {
+    const { id } = this.routeData
+    const hour = await Hour.findOne(id)
+    if (!hour) {
+      return this.badRequest(`No hour with id ${id} found`)
+    }
+    Object.assign(hour, hours)
+    await hour.save()
+
+    return this.accepted(hour)
+  }
+
+  // @PUT('/')
+  // public async updateOrCreate({ date: rawDate, hours }: HourInput) {
+  //   const { user } = this.ctx
+  //   const { amount, projectId, description } = hours
+  //   const date = moment(rawDate).utc().add(1, 'day').format('YYYY-MM-DD')
+
+  //   const hour = await Hour.findOne({
+  //     where: {
+  //       date,
+  //       userId: user.id,
+  //     },
+  //   })
+  //   if (hour) {
+  //     hour.amount = amount
+  //     hour.projectId = projectId || hour.projectId
+  //     hour.description = description || hour.description
+  //     await hour.save()
+
+  //     return this.accepted({ hour, updated: true })
+  //   }
+
+  //   Hour.create({
+  //     amount,
+  //     date,
+  //     userId: user.id,
+  //     projectId,
+  //     description,
+  //   })
+  //     .save()
+  //     .then(created => this.accepted(created))
+  // }
 
   @DELETE('/:id')
   public async deleteHour() {

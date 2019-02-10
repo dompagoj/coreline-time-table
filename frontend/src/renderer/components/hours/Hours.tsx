@@ -6,6 +6,7 @@ import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import { hoursStore } from '../../stores/HoursStore'
 import { projectStore } from '../../stores/ProjectStore'
+import { ID } from '../../types/general'
 import { Hour } from '../../types/hours-types'
 import { Spinner } from '../spinner/Spinner'
 import { dateFromNums, getDaysAfter, getDaysBefore } from '../utils/hours'
@@ -20,6 +21,7 @@ interface IState {
   openModal: boolean
   modalStyle: React.CSSProperties
   selectedDay: number
+  selectedHourId: ID | null
   initialValues: any
   modalTitle: string
 }
@@ -36,6 +38,7 @@ export class Hours extends React.Component<any, IState> {
     currDate: moment(),
     today: moment(),
     selectedDay: 0,
+    selectedHourId: null,
     openModal: false,
     modalStyle: {},
     initialValues: {},
@@ -127,7 +130,7 @@ export class Hours extends React.Component<any, IState> {
                     }}
                   >
                     {hours && (weekend || !this.beforeToday(day)) && (
-                      <Button onClick={this.deleteHour(currDate, day)} icon="delete" type="danger" shape="circle" />
+                      <Button onClick={this.deleteHour(hours.id)} icon="delete" type="danger" shape="circle" />
                     )}
                     <div className={this.isToday(day) ? styles.today : styles.day}>{day}</div>
                   </div>
@@ -148,14 +151,13 @@ export class Hours extends React.Component<any, IState> {
           style={modalStyle}
           width={MODAL_WIDTH}
           visible={openModal}
-          closable
-          onCancel={this.closePopover}
-          onOk={this.createHour}
+          onCancel={this.closeModal}
+          onOk={this.onSubmit}
           destroyOnClose
-          title={modalTitle}
+          // title={modalTitle}
           okText="Save"
         >
-          <HoursModalForm ref="form" onSubmit={this.createHour} initialValues={initialValues} />
+          <HoursModalForm ref="form" onSubmit={this.onSubmit} initialValues={initialValues} />
         </Modal>
       </div>
     )
@@ -187,7 +189,10 @@ export class Hours extends React.Component<any, IState> {
     return today.date() > day && today.month() === currDate.month()
   }
 
-  public goToToday = () => {
+  public goToToday = async () => {
+    await hoursStore.getHours({
+      where: { month: this.state.today.month() + 1 }
+    })
     this.setState({
       currDate: moment(),
     })
@@ -236,12 +241,13 @@ export class Hours extends React.Component<any, IState> {
         right: modalXOffset,
       },
       selectedDay: day,
+      selectedHourId: hours && hours.id,
       initialValues,
       modalTitle,
       openModal: true,
     })
   }
-  public closePopover = () => {
+  public closeModal = () => {
     this.setState({
       openModal: false,
     })
@@ -254,21 +260,47 @@ export class Hours extends React.Component<any, IState> {
     // @ts-ignore
     const { errors, values } = await validateFieldsPromise(this.refs.form.validateFields)
     if (errors) {
-      return
+      return message.error('Something went wrong...')
     }
     const { amount, description, projectId } = values
 
     const { currDate, selectedDay } = this.state
     const date = dateFromNums(currDate.month() + 1, selectedDay, currDate.year())
-
     await hoursStore.createHour({
       date,
       hours: { amount, projectId, description },
     })
 
-    this.setState({ openModal: false })
+    this.setState({ openModal: false, initialValues: null, selectedHourId: null })
     message.success('Confirmed')
   }
+
+  public updateHour = async e => {
+    if (e) {
+      e.preventDefault()
+    }
+    // @ts-ignore
+    const { errors, values } = await validateFieldsPromise(this.refs.form.validateFields)
+    if (errors) {
+      return message.error('Something went wrong...')
+    }
+    const { amount, description, projectId } = values
+
+    await hoursStore.updateHour({
+      id: this.state.selectedHourId!,
+      amount,
+      projectId,
+      description
+    })
+
+    this.setState({ openModal: false, initialValues: null, selectedHourId: null })
+    message.success('Updated')
+  }
+
+  public onSubmit = (e) => {
+    this.state.selectedHourId ? this.updateHour(e) : this.createHour(e)
+  }
+
   public checkIfOutOfBoundsY = top => {
     const condition = top + MODAL_HEIGHT * 2 - window.innerHeight
     if (condition > 0) {
@@ -288,10 +320,10 @@ export class Hours extends React.Component<any, IState> {
     return defaultXOffset
   }
 
-  public deleteHour = (currDate, day) => async e => {
+  public deleteHour = (id) => async e => {
     e.stopPropagation()
 
-    await hoursStore.deleteHour(currDate, day)
+    await hoursStore.deleteHour(id)
     message.warning('Deleted')
   }
 }

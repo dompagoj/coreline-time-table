@@ -29,3 +29,5 @@ export function getPollWinner(poll?: Poll): User | undefined {
 
   return winner
 }
+
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>

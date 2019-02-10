@@ -2,7 +2,7 @@ import { action, computed, observable } from 'mobx'
 import * as moment from 'moment'
 
 import { successCode } from '../components/utils/misc'
-import { CreateHoursInput, HoursApi } from '../http/HoursApi'
+import { CreateHourInput, HoursApi, UpdateHourInput } from '../http/HoursApi'
 import { GetHoursOptions, Hour } from '../types/hours-types'
 
 class HoursStore {
@@ -14,6 +14,19 @@ class HoursStore {
   public async getHours(options?: GetHoursOptions) {
     const { data } = await this.api.getHours(options)
     this.hours = data
+  }
+
+  public findHours(currDate: moment.Moment, day: number, returnIndex = false) {
+    if (!this.hours) {
+      return undefined
+    }
+    const selectedDay = moment(new Date(`${currDate.month() + 1}.${day}.${currDate.year()}`))
+
+    return this.hours.filter(hour => {
+      const date = moment(hour.date)
+
+      return date.isSame(selectedDay)
+    })
   }
 
   public getHour(currDate: moment.Moment, day: number, returnIndex = false) {
@@ -32,25 +45,45 @@ class HoursStore {
   }
 
   @action.bound
-  public async createHour(input: CreateHoursInput) {
+  public async createHour(input: CreateHourInput) {
     const { data, status } = await this.api.createHour(input)
     if (!successCode(status)) {
       return
     }
-    if (data.updated) {
-      const hourIndex = this.hours.findIndex(hour => moment(hour.date).isSame(moment(data.hour.date)))
-      this.hours[hourIndex] = data.hour
-    } else {
-      this.hours.push(data)
-    }
+    this.hours.push(data)
   }
+
   @action.bound
-  public async deleteHour(currDate: moment.Moment, day) {
-    const hourIndex = this.getHour(currDate, day, true) as number
+  public async updateHour(input: UpdateHourInput) {
+    const { data, status } = await this.api.updateHour(input)
+    if (!successCode(status)) {
+      return
+    }
+    console.log({ data })
+    const hourIndex = this.hours.findIndex(hour => hour.id === data.id)
+    this.hours[hourIndex] = data
+  }
+
+  // @action.bound
+  // public async createHour(input: CreateHoursInput) {
+  //   const { data, status } = await this.api.createHour(input)
+  //   if (!successCode(status)) {
+  //     return
+  //   }
+  //   if (data.updated) {
+  //     const hourIndex = this.hours.findIndex(hour => moment(hour.date).isSame(moment(data.hour.date)))
+  //     this.hours[hourIndex] = data.hour
+  //   } else {
+  //     this.hours.push(data)
+  //   }
+  // }
+  @action.bound
+  public async deleteHour(id) {
+    const hourIndex = this.hours.findIndex(h => h.id === id)
     if (!hourIndex) {
       return
     }
-    await this.api.deleteHour(this.hours[hourIndex].id)
+    await this.api.deleteHour(id)
 
     this.hours.splice(hourIndex, 1)
   }

@@ -38,7 +38,12 @@ export class Projects extends React.Component<any, State> {
           <Tabs
             activeKey={activeTab}
             onChange={this.onTabChange}
-            tabBarExtraContent={<TabExtraContent onChange={this.onChange} openDrawer={this.openDrawer} />}
+            tabBarExtraContent={
+              <TabExtraContent
+                onChange={this.onChange}
+                openDrawer={this.openDrawer}
+              />
+            }
           >
             <Tabs.TabPane key="active" tab="Active Projects" />
             <Tabs.TabPane key="all" tab="All Projects" />
@@ -53,17 +58,21 @@ export class Projects extends React.Component<any, State> {
         >
           <NewProjectForm onCreate={this.onCreate} />
         </Drawer>
-        {projectStore.activeProjects.length > 0 ? (
-          <Card className={styles.tableContainer}>
-            <Table columns={projectsTableColumns} dataSource={this.getTableData(search)} />
-          </Card>
-        ) : (
-            <div style={{ textAlign: 'center', fontSize: '25px', padding: 25 }}>
-              <span>
-                Your company has no active projects, click <a onClick={this.openDrawer}>here</a> to create one
+        {projectStore.activeProjects.length === 0 && activeTab === 'active' ? (
+          <div style={{ textAlign: 'center', fontSize: '25px', padding: 25 }}>
+            <span>
+              Your company has no active projects, click{' '}
+              <a onClick={this.openDrawer}>here</a> to create one
             </span>
-            </div>
-          )}
+          </div>
+        ) : (
+          <Card className={styles.tableContainer}>
+            <Table
+              columns={projectsTableColumns}
+              dataSource={this.getTableData(search)}
+            />
+          </Card>
+        )}
       </div>
     )
   }
@@ -72,22 +81,27 @@ export class Projects extends React.Component<any, State> {
   }
   public onCreate = async (project: Project) => {
     this.setState({
-      drawerVisible: false,
+      drawerVisible: false
     })
 
     await projectStore.createProject(project)
   }
 
   public getTableData(search: string) {
-    const projects = this.state.activeTab === 'active' ? projectStore.activeProjects : projectStore.projects
+    const projects =
+      this.state.activeTab === 'active'
+        ? projectStore.activeProjects
+        : projectStore.projects
 
     return projects
-      .filter(project => project.name.toLowerCase().startsWith(search.toLowerCase()))
+      .filter(project =>
+        project.name.toLowerCase().startsWith(search.toLowerCase())
+      )
       .map(project => ({
         key: project.id,
         name: project.name,
         status: project.status,
-        hours: project.hours ? sum(project.hours.map(p => p.amount)) : 0,
+        hours: project.hours ? sum(project.hours.map(p => p.amount)) : 0
       }))
   }
 
@@ -100,7 +114,7 @@ export class Projects extends React.Component<any, State> {
   public onChange = event => {
     // @ts-ignore
     this.setState({
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value
     })
   }
   public onTabChange = key => {
@@ -112,7 +126,11 @@ export class Projects extends React.Component<any, State> {
 
 const TabExtraContent = props => (
   <div className={styles.extraContent}>
-    <Input onChange={props.onChange} name="search" placeholder="Search by name..." />
+    <Input
+      onChange={props.onChange}
+      name="search"
+      placeholder="Search by name..."
+    />
     <Button onClick={props.openDrawer} className="button-green">
       New Project
     </Button>
@@ -121,57 +139,61 @@ const TabExtraContent = props => (
 
 const projectsTableColumns: Array<
   ColumnProps<{
-    key: string | number
-    name: any
-    status: any
-    hours: any
+    key: string | number;
+    name: any;
+    status: any;
+    hours: any;
   }>
 > = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render(status, p) {
-        return (
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name'
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    key: 'status',
+    render(status, p) {
+      return (
+        <Button
+          type={status === ProjectStatus.ACTIVE ? 'primary' : 'danger'}
+          ghost
+          onClick={() =>
+            projectStore.updateProject(p.key, {
+              status:
+                status === ProjectStatus.ACTIVE
+                  ? ProjectStatus.DONE
+                  : ProjectStatus.ACTIVE
+            })
+          }
+        >
+          {status}
+        </Button>
+      )
+    }
+  },
+  {
+    title: 'Total hours',
+    dataIndex: 'hours',
+    key: 'hours'
+  },
+  {
+    title: 'Actions',
+    className: styles.actionsContainer,
+    key: 'actions',
+    render(project) {
+      return (
+        <div className={styles.actionsContainer}>
           <Button
-            type={status === ProjectStatus.ACTIVE ? 'primary' : 'danger'}
-            ghost
-            onClick={
-            () => projectStore.updateProject(p.key,
-              { status: status === ProjectStatus.ACTIVE ? ProjectStatus.DONE : ProjectStatus.ACTIVE }
-            )}
-          >
-            {status}
-          </Button>
-        )
-      },
-    },
-    {
-      title: 'Total hours',
-      dataIndex: 'hours',
-      key: 'hours',
-    },
-    {
-      title: 'Actions',
-      className: styles.actionsContainer,
-      key: 'actions',
-      render(project) {
-        return (
-          <div className={styles.actionsContainer}>
-            <Button
-              className="tab-button"
-              onClick={() => projectStore.deleteProject(project.key)}
-              type="danger"
-              shape="circle-outline"
-              icon="delete"
-            />
-          </div>
-        )
-      },
-    },
-  ]
+            className="tab-button"
+            onClick={() => projectStore.deleteProject(project.key)}
+            type="danger"
+            shape="circle-outline"
+            icon="delete"
+          />
+        </div>
+      )
+    }
+  }
+]

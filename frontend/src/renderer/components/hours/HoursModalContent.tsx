@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, Select } from 'antd'
+import { Form, Icon, Input, InputNumber, Select, Tabs } from 'antd'
 import { FormComponentProps } from 'antd/lib/form'
 import { css } from 'emotion'
 import * as React from 'react'
@@ -25,6 +25,14 @@ class HoursModalFormBase extends React.Component<Props> {
     const { getFieldDecorator } = this.props.form
 
     return (
+      <>
+      <Tabs>
+        <Tabs.TabPane key="new" tab={<span><Icon type="plus-circle" />Add</span>} />
+        <Tabs.TabPane key="Project1" tab="Project1" />
+        <Tabs.TabPane key="Projct2" tab="Projec2" />
+        <Tabs.TabPane key="Projct3" tab="Projec2" />
+        <Tabs.TabPane key="Projct4" tab="Projec2" />
+      </Tabs>
       <Form onSubmit={onSubmit}>
         <div className={contentContainer}>
           <FormItem>
@@ -43,7 +51,7 @@ class HoursModalFormBase extends React.Component<Props> {
               rules: [{ required: true, message: 'Please select a project' }],
               initialValue: initialValues.projectId
             })(
-              <Select placeholder="Select a project..." allowClear>
+              <Select placeholder="Select a project...">
                 {projectStore.projects
                 .filter(p => p.status === ProjectStatus.ACTIVE)
                 .map(p => (
@@ -61,6 +69,7 @@ class HoursModalFormBase extends React.Component<Props> {
           })(<Input.TextArea placeholder="Describe what you've done" />)}
         </FormItem>
       </Form>
+      </>
     )
   }
 }
