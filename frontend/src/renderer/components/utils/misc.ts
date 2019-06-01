@@ -59,12 +59,21 @@ export function groupNoProjectHours(hours: Hour[]) {
   }
 }
 
+export function dummyRequest({ onSuccess }) {
+  onSuccess('Ok')
+}
+
 export function getBase64(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result!.toString())
-    reader.onerror = error => reject(error)
+    reader.onload = () => {
+      if (reader.result)
+        return resolve(reader.result.toString())
+
+      return reject(null)
+    }
+    reader.onerror = () => reject(null)
   })
 }
 
@@ -79,3 +88,15 @@ export function validateFieldsPromise(validateFields) {
     })
   })
 }
+
+// export async function getBase64 (img) {
+//   return new Promise<ArrayBuffer | null | string>(resolve => {
+//     const reader = new FileReader()
+//     reader.addEventListener('load', () => resolve(reader.result))
+//     try {
+//       reader.readAsDataURL(img)
+//     } catch(e) {
+//       resolve(null)
+//     }
+//   })
+// }

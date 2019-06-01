@@ -13,4 +13,5 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET!,
   port: parseInt(process.env.PORT!, 10),
   googleClientId: process.env.GOOGLE_CLIENT_ID!,
+  bucketUrl: process.env.BUCKET_URL!,
 }

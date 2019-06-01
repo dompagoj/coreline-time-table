@@ -35,7 +35,7 @@ export class MainRouterComponent extends React.Component<RouteComponentProps, { 
     ipcRenderer.on('jwt-reply', (event, token) => {
       if (token) {
         authStore.token = token
-        axios.defaults.headers.token = token
+        axios.defaults.headers.authorization = 'bearer ' + token
       }
       this.setState({ loading: false })
     })

@@ -21,4 +21,14 @@ export class UsersApi {
 
     return axios.put(`companies/${companyId}/users/${id}`, { ...input })
   }
+
+  public async updateAvatar(formData: FormData) {
+    const { companyId, id } = authStore.user
+
+    return axios.post(`companies/${companyId}/users/${id}/avatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    })
+  }
 }

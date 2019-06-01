@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Modal, Radio } from 'antd'
+import { Button, Form, Input, message, Modal, Radio, Upload } from 'antd'
 import * as React from 'react'
 const FormItem = Form.Item
 
@@ -7,22 +7,28 @@ import { userStore } from '../../stores/UserStore'
 import { UserType } from '../../types/enums'
 import { Title } from '../utils/Title'
 import { styles } from './styles'
+import { FormComponentProps } from 'antd/lib/form'
+import { UploadChangeParam } from 'antd/lib/upload'
+import { dummyRequest } from '../utils/misc'
+import { HTTPStatusCodes } from '../../types/HTTP_STATUS_CODES'
 
-interface IState {
+interface State {
   modalOpen: boolean
-  username: string
   authKey: string
   userType: UserType
+  avatar?: string
   errors: {
     authKey?: string,
   }
 }
 
-export class Profile extends React.Component<any, IState> {
-  public state: IState = {
+type Props = FormComponentProps
+
+class ProfileForm extends React.Component<Props, State> {
+  public state: State = {
     modalOpen: false,
-    username: authStore.user.username,
     authKey: authStore.companyAuthKey,
+    avatar: authStore.user.avatar,
     userType: authStore.user.type,
     errors: {
       authKey: '',
@@ -30,7 +36,8 @@ export class Profile extends React.Component<any, IState> {
   }
   public render() {
     const { user } = authStore
-    const { modalOpen, authKey, userType, errors, username } = this.state
+    const { modalOpen, errors, userType, authKey, avatar }= this.state
+    const { getFieldDecorator } = this.props.form
 
     return (
       <div>
@@ -39,14 +46,17 @@ export class Profile extends React.Component<any, IState> {
           <div>
             <Form onSubmit={this.updateProfile}>
               <FormItem>
-                <Input
-                  name="username"
-                  onChange={this.onChange}
-                  required
-                  value={username}
-                  addonBefore="Username"
-                  size="large"
-                />
+                {
+                  getFieldDecorator('username', {
+                    initialValue: user.username,
+                    rules: [{ required: true, message: 'Username is required' }]
+                  })(
+                    <Input
+                      addonBefore="Username"
+                      size="large"
+                    />
+                  )
+                }
               </FormItem>
               <FormItem>
                 <Input disabled defaultValue={user.firstName} addonBefore="Firstname" size="large" />
@@ -65,14 +75,22 @@ export class Profile extends React.Component<any, IState> {
                 </Radio.Group>
               </FormItem>
               <FormItem className={styles.buttons}>
-                <Button htmlType="submit" onClick={this.updateProfile} size="large" type="primary" icon="save">
+                <Button htmlType="submit" size="large" type="primary" icon="save">
                   Save
                 </Button>
               </FormItem>
             </Form>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <img style={{ width: '70%' }} src={user.avatar} />
+            <Upload
+              name="avatar"
+              listType="picture-card"
+              customRequest={dummyRequest}
+              onChange={this.onAvatarChange}
+              showUploadList={false}
+            >
+              <img style={{ width: '100%' }} src={avatar} />
+            </Upload>
           </div>
         </div>
         <Modal
@@ -110,13 +128,31 @@ export class Profile extends React.Component<any, IState> {
   }
 
   public onRadioChange = e => {
-    if (e.target.value === 'employer') {
+    if (e.target.value === UserType.EMPLOYER) {
       return this.openModal()
     }
     this.setState({
-      userType: e.target.value,
-    })
+      userType: UserType.EMPLOYEE,
+    }, () => this.updateProfile())
   }
+
+  public onAvatarChange = async ({ file }: UploadChangeParam) => {
+    if (file.originFileObj) {
+      const formData = new FormData()
+      formData.append('avatar', file.originFileObj)
+
+      const { data, status } = await userStore.updateAvatar(formData)
+      if (status !== HTTPStatusCodes.OK) {
+        return message.error('Failed to upload image...')
+      }
+      console.log(data)
+      authStore.user.avatar = data.url
+      this.setState({
+        avatar: data.url,
+      })
+    }
+  }
+
   public onChange = e => {
     this.setState({
       [e.target.name]: e.target.value,
@@ -137,30 +173,40 @@ export class Profile extends React.Component<any, IState> {
     }
     this.setState({
       errors: { authKey: '' },
-      userType: UserType.EMPLOYER,
       modalOpen: false,
+      userType: UserType.EMPLOYER,
     })
+    await this.updateProfile()
   }
 
-  public updateProfile = async e => {
-    e.preventDefault()
-    const { authKey, username, userType } = this.state
+  public updateProfile = async (e?) => {
+    e && e.preventDefault()
+    
+    const { authKey, userType } = this.state
+    const { validateFields } = this.props.form
+    validateFields(async (errors, { username }) => {
+      if (errors)
+        return
 
-    const { data, error } = await userStore.updateUser({
-      authKey,
-      type: userType,
-      username,
-    })
-    if (error) {
-      return message.error(error)
-    }
-    authStore.user = data
-    if (userType === UserType.EMPLOYEE) {
-      authStore.companyAuthKey = ''
-      this.setState({
-        authKey: '',
+      const { data, error } = await userStore.updateUser({
+        authKey: authKey || authStore.companyAuthKey,
+        type: userType,
+        username,
       })
-    }
-    message.success('Profile updated')
+      if (error) {
+        return message.error(error)
+      }
+      authStore.user = data
+      if (userType === UserType.EMPLOYEE) {
+        authStore.companyAuthKey = ''
+        this.setState({
+          authKey: '',
+        })
+      }
+      message.success('Profile updated')
+
+    })
   }
 }
+
+export const Profile = Form.create()(ProfileForm)

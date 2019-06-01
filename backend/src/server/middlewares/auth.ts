@@ -5,26 +5,27 @@ import { UserType } from '../../data/enums/UserType'
 import { verifyToken } from '../../utils/crypto'
 
 export async function verifyJWT(req: Request, res: Response, next) {
-  if (!req.headers.token) {
+  const { authorization } = req.headers
+  if (!authorization)
     return res
       .status(401)
       .json({ error: 'Invalid token' })
       .end()
-  }
-  const user = await verifyToken(req.headers.token as string)
+  const [_, token] = authorization.split(' ')
+  // spec is unclear wether bearer is case sensitive or not
+  if (_.toLowerCase() === 'bearer' && !!token) {
+    const user = await verifyToken(token.trim())
+    if (!user)
+      return next()
 
-  if (!user) {
-    return res
-      .status(401)
-      .json({ error: 'Invalid token' })
-      .end()
-  }
-
-  res.locals = {
-    user,
+    res.locals.user = user
+    return next()
   }
 
-  next()
+  return res
+    .status(401)
+    .json({ error: 'Invalid token' })
+    .end()
 }
 
 export async function verifyCompany(req, res, next) {

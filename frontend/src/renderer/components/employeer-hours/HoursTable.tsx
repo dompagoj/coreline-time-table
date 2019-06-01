@@ -1,17 +1,21 @@
 import { Table } from 'antd'
 import React from 'react'
+import { sum } from '../utils/misc'
 
 const { Column } = Table
 
 interface Props {
   dataSource: any
-  totalHours: number
   noProjectHours?: any
+}
+
+function getTotalHours(dataSource) {
+  return sum(dataSource.map(d => d.hours))
 }
 
 export function HoursTable(props: Props) {
   const { noProjectHours } = props
-  const dataSource = noProjectHours ? [...props.dataSource, noProjectHours] : props.dataSource
+  const dataSource = noProjectHours && noProjectHours.hours > 0 ? [...props.dataSource, noProjectHours] : props.dataSource
 
   return (
     <Table
@@ -19,7 +23,7 @@ export function HoursTable(props: Props) {
       bordered
       size="small"
       pagination={false}
-      footer={() => <TableFooter totalHours={props.totalHours} />}
+      footer={() => <TableFooter totalHours={getTotalHours(dataSource)} />}
     >
       <Column title="Hours" dataIndex="hours" />
       <Column title="Project" dataIndex="project" />

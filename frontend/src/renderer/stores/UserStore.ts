@@ -32,6 +32,10 @@ class UserStore {
 
     return { data, error: data.error }
   }
+
+  public async updateAvatar(formData: FormData) {
+    return this.usersApi.updateAvatar(formData)
+  }
 }
 
 const usersApiInstance = new UsersApi()

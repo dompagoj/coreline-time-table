@@ -25,7 +25,7 @@ export class UserDashboard extends React.Component<any, State> {
   public state: State = {
     calendarMode: 'year',
     loading: true,
-    currDate: moment().subtract(1, 'month'),
+    currDate: moment(),
   }
   public render() {
     const { currDate, calendarMode, loading } = this.state

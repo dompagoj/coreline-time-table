@@ -1,10 +1,13 @@
+import multer from 'multer'
 import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
 import { UserType } from '../../data/enums/UserType'
 import { Context } from '../../data/types/Context'
 import { UserUpdateInput } from '../../data/types/UserTypes'
-import { DELETE, GET, PUT } from '../controller-decorators'
+import { DELETE, GET, PUT, POST } from '../controller-decorators'
 import { BaseController } from './BaseController'
+import { MB } from '../constants';
+import { uploadProfileImage } from '../services/GStorage';
 
 export class UserController extends BaseController<Context & { company: Company }, { companyId: string; id: string }> {
   public constructor(req, res, next) {
@@ -43,8 +46,36 @@ export class UserController extends BaseController<Context & { company: Company 
     return this.accepted({ user, authKey: '' })
   }
 
+  @POST('/:id/avatar', {
+    before: [
+      multer({ limits: { fileSize: 10 * MB } }).single('avatar'),
+      uploadProfileImage,
+    ]
+  })
+  public async updateAvatar() {
+    try {
+      // @ts-ignore
+      const { url } = this.req.file
+
+      if (!url) {
+        return this.badRequest()
+      }
+      const { id } = this.routeData
+      await User.update(id, {
+        avatar: url 
+      })
+
+      // @ts-ignore
+      return this.accepted({ url })
+    }
+    catch (e) {
+      console.log(e)
+      return this.badRequest()
+    }
+  }
+
   @PUT('/:id')
-  public async update({ username, type, authKey, avatar }: UserUpdateInput) {
+  public async update({ username, type, authKey }: UserUpdateInput) {
     const { id } = this.ctx.user
 
     const { company } = this.ctx
@@ -61,11 +92,12 @@ export class UserController extends BaseController<Context & { company: Company 
     }
     user.username = username
     user.type = type
-    user.avatar = avatar ? avatar : user.avatar
     await user.save()
 
     return this.accepted(user)
   }
+
+
 
   @DELETE('/:id')
   public async delete() {

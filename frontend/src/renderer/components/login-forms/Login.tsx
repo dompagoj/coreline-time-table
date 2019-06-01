@@ -78,7 +78,7 @@ export class LoginComponent extends React.Component<any, { error: string | null 
       authStore.token = token
       authStore.user = user
       authStore.companyAuthKey = authKey
-      axios.defaults.headers.token = token
+      axios.defaults.headers.authorization = 'bearer ' + token
       routerStore.gotoHome()
     })
     ipcRenderer.send('login')

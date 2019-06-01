@@ -39,5 +39,5 @@ export interface UserUpdateInput {
   username: string
   type: UserType
   authKey: string
-  avatar: string
+  avatar: any
 }

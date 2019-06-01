@@ -82,7 +82,6 @@ export class EmployerDashboard extends React.Component<any, State> {
                     'YYYY',
                   )})`}</h2>
                   <HoursTable
-                    totalHours={getProjectsTotalHours(projectStore.projects)}
                     dataSource={getHoursTableDataSource(projectStore.projects, currDate.month() + 1)}
                     noProjectHours={this.state.noProjectHours}
                   />
