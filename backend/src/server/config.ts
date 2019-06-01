@@ -9,9 +9,18 @@ export const config = {
   dbUsername: process.env.DB_USERNAME!,
   dbPassword: process.env.DB_PASSWORD!,
   dbLogging: strToBool(process.env.DB_LOGGING!),
-  nodeEnv: process.env.NODE_ENV!,
+  langExtension: process.env.NODE_ENV === 'production' ? '.js' : '.ts',
+  location: process.env.NODE_ENV === 'production' ? './.build' : './',
   jwtSecret: process.env.JWT_SECRET!,
   port: parseInt(process.env.PORT!, 10),
   googleClientId: process.env.GOOGLE_CLIENT_ID!,
   bucketUrl: process.env.BUCKET_URL!,
+  nodeEnv: {
+    isDevelop() {
+      return process.env.NODE_ENV === 'develop' || process.env.NODE_ENV === undefined
+    },
+    isProduction() {
+      return process.env.NODE_ENV === 'production'
+    }
+  }
 }

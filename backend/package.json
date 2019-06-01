@@ -17,6 +17,7 @@
     "db:start": "docker container start 5f5accb6fddd",
     "db:init": "docker-compose -f docker-compose.yml up -d",
     "migration:generate": "typeorm migration:generate --dir src/data/migrations -n",
+    "migration:create": "typeorm migration:create -n",
     "migrate:up": "typeorm migration:run",
     "migrate:revert": "typeorm migration:revert"
   },

@@ -12,9 +12,9 @@ export const connectionOptions: any = {
   synchronize: false,
   logging: config.dbLogging,
   namingStrategy: new CustomNamingStragegy(),
-  entities: config.nodeEnv !== 'production' ? ['src/data/entities/**/*.ts'] : ['src/data/entities/**/.js'],
-  migrations: config.nodeEnv !== 'production' ? ['src/data/migrations/**/*.ts'] : ['src/data/migrations/**/.js'],
-  subscribers: config.nodeEnv !== 'production' ? ['src/data/subscribers/**/*.ts'] : ['src/data/subscribers/**/.js'],
+  entities: [`${config.location}/src/data/entities/**/*${config.langExtension}`],
+  migrations: [`${config.location}src/data/migrations/**/*${config.langExtension}`],
+  subscribers: [`${config.location}src/data/subscribers/**/*${config.langExtension}`],
   cli: {
     entitiesDir: 'src/data/entities',
     migrationsDir: 'src/data/migrations',
