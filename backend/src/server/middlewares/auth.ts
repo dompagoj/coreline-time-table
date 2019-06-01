@@ -16,7 +16,10 @@ export async function verifyJWT(req: Request, res: Response, next) {
   if (_.toLowerCase() === 'bearer' && !!token) {
     const user = await verifyToken(token.trim())
     if (!user)
-      return next()
+      return res
+        .status(401)
+        .json({ error: 'Invalid token' })
+        .end()
 
     res.locals.user = user
     return next()
