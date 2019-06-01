@@ -1,9 +1,9 @@
 import { Storage } from '@google-cloud/storage'
-import { join } from 'path';
+import { resolve } from 'app-root-path'
 import { config } from '../config';
 
 const gc = new Storage({
-  keyFilename: join(__dirname, '../../../google-cloud-storage.json'),
+  keyFilename: resolve('google-cloud-storage.json'),
   projectId: 'coreline-time-table',
 })
 
