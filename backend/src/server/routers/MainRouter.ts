@@ -5,13 +5,15 @@ import { companyRouter } from './companyRouter'
 import { hourRouter } from './hourRouter'
 import { projectsRouter } from './projectsRouter'
 import { userRouter } from './userRouter'
-// import { votingRouter } from './votingRouter'
+import { getMe } from '../controllers/MeController';
 
 export const mainRouter = Router()
 
 mainRouter.use('/auth', authRouter)
 
 mainRouter.use('/', verifyJWT)
+
+mainRouter.use('/me', getMe)
 
 mainRouter.use('/companies', companyRouter)
 

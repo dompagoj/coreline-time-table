@@ -81,6 +81,9 @@ export class UserController extends BaseController<Context & { company: Company 
     const { company } = this.ctx
     const user = await User.findOne(id)
 
+    console.log('authkey', authKey)
+    console.log('ctx company', company)
+
     if (!user) {
       return this.badRequest({ error: `User with username ${username} doesn\'t exist` })
     }

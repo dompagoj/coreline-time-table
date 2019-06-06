@@ -13,7 +13,7 @@ export class Company extends BaseEntity {
   })
   public name: string
 
-  @Column()
+  @Column({ select: false })
   public authKey: string
 
   @Column()

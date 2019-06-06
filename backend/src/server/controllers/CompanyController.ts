@@ -56,11 +56,16 @@ export class CompanyController extends BaseController<Context, { id: string }> {
   @POST('/:id/verify-key')
   private async verifyCompanyAuthKey({ authKey }) {
     const { id } = this.routeData
-    const company = await Company.findOne(id)
+    const company = await Company.findOne({ 
+      where: { id },
+      select: ['authKey']
+    })
+    console.log('Company', company)
 
     if (!company) {
       return this.badRequest('No company found')
     }
+    console.log(authKey, company.authKey)
 
     if (company.authKey !== authKey) {
       return this.badRequest({ error: 'Wrong password' })
