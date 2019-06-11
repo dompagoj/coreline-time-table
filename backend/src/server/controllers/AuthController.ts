@@ -1,5 +1,6 @@
 import { OAuth2Client } from 'google-auth-library'
 import { sign } from 'jsonwebtoken'
+import moment from 'moment'
 
 import { Company } from '../../data/entities/Company'
 import { User } from '../../data/entities/User'
@@ -8,19 +9,9 @@ import { config } from '../config'
 import { POST } from '../controller-decorators'
 import { BaseController } from './BaseController'
 import { verifyPassword, hashPassword } from '../../utils/crypto';
+import { RegisterToken } from '../../data/entities/RegisterToken';
 
 export class AuthController extends BaseController {
-  @POST('/company-check')
-  public async companyCheck({ company: companyName }) {
-    const company = await Company.findOne({
-      where: { name: companyName },
-    })
-    if (!company)
-      return this.badRequest(`No company with name ${companyName} found`)
-
-    return this.accepted({ data: company })    
-  }
-
   @POST('/company-login')
   public async companyLogin({ email, password }) {
     try {
@@ -46,10 +37,36 @@ export class AuthController extends BaseController {
     }
   }
 
-  @POST('/:companyName/register')
-  public async companyRegister({ username, firstName, lastName, email, password }) {
+  @POST('/verify-token')
+  public async verifyRegisterToken({ token }) {
     try {
-      const company = await Company.findOneOrFail({ where: { name: this.req.params.companyName } })
+      const registerToken = await RegisterToken.findOneOrFail({ where: { token } })
+      if (moment(registerToken.expires).isBefore(moment())) {
+        RegisterToken.delete(registerToken.id)
+
+        return this.badRequest()
+      }
+
+      return this.accepted()
+    } catch(e) {
+      return this.unauthorized()
+    }
+  }
+
+  @POST('/register')
+  public async companyRegister({ user, token }) {
+    if (!token)
+      return this.unauthorized()
+
+    const { username, firstName, lastName, email, password } = user
+    try {
+      const registerToken = await RegisterToken.findOneOrFail(token)
+      if (moment(registerToken.expires).isBefore(moment())) {
+        RegisterToken.delete(registerToken.id)
+        
+        return this.badRequest()
+      }
+      const company = await Company.findOneOrFail(registerToken.companyId)
       const user = await User.create({
         username,
         firstName,
@@ -59,6 +76,7 @@ export class AuthController extends BaseController {
         companyId: company.id,
       })
 
+      RegisterToken.delete(registerToken.id)
       return this.accepted({
         token: sign({ email: user.email, id: user.id, type: user.type, companyId: user.companyId }, config.jwtSecret),
         user,

@@ -1,8 +1,11 @@
+import moment from 'moment'
 import { Company } from '../../data/entities/Company'
 import { CompanyInput } from '../../data/types/CompanyTypes'
 import { Context } from '../../data/types/Context'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
+import { RegisterToken } from '../../data/entities/RegisterToken';
+import { createRegisterToken } from '../../utils/utils';
 
 export class CompanyController extends BaseController<Context, { id: string }> {
   public constructor(req, res, next) {
@@ -60,12 +63,10 @@ export class CompanyController extends BaseController<Context, { id: string }> {
       where: { id },
       select: ['authKey']
     })
-    console.log('Company', company)
 
     if (!company) {
       return this.badRequest('No company found')
     }
-    console.log(authKey, company.authKey)
 
     if (company.authKey !== authKey) {
       return this.badRequest({ error: 'Wrong password' })

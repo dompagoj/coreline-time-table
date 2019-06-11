@@ -54,6 +54,10 @@ export abstract class BaseController<Context = any, Params = any> {
       .end()
   }
 
+  protected unauthorized() {
+    return this.res.status(401).end()
+  }
+
   protected redirect(redirectTo?: string) {
     if (redirectTo)
       return this.res
