@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "antd": "^3.16.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "electron-is-dev": "^1.0.1",
     "emotion": "^9.2.12",
     "jsonwebtoken": "^8.3.0",
