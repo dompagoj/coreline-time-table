@@ -21,6 +21,9 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   public email: string
 
+  @Column({ nullable: true, select: false })
+  public password: string
+
   @Column({ enum: UserType, default: UserType.EMPLOYEE })
   public type: UserType
 

@@ -20,7 +20,7 @@ export abstract class BaseController<Context = any, Params = any> {
     if (!object) {
       return this.res.status(200).end()
     }
-    if (typeof object === 'string') {
+    if (typeof object === 'string' && !format) {
       return this.res
         .status(200)
         .json({ data: object })
@@ -41,7 +41,7 @@ export abstract class BaseController<Context = any, Params = any> {
         })
         .end()
     }
-    if (typeof error === 'string') {
+    if (typeof error === 'string' && !format) {
       return this.res
         .status(400)
         .json({ error })
@@ -51,6 +51,21 @@ export abstract class BaseController<Context = any, Params = any> {
     return this.res
       .status(400)
       .json(format ? format(error) : error)
+      .end()
+  }
+
+  protected unauthorized() {
+    return this.res.status(401).end()
+  }
+
+  protected redirect(redirectTo?: string) {
+    if (redirectTo)
+      return this.res
+        .status(302)
+        .redirect(redirectTo)
+
+    return this.res
+      .status(302)
       .end()
   }
 }

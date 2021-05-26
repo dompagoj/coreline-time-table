@@ -16,7 +16,10 @@ export async function verifyJWT(req: Request, res: Response, next) {
   if (_.toLowerCase() === 'bearer' && !!token) {
     const user = await verifyToken(token.trim())
     if (!user)
-      return next()
+      return res
+        .status(401)
+        .json({ error: 'Invalid token' })
+        .end()
 
     res.locals.user = user
     return next()
@@ -30,15 +33,16 @@ export async function verifyJWT(req: Request, res: Response, next) {
 
 export async function verifyCompany(req, res, next) {
   const { companyId } = req.params
-  const { companyId: reqUserCompanyId, id: reqUserId } = res.locals.user
-  if (reqUserCompanyId !== parseInt(companyId, 10)) {
-    const reqUser = await User.findOneOrFail(reqUserId)
-    if (reqUser.type !== UserType.ADMIN) {
-      return res.status(401).end()
-    }
+  const { user } = res.locals
+  if (user.companyId !== parseInt(companyId, 10)) {
+    return res.status(401).end()
   }
 
-  const company = await Company.findOne(companyId)
+  const company = await Company.createQueryBuilder('company')
+    .addSelect('company.authKey')
+    .where('company.id = :companyId', { companyId })
+    .getOne()
+
   if (!company) {
     return res
       .status(400)
@@ -52,16 +56,15 @@ export async function verifyCompany(req, res, next) {
 
 export async function verifyUser(req, res, next) {
   const { companyId, userId: userIdParams } = req.params
-  const { id: userId } = res.locals.user
+  const { user: localsUser } = res.locals
 
-  if (userIdParams && parseInt(userIdParams, 10) !== userId) {
-    const reqUser = await User.findOneOrFail(userId)
-    if (reqUser.type !== UserType.EMPLOYER) {
+  if (userIdParams && parseInt(userIdParams, 10) !== localsUser.id) {
+    if (localsUser.type !== UserType.EMPLOYER) {
       return res.status(401).end()
     }
   }
 
-  const user = await User.findOne({
+  const user = await User.findOneOrFail({
     where: {
       id: userIdParams,
       companyId,
@@ -72,7 +75,7 @@ export async function verifyUser(req, res, next) {
     return res
       .status(400)
       .json({
-        error: `No user with id ${userId} under company with id ${companyId} found`,
+        error: `No user with id ${localsUser.id} under company with id ${companyId} found`,
       })
       .end()
   }

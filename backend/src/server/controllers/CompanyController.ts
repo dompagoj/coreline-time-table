@@ -1,8 +1,11 @@
+import moment from 'moment'
 import { Company } from '../../data/entities/Company'
 import { CompanyInput } from '../../data/types/CompanyTypes'
 import { Context } from '../../data/types/Context'
 import { DELETE, GET, POST, PUT } from '../controller-decorators'
 import { BaseController } from './BaseController'
+import { RegisterToken } from '../../data/entities/RegisterToken';
+import { createRegisterToken } from '../../utils/utils';
 
 export class CompanyController extends BaseController<Context, { id: string }> {
   public constructor(req, res, next) {
@@ -56,7 +59,10 @@ export class CompanyController extends BaseController<Context, { id: string }> {
   @POST('/:id/verify-key')
   private async verifyCompanyAuthKey({ authKey }) {
     const { id } = this.routeData
-    const company = await Company.findOne(id)
+    const company = await Company.findOne({ 
+      where: { id },
+      select: ['authKey']
+    })
 
     if (!company) {
       return this.badRequest('No company found')
