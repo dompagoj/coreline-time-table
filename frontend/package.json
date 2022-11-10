@@ -44,7 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^1.6.0",
     "@typescript-eslint/parser": "^1.6.0",
     "babel-plugin-import": "^1.11.0",
-    "electron": "3.0.7",
+    "electron": "18.3.7",
     "electron-builder": "^20.39.0",
     "electron-webpack": "^2.6.2",
     "electron-webpack-ts": "^3.1.1",
