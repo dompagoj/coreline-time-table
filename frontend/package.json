@@ -21,7 +21,7 @@
     "axios": "^0.18.0",
     "electron-is-dev": "^1.0.1",
     "emotion": "^9.2.12",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "minimist": "^1.2.0",
     "mobx": "^5.5.0",
     "mobx-react": "^5.2.8",
